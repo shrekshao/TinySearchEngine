@@ -6,8 +6,9 @@ import spark.Route;
 import spark.Spark;
 
 public class CrawlerCluster {
-	
-	public CrawlerCluster(int port) {
+	private CrawlerContext m_context = null;
+	public CrawlerCluster(int port, CrawlerContext context) {
+		m_context = context;
 		Spark.setPort(port);
 		
 		Spark.post(new Route("/pushdata") {
@@ -24,5 +25,7 @@ public class CrawlerCluster {
 			}
 			
 		});
+		
+		
 	}
 }
