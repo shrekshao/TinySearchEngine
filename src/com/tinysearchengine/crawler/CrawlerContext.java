@@ -1,6 +1,7 @@
 package com.tinysearchengine.crawler;
 
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,14 +13,14 @@ public class CrawlerContext {
 	private DatabaseWrapper m_dbWrapper = null;
 	private AtomicInteger m_totalDocs = null;
 	private URLFrontier m_URLFrontier = null;
-	private Queue<Runnable> m_taskQueue = null;
+	private HashSet<String> m_URLSet = null;
 	// private URLFrontier m_URLFrontier;
 	
 	public CrawlerContext(DatabaseWrapper dbwrapper, URLFrontier frontier) {
 		m_dbWrapper = dbwrapper;
 		m_totalDocs = new AtomicInteger(0);
 		m_URLFrontier = frontier;
-		m_taskQueue = new ConcurrentLinkedQueue<Runnable>();
+		m_URLSet = new HashSet<String>();
 	}
 	
 	public void incDocsCounter() {
@@ -34,7 +35,7 @@ public class CrawlerContext {
 		return m_URLFrontier.getCurrentQueue();
 	}
 	
-	public void addTask(Runnable task) {
-		m_taskQueue.add(task);
+	public void putTask(URL url) {
+		// TODO: add a new task to URL frontier
 	}
 }

@@ -41,7 +41,7 @@ public class Crawler {
 	public void crawl(String[] startURLs, int nMaxDocs) throws MalformedURLException {
 		// start from startURLs
 		for (String url : startURLs) {
-			m_context.addTask(new DownloadTask(new URL(url), m_context));
+			m_context.putTask(new URL(url));
 		}
 		
 		while (m_context.getDocsCounter() < nMaxDocs) {
