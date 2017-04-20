@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-template" default="jar-crawler">
+
+<target name="clean">
+  <delete dir="build" />
+</target>
+
+<target name="init">
+  <mkdir dir="build/classes"/>
+</target>
+
+<target name="crawler-classes" depends="init,util-classes">
+  <javac srcdir="src"
+         includes="com/tinysearchengine/crawler/**/*.java"
+         destdir="build/classes"
+         deprecation="on"
+         debug="true"
+         includeantruntime="false">
+    <classpath>
+      <fileset dir="lib">
+        <include name="*.jar"/>
+      </fileset>
+    </classpath>
+  </javac>
+</target>
+
+<target name="util-classes">
+  <javac srcdir="src"
+         includes="com/tinysearchengine/utils/**/*.java"
+         destdir="build/classes"
+         deprecation="on"
+         debug="true"
+         includeantruntime="false">
+    <classpath>
+      <fileset dir="lib">
+        <include name="*.jar"/>
+      </fileset>
+    </classpath>
+  </javac>
+</target>
+
+<target name="jar-crawler" depends="crawler-classes">
+  <jar destfile="build/crawler.jar" update="true">
+    <fileset dir="build/classes">
+      <include name="crawler/**/*.class"/>
+      <include name="utils/**/*.class"/>
+    </fileset>
+    <zipgroupfileset dir="lib" includes="*.jar"/>
+  </jar>
+</target>
+
+</project>

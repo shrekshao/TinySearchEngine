@@ -9,9 +9,9 @@ public class CrawlerCluster {
 	private CrawlerContext m_context = null;
 	public CrawlerCluster(int port, CrawlerContext context) {
 		m_context = context;
-		Spark.setPort(port);
-		
-		Spark.post(new Route("/pushdata") {
+
+		Spark.port(port);
+		Spark.post("/pushdata", new Route() {
 
 			@Override
 			public Object handle(Request arg0, Response arg1) {
@@ -25,7 +25,5 @@ public class CrawlerCluster {
 			}
 			
 		});
-		
-		
 	}
 }
