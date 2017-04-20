@@ -75,4 +75,9 @@ public class URLFrontier {
 	 */
 	TimedBlockingPriorityQueue<String> d_domainQueue =
 		new TimedBlockingPriorityQueue<>();
+	
+	public Queue<URL> getCurrentQueue() {
+		// TODO: return the current (non-empty?) backend queue
+		return d_backendQueues[0];
+	}
 }

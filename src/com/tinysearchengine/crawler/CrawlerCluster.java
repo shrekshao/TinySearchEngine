@@ -5,6 +5,10 @@ import spark.Response;
 import spark.Route;
 import spark.Spark;
 
+/**
+ * @author MIAO
+ *
+ */
 public class CrawlerCluster {
 	private CrawlerContext m_context = null;
 	public CrawlerCluster(int port, CrawlerContext context) {
