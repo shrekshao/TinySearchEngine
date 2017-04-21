@@ -55,7 +55,7 @@
 </target>
 
 <target name="jar-crawler" depends="crawler-classes">
-  <jar destfile="build/crawler.jar" update="true">
+  <jar destfile="build/crawler.jar" update="true" zip64Mode="always">
     <fileset dir="build/classes">
       <include name="crawler/**/*.class"/>
       <include name="utils/**/*.class"/>
@@ -81,7 +81,7 @@
 </target>
 
 <target name="jar-testsuite" depends="tests-classes">
-  <jar destfile="build/tests/testsuite.jar" update="true">
+  <jar destfile="build/tests/testsuite.jar" update="true" zip64Mode="always">
     <fileset dir="build/tests/classes">
       <include name="**/*.class"/>
     </fileset>
