@@ -27,7 +27,7 @@ public class Crawler {
 	 */
 	public Crawler(String dbDir, int port, int nThread) {
 		m_dbWrapper = new DatabaseWrapper(dbDir);
-		m_URLFrontier = new URLFrontier();
+		// m_URLFrontier = new URLFrontier();
 		m_context = new CrawlerContext(m_dbWrapper, m_URLFrontier);
 		m_executor = Executors.newFixedThreadPool(nThread);
 		m_cluster = new CrawlerCluster(port, m_context);
@@ -45,9 +45,9 @@ public class Crawler {
 		}
 		
 		while (m_context.getDocsCounter() < nMaxDocs) {
-			Queue<URL> queue = m_context.getTaskQueue();
+			// Queue<URL> queue = m_context.getTaskQueue();
 			// TODO: what if the returned backend queue is empty?
-			m_executor.execute(new DownloadTask(queue.poll(), m_context));
+			// m_executor.execute(new DownloadTask(queue.poll(), m_context));
 		}
 	}
 }

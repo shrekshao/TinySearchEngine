@@ -31,9 +31,9 @@ public class CrawlerContext {
 		return m_totalDocs.get();
 	}
 	
-	public Queue<URL> getTaskQueue() {
-		return m_URLFrontier.getCurrentQueue();
-	}
+//	public Queue<URL> getTaskQueue() {
+//		return m_URLFrontier.getCurrentQueue();
+//	}
 	
 	public void putTask(URL url) {
 		// TODO: add a new task to URL frontier
