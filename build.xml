@@ -80,17 +80,31 @@
   </javac>
 </target>
 
-<target name="jar-testsuite" depends="tests-classes">
-  <jar destfile="build/tests/testsuite.jar" update="true" zip64Mode="always">
+<target name="compute-build-path">
+  <path id="build-classpath">
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+</target>
+
+<target name="compute-class-path" depends="compute-build-path">
+  <manifestclasspath property="lib.classpath" jarfile="build/tests/testsuite.jar">
+    <classpath refid="build-classpath"/>
+  </manifestclasspath>
+</target>
+
+<target name="jar-testsuite" depends="tests-classes,compute-class-path">
+  <jar destfile="build/tests/testsuite.jar" update="true">
     <fileset dir="build/tests/classes">
       <include name="**/*.class"/>
     </fileset>
     <fileset dir="build/classes">
       <include name="**/*.class"/>
     </fileset>
-    <zipgroupfileset dir="lib" includes="*.jar"/>
     <manifest>
       <attribute name="Main-Class" value="com.tinysearchengine.tests.TestDriver"/>
+      <attribute name="Class-Path" value="${lib.classpath}"/>
     </manifest>
   </jar>
 </target>
