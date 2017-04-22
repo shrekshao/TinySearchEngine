@@ -13,6 +13,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.s3.model.Region;
 
 public class DdbConnector {
 
@@ -37,7 +38,6 @@ public class DdbConnector {
 	 */
 	public DdbConnector() {
 		d_ddb = AmazonDynamoDBClientBuilder.standard().build();
-
 		AWSCredentialsProvider s3CredentialProvider =
 			DefaultAWSCredentialsProviderChain.getInstance();
 		d_mapper = new DynamoDBMapper(d_ddb, s3CredentialProvider);
@@ -121,6 +121,6 @@ public class DdbConnector {
 	}
 
 	public S3Link createS3Link(String linkKey) {
-		return d_mapper.createS3Link(k_BUCKET_NAME, linkKey);
+		return d_mapper.createS3Link(Region.US_East_2, k_BUCKET_NAME, linkKey);
 	}
 }

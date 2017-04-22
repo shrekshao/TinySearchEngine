@@ -60,7 +60,9 @@
       <include name="crawler/**/*.class"/>
       <include name="utils/**/*.class"/>
     </fileset>
-    <zipgroupfileset dir="lib" includes="*.jar"/>
+    <manifest>
+      <attribute name="Class-Path" value="${lib.classpath}"/>
+    </manifest>
   </jar>
 </target>
 

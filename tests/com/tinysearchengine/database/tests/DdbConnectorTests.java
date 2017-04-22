@@ -33,7 +33,9 @@ public class DdbConnectorTests {
 		appender.setThreshold(Level.INFO);
 		appender.activateOptions();
 
-		Logger.getRootLogger().addAppender(appender);
+		if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
+			Logger.getRootLogger().addAppender(appender);
+		}
 	}
 
 	@Test
@@ -44,10 +46,10 @@ public class DdbConnectorTests {
 		doc.setContentType("application/html");
 		doc.setCrawledTime(new Date().getTime());
 		doc.setCharset("UTF-8");
-		
+
 		String s3LinkName = DdbConnector.urlToS3LinkKey(doc.getUrl());
 		doc.setContentLink(d_connector.createS3Link(s3LinkName));
-		
+
 		String content = "<h1>this is some content</h1>";
 		doc.setContent(content.getBytes());
 
@@ -85,9 +87,9 @@ public class DdbConnectorTests {
 		String[] urlsToMatch = { "www.google.com/foobar",
 				"www.google.com/foobar/index.html",
 				"www.facebook.com/foobar?q=123" };
-		
+
 		assertEquals(urlsToTest.length, urlsToMatch.length);
-		
+
 		for (int i = 0; i < urlsToTest.length; ++i) {
 			URL url = new URL(urlsToTest[i]);
 			String keyName = DdbConnector.urlToS3LinkKey(url);

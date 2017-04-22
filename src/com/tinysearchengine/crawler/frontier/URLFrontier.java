@@ -15,6 +15,7 @@ import java.util.TimerTask;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.model.Persistent;
 import com.tinysearchengine.database.DBEnv;
@@ -25,12 +26,12 @@ import java.util.Map;
 import org.apache.log4j.*;
 
 public class URLFrontier {
-	
+
 	/**
 	 * Every 10 minutes;
 	 */
 	private final static long k_SNAPSHOT_INTERVAL = 1000 * 60 * 10;
-	
+
 	/**
 	 * This represents the priority of a given URL to be enqueued into the
 	 * frontier.
@@ -111,7 +112,7 @@ public class URLFrontier {
 	 * The primary index used to access snapshots.
 	 */
 	PrimaryIndex<Long, URLFrontierSnapshot> d_snapshotByTime;
-	
+
 	/**
 	 * The timer used to trigger snapshots.
 	 */
@@ -135,6 +136,16 @@ public class URLFrontier {
 		d_dbEnv = dbEnv;
 		d_snapshotByTime = d_dbEnv.getStore().getPrimaryIndex(Long.class,
 				URLFrontierSnapshot.class);
+
+		URLFrontierSnapshot snapshot = fetchLatestSnapshot();
+		if (snapshot != null) {
+			Logger logger = Logger.getLogger(URLFrontier.class);
+			logger.info("Found a snapshot at: "
+					+ new Date(snapshot.snapshotTime).toString());
+			logger.info("Restoring from last snapshot.");
+			restoreFromSnapshot(snapshot);
+			logger.info("Finished restoring.");
+		}
 
 		for (URL url : seeds) {
 			Request req = new Request();
@@ -333,8 +344,47 @@ public class URLFrontier {
 
 		d_snapshotByTime.put(snap);
 		d_dbEnv.getStore().sync();
-		
+
 		logger.info("Finished snapshot.");
+	}
+
+	/**
+	 * Return the latest snapshot, if none exists, return null.
+	 * 
+	 * @return
+	 */
+	private URLFrontierSnapshot fetchLatestSnapshot() {
+		EntityCursor<Long> keyCursor = d_snapshotByTime.keys();
+		try {
+			Long lastKey = keyCursor.last();
+			if (lastKey != null) {
+				return d_snapshotByTime.get(lastKey);
+			}
+
+			return null;
+		} finally {
+			keyCursor.close();
+		}
+	}
+
+	/**
+	 * Restore the state of the frontier from the given snapshot.
+	 * 
+	 * @param snapshot
+	 */
+	private void restoreFromSnapshot(URLFrontierSnapshot snapshot) {
+		long now = new Date().getTime();
+		long dur = now - snapshot.snapshotTime;
+
+		d_backendQueues = snapshot.backendQueues;
+		d_domainToQueue = snapshot.domainToQueue;
+		d_frontendQueues = snapshot.frontendQueues;
+		d_emptyBackendQueues = snapshot.emptyBackendQueues;
+		for (int i = 0; i < snapshot.domainQueue.length; ++i) {
+			String domain = snapshot.domainQueue[i].getLeft();
+			long releaseTime = snapshot.domainQueue[i].getRight() + dur;
+			d_domainQueue.put(domain, releaseTime);
+		}
 	}
 
 	/**
@@ -345,11 +395,11 @@ public class URLFrontier {
 		if (d_snapshotTimer != null) {
 			return;
 		}
-		
+
 		WeakReference<URLFrontier> self = new WeakReference<>(this);
 		d_snapshotTimer = new Timer("URLFrontierSnapshot");
 		d_snapshotTimer.schedule(new TimerTask() {
-			
+
 			@Override
 			public void run() {
 				if (self.get() != null) {
@@ -358,7 +408,7 @@ public class URLFrontier {
 			}
 		}, 0, k_SNAPSHOT_INTERVAL);
 	}
-	
+
 	public void stop() {
 		d_snapshotTimer.cancel();
 		d_snapshotTimer = null;
