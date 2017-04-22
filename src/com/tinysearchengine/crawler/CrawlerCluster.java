@@ -32,15 +32,14 @@ public class CrawlerCluster {
 
 			@Override
 			public Object handle(Request arg0, Response arg1) throws MalformedURLException {
-				String strURL = arg0.params("url");
-				LinkedHashMap<String, String> due = m_context.getDue();
+				URL url = new URL(arg0.params("url"));
+				LinkedHashMap<Integer, URL> due = m_context.getDue();
 				
 				// DUE
-				String fingerPrint = URLHelper.getFingerPrint(strURL);
+				int fingerPrint = URLHelper.getFingerPrint(url);
 				if (!due.containsKey(fingerPrint)) {
-					due.put(fingerPrint, strURL);
+					due.put(fingerPrint, url);
 					
-					URL url = new URL(strURL);
 					URLFrontier frontier = m_context.getFrontier();
 					
 					// put head request into URLFrontier
@@ -52,7 +51,7 @@ public class CrawlerCluster {
 					// put get request into URLFrontier
 					frontier.put(url, URLFrontier.Priority.High, 5000);
 				}
-				return strURL;
+				return url.toString();
 			}
 			
 		});
@@ -90,12 +89,12 @@ public class CrawlerCluster {
 		}
 	}
 	
-	private int getURLWorkerIndex(String url) {
+	private int getURLWorkerIndex(URL url) {
 		// TODO
 		return 0;
 	}
 	
-	public void distributeURL(String url, ArrayList<Pair<String, String>> parameters) throws IOException {
+	public void distributeURL(URL url, ArrayList<Pair<String, String>> parameters) throws IOException {
 		int workerIndex = getURLWorkerIndex(url);
 		String dest = m_context.getWorkerByIndex(workerIndex);
 		

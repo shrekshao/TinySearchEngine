@@ -24,7 +24,7 @@ public class Crawler {
 	private CrawlerContext m_context = null;
 	private ExecutorService m_executor = null;
 	private CrawlerCluster m_cluster = null;
-	private LinkedHashMap<String, String> m_LRUdue = null;
+	private LinkedHashMap<Integer, URL> m_LRUdue = null;
 	
 	/**
 	 * @param dbDir	database directory
@@ -33,7 +33,7 @@ public class Crawler {
 	 */
 	public Crawler(String dbDir, int port, int nThread) {
 		m_dbEnv = new DBEnv(new File(dbDir));
-		m_LRUdue = new LinkedHashMap<String, String>(20000);
+		m_LRUdue = new LinkedHashMap<Integer, URL>(20000);
 		//m_URLFrontier = new URLFrontier();
 		m_context = new CrawlerContext(m_dbEnv, m_URLFrontier, m_LRUdue, null);
 		m_executor = Executors.newFixedThreadPool(nThread);
@@ -63,13 +63,13 @@ public class Crawler {
 		URLFrontier m_URLFrontier = null;
 		CrawlerContext m_context = null;
 		CrawlerCluster m_cluster = null;
-		LinkedHashMap<String, String> m_LRUdue = null;
+		LinkedHashMap<Integer, URL> m_LRUdue = null;
 		
 		File dbDir = new File(args[1]);
 		dbDir.mkdirs();
 		m_dbEnv = new DBEnv(dbDir);
 		
-		m_LRUdue = new LinkedHashMap<String, String>(20000);
+		m_LRUdue = new LinkedHashMap<Integer, URL>(20000);
 		m_context = new CrawlerContext(m_dbEnv, m_URLFrontier, m_LRUdue, null);
 		m_cluster = new CrawlerCluster(Integer.parseInt(args[0]), m_context);
 		

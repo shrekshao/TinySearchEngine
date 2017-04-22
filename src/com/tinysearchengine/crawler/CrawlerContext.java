@@ -14,10 +14,10 @@ public class CrawlerContext {
 	private DBEnv m_dbEnv = null;
 	private AtomicInteger m_totalDocs = null;
 	private URLFrontier m_URLFrontier = null;
-	private LinkedHashMap<String, String> m_LRUdue = null;
+	private LinkedHashMap<Integer, URL> m_LRUdue = null;
 	private String[] m_workerList = null; // ip:port
 	
-	public CrawlerContext(DBEnv dbEnv, URLFrontier frontier, LinkedHashMap<String, String> due, String[] workerList) {
+	public CrawlerContext(DBEnv dbEnv, URLFrontier frontier, LinkedHashMap<Integer, URL> due, String[] workerList) {
 		m_dbEnv = dbEnv;
 		m_totalDocs = new AtomicInteger(0);
 		m_URLFrontier = frontier;
@@ -41,7 +41,7 @@ public class CrawlerContext {
 		// TODO: add a new task to URL frontier
 	}
 	
-	public LinkedHashMap<String, String> getDue() {
+	public LinkedHashMap<Integer, URL> getDue() {
 		return m_LRUdue;
 	}
 	

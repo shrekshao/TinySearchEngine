@@ -1,10 +1,17 @@
 package com.tinysearchengine.utils;
 
+import java.net.URL;
 import java.util.UUID;
 
 public class URLHelper {
-	static public String getFingerPrint(String url) {
+	static public int getHostFingerPrint(URL url) {
 		// how to calculate the fingerprint for URL?
-		return UUID.nameUUIDFromBytes(url.getBytes()).toString();
+		String host = url.getHost();
+		return host.hashCode();
+	}
+	
+	static public int getFingerPrint(URL url) {
+		//String noProtocolURL = url.getHost() + url.getFile();
+		return url.hashCode();
 	}
 }
