@@ -83,10 +83,13 @@ public class RobotInfoCache {
 		 */
 		public int getCrawlDelay(String userAgent) {
 			Integer delay = d_crawlDelay.get(userAgent);
-			if (delay == null) {
+			Integer delayAny = d_crawlDelay.get("*");
+			if (delay == null && delayAny == null) {
 				return 0;
-			} else {
+			} else if (delay != null){
 				return delay.intValue();
+			} else {
+				return delayAny.intValue();
 			}
 		}
 	}

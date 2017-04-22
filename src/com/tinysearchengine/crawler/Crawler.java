@@ -204,10 +204,11 @@ public class Crawler {
 	private long computeReleaseTime(URL url) {
 		long lastScheduledTime =
 			m_URLFrontier.lastScheduledTime(url.getAuthority());
-		int delay = 2000;
+		int delay = 2;
 		RobotInfo info = m_robotCache.getInfoForUrl(url);
 		if (info != null) {
-			delay = info.getCrawlDelay(k_USER_AGENT);
+			delay = Math.max(delay, info.getCrawlDelay(k_USER_AGENT));
+			logger.debug(url.toString() + " has delay: " + delay + " seconds");
 		}
 
 		return lastScheduledTime + delay * 1000;
@@ -306,42 +307,42 @@ public class Crawler {
 							charset = "unknown";
 						}
 
-						//if (!d_contentSeenCache.hasSeen(content)) {
-							// Store into Ddb.
-							DdbDocument ddbDoc = new DdbDocument();
-							S3Link contentLink = d_ddbConnector.createS3Link(
-									DdbConnector.urlToS3LinkKey(req.url));
-							ddbDoc.setContentLink(contentLink);
-							ddbDoc.setContent(content);
-							ddbDoc.setCharset(charset);
+						// if (!d_contentSeenCache.hasSeen(content)) {
+						// Store into Ddb.
+						DdbDocument ddbDoc = new DdbDocument();
+						S3Link contentLink = d_ddbConnector.createS3Link(
+								DdbConnector.urlToS3LinkKey(req.url));
+						ddbDoc.setContentLink(contentLink);
+						ddbDoc.setContent(content);
+						ddbDoc.setCharset(charset);
 
-							long now = (new Date()).getTime();
-							ddbDoc.setCrawledTime(now);
-							ddbDoc.setUrl(req.url);
-							ddbDoc.setUrlAsString(req.url.toString());
-							ddbDoc.setFingerprint(DdbDocument
-									.computeFingerprint(ddbDoc.getContent()));
+						long now = (new Date()).getTime();
+						ddbDoc.setCrawledTime(now);
+						ddbDoc.setUrl(req.url);
+						ddbDoc.setUrlAsString(req.url.toString());
+						ddbDoc.setFingerprint(DdbDocument
+								.computeFingerprint(ddbDoc.getContent()));
 
-							d_ddbConnector.putDocument(ddbDoc);
-							logger.debug("Stored " + req.url.toString()
-									+ " to the database.");
+						d_ddbConnector.putDocument(ddbDoc);
+						logger.debug("Stored " + req.url.toString()
+								+ " to the database.");
 
-							m_context.incDocsCounter();
+						m_context.incDocsCounter();
 
-							// Extract the URLs
-							String[] urls =
-								URLExtractor.extract(ddbDoc.getContent());
-							logger.debug(
-									"Extracted urls: " + Arrays.toString(urls));
-							for (int i = 0; i < urls.length; ++i) {
-								try {
-									URL resolvedUrl = new URL(req.url, urls[i]);
-									m_context.putTask(resolvedUrl);
-								} catch (MalformedURLException e) {
-									// Ignore.
-								}
+						// Extract the URLs
+						String[] urls =
+							URLExtractor.extract(ddbDoc.getContent());
+						logger.debug(
+								"Extracted urls: " + Arrays.toString(urls));
+						for (int i = 0; i < urls.length; ++i) {
+							try {
+								URL resolvedUrl = new URL(req.url, urls[i]);
+								m_context.putTask(resolvedUrl);
+							} catch (MalformedURLException e) {
+								// Ignore.
 							}
-						//}
+						}
+						// }
 					}
 				} catch (IOException e) {
 					logger.warn(

@@ -30,6 +30,8 @@ public class CrawlerCluster {
 	private Map<URL, Boolean> m_due = null;
 	private String[] m_workerConfig = null;
 
+	private static Logger logger = Logger.getLogger(CrawlerCluster.class);
+
 	public CrawlerCluster(int port,
 			URLFrontier frontier,
 			RobotInfoCache cache,
@@ -73,11 +75,14 @@ public class CrawlerCluster {
 						frontier.lastScheduledTime(url.getAuthority());
 					RobotInfo info = m_cache.getInfoForUrl(url);
 
-					int crawlDelaySeconds = 2000;
+					int crawlDelaySeconds = 2;
 					if (info != null) {
-						crawlDelaySeconds =
-							info.getCrawlDelay(Crawler.k_USER_AGENT);
+						crawlDelaySeconds = Math.max(crawlDelaySeconds,
+								info.getCrawlDelay(Crawler.k_USER_AGENT));
 					}
+					logger.debug(url.toString() + " has delay: "
+							+ crawlDelaySeconds
+							+ " seconds.");
 
 					frontier.put(headRequest,
 							URLFrontier.Priority.Medium,
@@ -133,7 +138,7 @@ public class CrawlerCluster {
 	public synchronized void distributeURL(URL url) throws IOException {
 		int workerIndex = getURLWorkerIndex(url);
 		if (workerIndex == m_myIndex) {
-			if (m_due.containsKey(url)) {
+			if (!m_due.containsKey(url)) {
 				m_due.put(url, true);
 				URLFrontier.Request headRequest = new URLFrontier.Request();
 				headRequest.url = url;
@@ -142,11 +147,14 @@ public class CrawlerCluster {
 				long lastScheduledTime =
 					m_frontier.lastScheduledTime(url.getAuthority());
 				RobotInfo info = m_cache.getInfoForUrl(url);
-				int crawlDelaySeconds = 0;
+				int crawlDelaySeconds = 2;
 				if (info != null) {
-					crawlDelaySeconds =
-						info.getCrawlDelay(Crawler.k_USER_AGENT);
+					crawlDelaySeconds = Math.max(crawlDelaySeconds,
+							info.getCrawlDelay(Crawler.k_USER_AGENT));
 				}
+				logger.debug(url.toString() + " has delay: "
+						+ crawlDelaySeconds
+						+ " seconds");
 
 				if (RobotInfoCache.canCrawl(info, url, Crawler.k_USER_AGENT)) {
 					m_frontier.put(headRequest,
