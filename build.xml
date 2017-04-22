@@ -1,135 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ant-template" default="jar-crawler">
 
-	<target name="clean">
-		<delete dir="build" />
-	</target>
+        <target name="clean">
+                <delete dir="build" />
+        </target>
 
-	<target name="init">
-		<mkdir dir="build/classes"/>
-		<mkdir dir="build/tests/classes"/>
-	</target>
+        <target name="init">
+                <mkdir dir="build/classes"/>
+                <mkdir dir="build/tests/classes"/>
+        </target>
 
-	<target name="crawler-classes" depends="init,util-classes,db-classes">
-		<javac srcdir="src"
+        <target name="crawler-classes" depends="init,util-classes,db-classes">
+                <javac srcdir="src"
          includes="com/tinysearchengine/crawler/**/*.java"
          destdir="build/classes"
          deprecation="on"
          debug="true"
          includeantruntime="false">
-			<classpath>
-				<fileset dir="lib">
-					<include name="*.jar"/>
-				</fileset>
-			</classpath>
-		</javac>
-	</target>
+                  <classpath>
+                    <fileset dir="lib">
+                      <include name="*.jar"/>
+                    </fileset>
+                  </classpath>
+                </javac>
+        </target>
 
-	<target name="db-classes">
-		<javac srcdir="src"
-         includes="com/tinysearchengine/database/**/*.java"
-         destdir="build/classes"
-         debug="true"
-         includeantruntime="false">
-			<classpath>
-				<fileset dir="lib">
-					<include name="*.jar"/>
-				</fileset>
-			</classpath>
-		</javac>
-	</target>
+        <target name="db-classes">
+                <javac srcdir="src"
+                       includes="com/tinysearchengine/database/**/*.java"
+                       destdir="build/classes"
+                       debug="true"
+                       includeantruntime="false">
+                  <classpath>
+                    <fileset dir="lib">
+                      <include name="*.jar"/>
+                    </fileset>
+                  </classpath>
+                </javac>
+        </target>
 
-	<target name="util-classes">
-		<javac srcdir="src"
-         includes="com/tinysearchengine/utils/**/*.java"
-         destdir="build/classes"
-         deprecation="on"
-         debug="true"
-         includeantruntime="false">
-			<classpath>
-				<fileset dir="lib">
-					<include name="*.jar"/>
-				</fileset>
-			</classpath>
-		</javac>
-	</target>
+        <target name="util-classes">
+                <javac srcdir="src"
+                       includes="com/tinysearchengine/utils/**/*.java"
+                       destdir="build/classes"
+                       deprecation="on"
+                       debug="true"
+                       includeantruntime="false">
+                  <classpath>
+                    <fileset dir="lib">
+                      <include name="*.jar"/>
+                    </fileset>
+                  </classpath>
+                </javac>
+        </target>
 
-	<target name="jar-crawler" depends="crawler-classes">
-		<jar destfile="build/crawler.jar" update="true" zip64Mode="always">
-			<fileset dir="build/classes">
-				<include name="crawler/**/*.class"/>
-				<include name="utils/**/*.class"/>
-			</fileset>
-			<manifest>
-				<attribute name="Class-Path" value="${lib.classpath}"/>
-			</manifest>
-		</jar>
-	</target>
+        <target name="jar-crawler" depends="crawler-classes,compute-crawler-class-path">
+          <echo message="${lib.crawler.classpath}"/>
+          <jar destfile="build/crawler.jar" update="true">
+            <fileset dir="build/classes">
+              <include name="**/*.class"/>
+            </fileset>
+            <manifest>
+              <attribute name="Main-Class" value="com.tinysearchengine.crawler.Crawler"/>
+              <attribute name="Class-Path" value="${lib.crawler.classpath}"/>
+            </manifest>
+          </jar>
+        </target>
 
-	<target name="tests-classes" depends="crawler-classes,util-classes">
-		<javac srcdir="tests"
-         includes="com/tinysearchengine/**/*.java"
-         destdir="build/tests/classes"
-         deprecation="on"
-         debug="true"
-         includeantruntime="false">
-			<classpath>
-				<fileset dir="lib">
-					<include name="*.jar"/>
-				</fileset>
-				<pathelement path="build/classes"/>
-			</classpath>
-		</javac>
-	</target>
+        <target name="tests-classes" depends="crawler-classes,util-classes">
+                <javac srcdir="tests"
+                       includes="com/tinysearchengine/**/*.java"
+                       destdir="build/tests/classes"
+                       deprecation="on"
+                       debug="true"
+                       includeantruntime="false">
+                  <classpath>
+                    <fileset dir="lib">
+                      <include name="*.jar"/>
+                    </fileset>
+                    <pathelement path="build/classes"/>
+                  </classpath>
+                </javac>
+        </target>
 
-	<target name="compile-engine" description="Compiles the engine">
-		<mkdir dir="build/classes" />
-		<javac srcdir="src/com/tinysearchengine" destdir="build/classes" debug="on" deprecation="off" optimize="on" includeAntRuntime="no">
-			<classpath>
-				<fileset dir="lib">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
-		</javac>
-	</target>
-	
-	<target name="start" description="Start" depends="compile-engine">
-		<java fork="true" classname="com.tinysearchengine.crawler.Crawler">
-			<classpath>
-				<pathelement location="build/classes"/>
-				<fileset dir="lib" includes="*.jar"/>
-			</classpath>
-			<arg line="8080 database" />
-		</java>
-	</target>
+        <target name="compute-build-path">
+          <path id="build-classpath">
+            <fileset dir="lib">
+              <include name="*.jar"/>
+            </fileset>
+          </path>
+        </target>
 
-<target name="compute-build-path">
-  <path id="build-classpath">
-    <fileset dir="lib">
-      <include name="*.jar"/>
-    </fileset>
-  </path>
-</target>
+        <target name="compute-test-class-path" depends="compute-build-path">
+          <manifestclasspath property="lib.test.classpath" jarfile="build/tests/testsuite.jar">
+            <classpath refid="build-classpath"/>
+          </manifestclasspath>
+        </target>
 
-<target name="compute-class-path" depends="compute-build-path">
-  <manifestclasspath property="lib.classpath" jarfile="build/tests/testsuite.jar">
-    <classpath refid="build-classpath"/>
-  </manifestclasspath>
-</target>
+        <target name="compute-crawler-class-path" depends="compute-build-path">
+          <manifestclasspath property="lib.crawler.classpath" jarfile="build/crawler.jar">
+            <classpath refid="build-classpath"/>
+          </manifestclasspath>
+        </target>
 
-<target name="jar-testsuite" depends="tests-classes,compute-class-path">
-  <jar destfile="build/tests/testsuite.jar" update="true">
-    <fileset dir="build/tests/classes">
-      <include name="**/*.class"/>
-    </fileset>
-    <fileset dir="build/classes">
-      <include name="**/*.class"/>
-    </fileset>
-    <manifest>
-      <attribute name="Main-Class" value="com.tinysearchengine.tests.TestDriver"/>
-      <attribute name="Class-Path" value="${lib.classpath}"/>
-    </manifest>
-  </jar>
-</target>
+        <target name="jar-testsuite" depends="tests-classes,compute-test-class-path">
+          <echo message="${lib.test.classpath}"/>
+          <jar destfile="build/tests/testsuite.jar" update="true">
+            <fileset dir="build/tests/classes">
+              <include name="**/*.class"/>
+            </fileset>
+            <fileset dir="build/classes">
+              <include name="**/*.class"/>
+            </fileset>
+            <manifest>
+              <attribute name="Main-Class" value="com.tinysearchengine.tests.TestDriver"/>
+              <attribute name="Class-Path" value="${lib.test.classpath}"/>
+            </manifest>
+          </jar>
+        </target>
 
 </project>

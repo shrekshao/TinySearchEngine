@@ -2,3 +2,4 @@ bin/
 build/
 *.class
 credentials.csv
+database/
