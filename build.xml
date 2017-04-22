@@ -61,7 +61,7 @@
               <include name="**/*.class"/>
             </fileset>
             <manifest>
-              <attribute name="Main-Class" value="com.tinysearchengine.crawler.Crawler"/>
+              <attribute name="Main-Class" value="com.tinysearchengine.crawler.CrawlerDriver"/>
               <attribute name="Class-Path" value="${lib.crawler.classpath}"/>
             </manifest>
           </jar>

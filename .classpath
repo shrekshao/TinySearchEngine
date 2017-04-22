@@ -42,5 +42,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.13.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-simple-1.7.13.jar"/>
 	<classpathentry kind="lib" path="lib/spark-core-2.5.5.jar"/>
+	<classpathentry kind="lib" path="lib/jtidy-r938.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

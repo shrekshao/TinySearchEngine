@@ -2,6 +2,9 @@ package com.tinysearchengine.database;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.apache.log4j.Logger;
+
 import com.sleepycat.persist.model.Persistent;
 import com.sleepycat.persist.model.PersistentProxy;
 
@@ -15,7 +18,8 @@ public class URLPersistentProxy implements PersistentProxy<URL> {
 			return new URL(d_url);
 		} catch (MalformedURLException e) {
 			// Should be impossible.
-			e.printStackTrace();
+			Logger logger = Logger.getLogger(URLPersistentProxy.class);
+			logger.error(e.getStackTrace());
 			return null;
 		}
 	}

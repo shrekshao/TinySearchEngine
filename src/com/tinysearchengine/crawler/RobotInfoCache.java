@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 /**
  * This class implements a robot.txt cache, and provides methods for testing
  * whether a given URL is allowed to be crawled.
@@ -25,6 +27,9 @@ import java.util.Set;
  *
  */
 public class RobotInfoCache {
+	
+	static Logger logger = Logger.getLogger(RobotInfoCache.class);
+	
 	public static class RobotInfo {
 		Map<String, List<String>> d_disallowedLinks = new HashMap<>();
 		Map<String, Integer> d_crawlDelay = new HashMap<>();
@@ -138,7 +143,7 @@ public class RobotInfoCache {
 
 				String key = parts[0];
 				if (key.equalsIgnoreCase("User-agent")) {
-					currUserAgent = parts[1];
+					currUserAgent = parts[1].trim();
 					continue;
 				}
 
@@ -161,7 +166,7 @@ public class RobotInfoCache {
 
 			return info;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.debug(e.getStackTrace());
 			return null;
 		}
 	}
@@ -209,13 +214,13 @@ public class RobotInfoCache {
 			return info;
 
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			logger.debug(e.getStackTrace());
 			return null;
 		} catch (ProtocolException e) {
-			e.printStackTrace();
+			logger.debug(e.getStackTrace());
 			return null;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.debug(e.getStackTrace());
 			return null;
 		}
 	}

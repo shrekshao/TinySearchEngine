@@ -11,7 +11,6 @@ public class URLHelper {
 	}
 	
 	static public int getFingerPrint(URL url) {
-		//String noProtocolURL = url.getHost() + url.getFile();
 		return url.hashCode();
 	}
 }

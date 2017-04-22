@@ -201,6 +201,10 @@ public class URLFrontier {
 	public synchronized void put(Request req,
 			Priority priority,
 			long releaseTime) {
+		Logger logger = Logger.getLogger(URLFrontier.class);
+		logger.debug("Putting url: " + req.url + ", method: " + req.method);
+		logger.debug("Releasing at: " + new Date(releaseTime).toString());
+		
 		// Some sanity check on the inputs.
 		int frontendQueueId = priority.toInt();
 		assert 0 <= frontendQueueId && frontendQueueId < 3;

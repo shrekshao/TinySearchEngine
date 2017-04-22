@@ -1,59 +1,73 @@
 package com.tinysearchengine.crawler;
 
+import java.io.IOException;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
+
 import com.tinysearchengine.crawler.frontier.URLFrontier;
-import com.tinysearchengine.database.DBEnv;
 
 public class CrawlerContext {
-	private DBEnv m_dbEnv = null;
 	private AtomicInteger m_totalDocs = null;
 	private URLFrontier m_URLFrontier = null;
-	private LinkedHashMap<Integer, URL> m_LRUdue = null;
+	private Map<URL, Boolean> m_LRUdue = null;
 	private String[] m_workerList = null; // ip:port
-	
-	public CrawlerContext(DBEnv dbEnv, URLFrontier frontier, LinkedHashMap<Integer, URL> due, String[] workerList) {
-		m_dbEnv = dbEnv;
+	private RobotInfoCache m_robotInfoCache = null;
+	private CrawlerCluster m_cluster = null;
+
+	public CrawlerContext(URLFrontier frontier,
+			Map<URL, Boolean> due,
+			String[] workerList,
+			CrawlerCluster cluster,
+			RobotInfoCache robotCache) {
 		m_totalDocs = new AtomicInteger(0);
 		m_URLFrontier = frontier;
 		m_LRUdue = due;
 		m_workerList = workerList;
+		m_cluster = cluster;
+		m_robotInfoCache = robotCache;
 	}
-	
+
 	public void incDocsCounter() {
 		m_totalDocs.incrementAndGet();
 	}
-	
+
 	public int getDocsCounter() {
 		return m_totalDocs.get();
 	}
-	
-//	public Queue<URL> getTaskQueue() {
-//		return m_URLFrontier.getCurrentQueue();
-//	}
-	
+
 	public void putTask(URL url) {
-		// TODO: add a new task to URL frontier
+		try {
+			m_cluster.distributeURL(url);
+		} catch (IOException e) {
+			Logger logger = Logger.getLogger(CrawlerContext.class);
+			logger.error("Failed to put task: " + e.getMessage());
+			logger.error(e.getStackTrace());
+		}
 	}
-	
-	public LinkedHashMap<Integer, URL> getDue() {
+
+	public Map<URL, Boolean> getDue() {
 		return m_LRUdue;
 	}
-	
+
 	public URLFrontier getFrontier() {
 		return m_URLFrontier;
 	}
-	
+
 	public String getWorkerByIndex(int i) {
 		return m_workerList[i];
 	}
-	
+
 	public int getTotalWorker() {
 		return m_workerList.length;
+	}
+
+	public RobotInfoCache getRobotInfoCache() {
+		return m_robotInfoCache;
 	}
 }

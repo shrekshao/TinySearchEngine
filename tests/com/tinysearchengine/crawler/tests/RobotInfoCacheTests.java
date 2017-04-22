@@ -117,4 +117,14 @@ public class RobotInfoCacheTests {
 				"cis455crawler"));
 
 	}
+
+	@Test
+	public void testDisallowedHackerNews() throws MalformedURLException {
+		URL url = new URL(
+				"https://news.ycombinator.com/vote?id=14152279&how=up&goto=show");
+		
+		RobotInfo info = d_cache.getInfoForUrl(url);
+		assertNotNull(info);
+		assertFalse(RobotInfoCache.canCrawl(info, url, "cis455crawlerg05"));
+	}
 }

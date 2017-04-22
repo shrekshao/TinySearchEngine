@@ -6,6 +6,8 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.log4j.Logger;
+
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
@@ -116,7 +118,8 @@ public class DdbDocument {
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			return md.digest(document);
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			Logger logger = Logger.getLogger(DdbDocument.class);
+			logger.error(e.getStackTrace());
 			assert false;
 			return null;
 		}
