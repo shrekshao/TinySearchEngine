@@ -2,25 +2,27 @@ package com.tinysearchengine.crawler;
 
 import java.net.URL;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.tinysearchengine.crawler.frontier.URLFrontier;
-import com.tinysearchengine.database.DatabaseWrapper;
+import com.tinysearchengine.database.DBEnv;
 
 public class CrawlerContext {
-	private DatabaseWrapper m_dbWrapper = null;
+	private DBEnv m_dbEnv = null;
 	private AtomicInteger m_totalDocs = null;
 	private URLFrontier m_URLFrontier = null;
-	private HashSet<String> m_URLSet = null;
-	// private URLFrontier m_URLFrontier;
+	private LinkedHashMap<String, String> m_LRUdue = null;
+	private String[] m_workerList = null; // ip:port
 	
-	public CrawlerContext(DatabaseWrapper dbwrapper, URLFrontier frontier) {
-		m_dbWrapper = dbwrapper;
+	public CrawlerContext(DBEnv dbEnv, URLFrontier frontier, LinkedHashMap<String, String> due, String[] workerList) {
+		m_dbEnv = dbEnv;
 		m_totalDocs = new AtomicInteger(0);
 		m_URLFrontier = frontier;
-		m_URLSet = new HashSet<String>();
+		m_LRUdue = due;
+		m_workerList = workerList;
 	}
 	
 	public void incDocsCounter() {
@@ -37,5 +39,17 @@ public class CrawlerContext {
 	
 	public void putTask(URL url) {
 		// TODO: add a new task to URL frontier
+	}
+	
+	public LinkedHashMap<String, String> getDue() {
+		return m_LRUdue;
+	}
+	
+	public URLFrontier getFrontier() {
+		return m_URLFrontier;
+	}
+	
+	public String getWorkerByIndex(int i) {
+		return m_workerList[i];
 	}
 }
