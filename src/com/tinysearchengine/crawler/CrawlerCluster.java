@@ -90,8 +90,7 @@ public class CrawlerCluster {
 	}
 	
 	private int getURLWorkerIndex(URL url) {
-		// TODO
-		return 0;
+		return url.hashCode() % m_context.getTotalWorker();
 	}
 	
 	public void distributeURL(URL url, ArrayList<Pair<String, String>> parameters) throws IOException {

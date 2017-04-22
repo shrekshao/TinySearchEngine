@@ -52,4 +52,8 @@ public class CrawlerContext {
 	public String getWorkerByIndex(int i) {
 		return m_workerList[i];
 	}
+	
+	public int getTotalWorker() {
+		return m_workerList.length;
+	}
 }
