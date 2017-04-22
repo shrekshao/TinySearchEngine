@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 
-import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -102,17 +101,21 @@ public class DdbConnector {
 	 * 
 	 * For example,
 	 * 
-	 * http://www.google.com/foobar -> www.google.com/foobar
-	 * http://www.google.com/foobar/index.html ->
-	 * www.google.com/foobar/index.html http://www.facebook.com/foobar?q=123 ->
-	 * www.facebook.com/foobar?q=123
+	 * http://www.google.com/foobar
+	 * 	-> www.google.com/foobar
+	 * 
+	 * http://www.google.com/foobar/index.html
+	 * 	-> www.google.com/foobar/index.html
+	 * 
+	 * http://www.facebook.com/foobar?q=123
+	 * 	-> www.facebook.com/foobar?q=123
 	 * 
 	 * @param url
 	 * @return
 	 */
 	public static String urlToS3LinkKey(URL url) {
 		StringBuilder builder = new StringBuilder();
-		builder.append(url.getHost());
+		builder.append(url.getAuthority());
 		builder.append(url.getFile());
 		return builder.toString();
 	}
