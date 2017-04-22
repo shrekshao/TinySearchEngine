@@ -3,11 +3,13 @@ package com.tinysearchengine.crawler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 
 import java.net.URL;
 
 import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -16,16 +18,24 @@ public class CrawlerDriver {
 
 	static Logger logger = Logger.getLogger(CrawlerDriver.class);
 
-	public static void setUpLogging() {
+	public static void setUpLogging() throws IOException {
 		ConsoleAppender appender = new ConsoleAppender();
 		String pattern = "[%p] %c [%t] %d: %m%n";
 		appender.setLayout(new PatternLayout(pattern));
-		appender.setThreshold(Level.DEBUG);
+		appender.setThreshold(Level.INFO);
 		appender.activateOptions();
 
 		if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
 			Logger.getRootLogger().addAppender(appender);
 		}
+
+		long now = (new Date()).getTime();
+		FileAppender fileAppender =
+			new FileAppender(new PatternLayout(pattern), "crawler.log." + now);
+		fileAppender.setThreshold(Level.DEBUG);
+		fileAppender.activateOptions();
+		
+		Logger.getRootLogger().addAppender(fileAppender);
 	}
 
 	public static void main(String[] args)

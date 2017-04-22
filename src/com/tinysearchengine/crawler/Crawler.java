@@ -197,8 +197,32 @@ public class Crawler {
 		return null;
 	}
 
-	private URLFrontier.Priority computePriority(URL url) {
-		return URLFrontier.Priority.Medium;
+	private static boolean isEnglish(HttpResponse headResp) {
+		Header[] headers = headResp.getHeaders("content-language");
+		if (headers == null || headers.length == 0) {
+			return false;
+		}
+
+		for (int i = 0; i < headers.length; ++i) {
+			Header hd = headers[i];
+			HeaderElement[] elmts = hd.getElements();
+			for (int j = 0; j < elmts.length; ++j) {
+				if (elmts[j].getName().toLowerCase().startsWith("en")) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private URLFrontier.Priority computePriority(URL url,
+			HttpResponse headResp) {
+		if (isEnglish(headResp)) {
+			return URLFrontier.Priority.High;
+		} else {
+			return URLFrontier.Priority.Low;
+		}
 	}
 
 	private long computeReleaseTime(URL url) {
@@ -288,7 +312,7 @@ public class Crawler {
 							logger.debug("Adding " + req.url.toString()
 									+ " for GET.");
 							m_URLFrontier.put(req.url,
-									computePriority(req.url),
+									computePriority(req.url, resp),
 									computeReleaseTime(req.url));
 						}
 					} else if (req.method.equals("GET")) {
@@ -307,42 +331,46 @@ public class Crawler {
 							charset = "unknown";
 						}
 
-						// if (!d_contentSeenCache.hasSeen(content)) {
-						// Store into Ddb.
-						DdbDocument ddbDoc = new DdbDocument();
-						S3Link contentLink = d_ddbConnector.createS3Link(
-								DdbConnector.urlToS3LinkKey(req.url));
-						ddbDoc.setContentLink(contentLink);
-						ddbDoc.setContent(content);
-						ddbDoc.setCharset(charset);
+						if (!d_contentSeenCache.hasSeen(content)) {
+							// Store into Ddb.
+							DdbDocument ddbDoc = new DdbDocument();
+							S3Link contentLink = d_ddbConnector.createS3Link(
+									DdbConnector.urlToS3LinkKey(req.url));
+							ddbDoc.setContentLink(contentLink);
+							ddbDoc.setContent(content);
+							ddbDoc.setCharset(charset);
 
-						long now = (new Date()).getTime();
-						ddbDoc.setCrawledTime(now);
-						ddbDoc.setUrl(req.url);
-						ddbDoc.setUrlAsString(req.url.toString());
-						ddbDoc.setFingerprint(DdbDocument
-								.computeFingerprint(ddbDoc.getContent()));
+							long now = (new Date()).getTime();
+							ddbDoc.setCrawledTime(now);
+							ddbDoc.setUrl(req.url);
+							ddbDoc.setUrlAsString(req.url.toString());
+							ddbDoc.setFingerprint(DdbDocument
+									.computeFingerprint(ddbDoc.getContent()));
+							ddbDoc.setContentType(contentType);
 
-						d_ddbConnector.putDocument(ddbDoc);
-						logger.debug("Stored " + req.url.toString()
-								+ " to the database.");
+							d_ddbConnector.putDocument(ddbDoc);
+							logger.debug("Stored " + req.url.toString()
+									+ " to the database.");
 
-						m_context.incDocsCounter();
+							m_context.incDocsCounter();
 
-						// Extract the URLs
-						String[] urls =
-							URLExtractor.extract(ddbDoc.getContent());
-						logger.debug(
-								"Extracted urls: " + Arrays.toString(urls));
-						for (int i = 0; i < urls.length; ++i) {
-							try {
-								URL resolvedUrl = new URL(req.url, urls[i]);
-								m_context.putTask(resolvedUrl);
-							} catch (MalformedURLException e) {
-								// Ignore.
+							// Extract the URLs
+							String[] urls =
+								URLExtractor.extract(ddbDoc.getContent());
+							logger.debug(
+									"Extracted urls: " + Arrays.toString(urls));
+							for (int i = 0; i < urls.length; ++i) {
+								try {
+									URL resolvedUrl = new URL(req.url, urls[i]);
+									m_context.putTask(resolvedUrl);
+								} catch (MalformedURLException e) {
+									// Ignore.
+								}
 							}
+						} else {
+							logger.info(
+									"Has already seen: " + req.url.toString());
 						}
-						// }
 					}
 				} catch (IOException e) {
 					logger.warn(

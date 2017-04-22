@@ -45,7 +45,7 @@ public class CrawlerClusterTests {
 		
 		d_LRUdue = new LinkedHashMap<String, String>(20000);
 		//d_context = new CrawlerContext(d_testEnv, d_frontier, d_LRUdue);
-		d_cluster = new CrawlerCluster(8080, d_context);
+		// d_cluster = new CrawlerCluster(8080, d_context);
 	}
 	
 	@After
@@ -53,6 +53,7 @@ public class CrawlerClusterTests {
 		d_frontier.stop();
 	}
 	
+	/*
 	@Test
 	public void testResponse() throws IOException {
 		URL url = new URL("http://127.0.0.1/pushdata");
@@ -69,4 +70,5 @@ public class CrawlerClusterTests {
 		
 		assertEquals(conn.getResponseCode(), HttpURLConnection.HTTP_OK);
 	}
+	*/
 }

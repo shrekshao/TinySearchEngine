@@ -1,6 +1,7 @@
 package com.tinysearchengine.crawler;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
@@ -42,6 +43,11 @@ public class CrawlerContext {
 	}
 
 	public void putTask(URL url) {
+		if (!url.getProtocol().equals("http") &&
+				!url.getProtocol().equals("https")) {
+			// Just ignore.
+			return;
+		}
 		try {
 			m_cluster.distributeURL(url);
 		} catch (IOException e) {

@@ -176,11 +176,11 @@ public class URLFrontierTests {
 		long now = (new Date()).getTime();
 		d_frontier.put(new URL("http://www.google2.com"),
 				URLFrontier.Priority.Medium,
-				now + 5000);
+				now + 10000);
 
 		long lastScheduledTime =
 			d_frontier.lastScheduledTime("www.google2.com");
-		assertEquals(now + 5000, lastScheduledTime);
+		assertEquals(now + 10000, lastScheduledTime);
 
 		now = (new Date()).getTime();
 		d_frontier.put(new URL("http://www.facebook.com"),

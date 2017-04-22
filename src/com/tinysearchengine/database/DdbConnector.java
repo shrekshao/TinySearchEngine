@@ -104,6 +104,9 @@ public class DdbConnector {
 	 * http://www.google.com/foobar
 	 * 	-> www.google.com/foobar
 	 * 
+	 * http://www.google.com/foobar/
+	 * 	-> www.google.com/foobar
+	 * 
 	 * http://www.google.com/foobar/index.html
 	 * 	-> www.google.com/foobar/index.html
 	 * 
@@ -116,7 +119,11 @@ public class DdbConnector {
 	public static String urlToS3LinkKey(URL url) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(url.getAuthority());
-		builder.append(url.getFile());
+		String fileName = url.getFile();
+		while (fileName.endsWith("/")) {
+			fileName = fileName.substring(0, fileName.length() - 1);
+		}
+		builder.append(fileName);
 		return builder.toString();
 	}
 

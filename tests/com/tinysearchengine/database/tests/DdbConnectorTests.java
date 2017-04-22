@@ -82,11 +82,13 @@ public class DdbConnectorTests {
 	public void testLinkConversion() throws MalformedURLException {
 		String[] urlsToTest = { "http://www.google.com/foobar",
 				"http://www.google.com/foobar/index.html",
-				"http://www.facebook.com/foobar?q=123" };
+				"http://www.facebook.com/foobar?q=123",
+				"http://www.google.com/foobar/" };
 
 		String[] urlsToMatch = { "www.google.com/foobar",
 				"www.google.com/foobar/index.html",
-				"www.facebook.com/foobar?q=123" };
+				"www.facebook.com/foobar?q=123",
+				"www.google.com/foobar"};
 
 		assertEquals(urlsToTest.length, urlsToMatch.length);
 

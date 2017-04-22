@@ -2,6 +2,7 @@ package com.tinysearchengine.crawler.frontier;
 
 import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -142,6 +143,7 @@ public class URLFrontier {
 			Logger logger = Logger.getLogger(URLFrontier.class);
 			logger.info("Found a snapshot at: "
 					+ new Date(snapshot.snapshotTime).toString());
+
 			logger.info("Restoring from last snapshot.");
 			restoreFromSnapshot(snapshot);
 			logger.info("Finished restoring.");
@@ -202,9 +204,14 @@ public class URLFrontier {
 			Priority priority,
 			long releaseTime) {
 		Logger logger = Logger.getLogger(URLFrontier.class);
-		logger.debug("Putting url: " + req.url + ", method: " + req.method);
-		logger.debug("Releasing at: " + new Date(releaseTime).toString());
-		
+		logger.debug("Putting url: " + req.url
+				+ ", method: "
+				+ req.method
+				+ ", priority: "
+				+ priority.toString()
+				+ ", releasing at: "
+				+ new Date(releaseTime).toString());
+
 		// Some sanity check on the inputs.
 		int frontendQueueId = priority.toInt();
 		assert 0 <= frontendQueueId && frontendQueueId < 3;
@@ -237,14 +244,14 @@ public class URLFrontier {
 
 	/**
 	 * Select a frontend queue based on the following intervals: [0, 10] -> low
-	 * priority [10, 50] -> medium priority [50, 120] -> high priority
+	 * priority [10, 50] -> medium priority [50, 200] -> high priority
 	 * 
 	 * @return
 	 */
 	private int selectFrontendQueue() {
 		int lowPrioEnd = d_frontendQueues[0].isEmpty() ? 0 : 10;
 		int medPrioEnd = d_frontendQueues[1].isEmpty() ? lowPrioEnd : 50;
-		int hiPrioEnd = d_frontendQueues[2].isEmpty() ? medPrioEnd : 120;
+		int hiPrioEnd = d_frontendQueues[2].isEmpty() ? medPrioEnd : 200;
 
 		int rand = d_generator.nextInt(hiPrioEnd);
 		if (0 <= rand && rand < lowPrioEnd) {
@@ -339,10 +346,21 @@ public class URLFrontier {
 
 		snap.snapshotTime = now.getTime();
 		synchronized (this) {
-			snap.frontendQueues = d_frontendQueues;
-			snap.emptyBackendQueues = d_emptyBackendQueues;
-			snap.backendQueues = d_backendQueues;
-			snap.domainToQueue = d_domainToQueue;
+			snap.frontendQueues = new HashMap<>();
+			for (int i = 0; i < d_frontendQueues.length; ++i) {
+				snap.frontendQueues.put(i,
+						d_frontendQueues[i].toArray(new Pair[0]));
+			}
+
+			snap.emptyBackendQueues = new HashSet<>(d_emptyBackendQueues);
+
+			snap.backendQueues = new HashMap<>();
+			for (int i = 0; i < d_backendQueues.length; ++i) {
+				snap.backendQueues.put(i,
+						d_backendQueues[i].toArray(new Request[0]));
+			}
+
+			snap.domainToQueue = new HashMap<>(d_domainToQueue);
 			snap.domainQueue = d_domainQueue.dumpQueue(new Pair[0]);
 		}
 
@@ -380,10 +398,27 @@ public class URLFrontier {
 		long now = new Date().getTime();
 		long dur = now - snapshot.snapshotTime;
 
-		d_backendQueues = snapshot.backendQueues;
-		d_domainToQueue = snapshot.domainToQueue;
-		d_frontendQueues = snapshot.frontendQueues;
-		d_emptyBackendQueues = snapshot.emptyBackendQueues;
+		d_backendQueues = new Queue[snapshot.backendQueues.size()];
+		for (int i = 0; i < d_backendQueues.length; ++i) {
+			d_backendQueues[i] = new LinkedList<>();
+			Request[] reqs = snapshot.backendQueues.get(i);
+			for (int j = 0; j < reqs.length; ++j) {
+				d_backendQueues[i].offer(reqs[j]);
+			}
+		}
+
+		d_domainToQueue = new HashMap<>(snapshot.domainToQueue);
+		d_frontendQueues = new Queue[snapshot.frontendQueues.size()];
+		for (int i = 0; i < d_frontendQueues.length; ++i) {
+			d_frontendQueues[i] = new LinkedList<>();
+			Pair<Request, Long>[] reqs = snapshot.frontendQueues.get(i);
+			for (int j = 0; j < reqs.length; ++j) {
+				d_frontendQueues[i].offer(reqs[j]);
+			}
+		}
+
+		d_emptyBackendQueues = new HashSet<>(snapshot.emptyBackendQueues);
+
 		for (int i = 0; i < snapshot.domainQueue.length; ++i) {
 			String domain = snapshot.domainQueue[i].getLeft();
 			long releaseTime = snapshot.domainQueue[i].getRight() + dur;
