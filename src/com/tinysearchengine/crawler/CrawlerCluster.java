@@ -135,7 +135,7 @@ public class CrawlerCluster {
 		return Math.abs(url.hashCode()) % m_workerConfig.length;
 	}
 
-	public synchronized void distributeURL(URL url) throws IOException {
+	public void distributeURL(URL url) throws IOException {
 		int workerIndex = getURLWorkerIndex(url);
 		if (workerIndex == m_myIndex) {
 			if (!m_due.containsKey(url)) {
