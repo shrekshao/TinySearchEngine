@@ -132,7 +132,7 @@ public class CrawlerCluster {
 	}
 
 	private int getURLWorkerIndex(URL url) {
-		return url.hashCode() % m_workerConfig.length;
+		return Math.abs(url.hashCode()) % m_workerConfig.length;
 	}
 
 	public synchronized void distributeURL(URL url) throws IOException {
