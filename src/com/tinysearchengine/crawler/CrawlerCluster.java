@@ -9,6 +9,14 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.log4j.Logger;
 
 import com.tinysearchengine.crawler.RobotInfoCache.RobotInfo;
@@ -29,21 +37,24 @@ public class CrawlerCluster {
 	private RobotInfoCache m_cache = null;
 	private Map<URL, Boolean> m_due = null;
 	private String[] m_workerConfig = null;
+	private PoolingHttpClientConnectionManager m_poolingConnManager = null;
+	private CloseableHttpClient m_client = null;
 
 	private static Logger logger = Logger.getLogger(CrawlerCluster.class);
 
-	public CrawlerCluster(int port,
-			URLFrontier frontier,
-			RobotInfoCache cache,
-			Map<URL, Boolean> due,
-			String[] workerConfig,
-			int myIndex) {
+	public CrawlerCluster(int port, URLFrontier frontier, RobotInfoCache cache, Map<URL, Boolean> due,
+			String[] workerConfig, int myIndex) {
 		m_frontier = frontier;
 		m_cache = cache;
 		m_due = due;
 		m_workerConfig = workerConfig;
 		m_myIndex = myIndex;
-
+		m_poolingConnManager = new PoolingHttpClientConnectionManager();
+		m_poolingConnManager.setDefaultMaxPerRoute(20); // max connection for
+														// each host
+		m_poolingConnManager.setMaxTotal(200); // max total connection
+		m_client = HttpClients.custom().setConnectionManager(m_poolingConnManager).build();
+		
 		Spark.port(port);
 		Spark.post("/pushdata", new Route() {
 			@Override
@@ -71,21 +82,16 @@ public class CrawlerCluster {
 					headRequest.url = url;
 					headRequest.method = "HEAD";
 
-					long lastScheduledTime =
-						frontier.lastScheduledTime(url.getAuthority());
+					long lastScheduledTime = frontier.lastScheduledTime(url.getAuthority());
 					RobotInfo info = m_cache.getInfoForUrl(url);
 
 					int crawlDelaySeconds = 2;
 					if (info != null) {
-						crawlDelaySeconds = Math.max(crawlDelaySeconds,
-								info.getCrawlDelay(Crawler.k_USER_AGENT));
+						crawlDelaySeconds = Math.max(crawlDelaySeconds, info.getCrawlDelay(Crawler.k_USER_AGENT));
 					}
-					logger.debug(url.toString() + " has delay: "
-							+ crawlDelaySeconds
-							+ " seconds.");
+					logger.debug(url.toString() + " has delay: " + crawlDelaySeconds + " seconds.");
 
-					frontier.put(headRequest,
-							URLFrontier.Priority.Medium,
+					frontier.put(headRequest, URLFrontier.Priority.Medium,
 							lastScheduledTime + crawlDelaySeconds * 1000);
 				}
 				return url.toString();
@@ -93,8 +99,7 @@ public class CrawlerCluster {
 		});
 	}
 
-	private static String
-			getParamString(ArrayList<Pair<String, String>> parameters) {
+	private static String getParamString(ArrayList<Pair<String, String>> parameters) {
 		String params = new String();
 		int c = 0;
 		for (Pair<String, String> p : parameters) {
@@ -106,30 +111,46 @@ public class CrawlerCluster {
 		}
 		return params;
 	}
-
-	private void sendData(String dest, String reqType, byte[] body)
-			throws IOException {
-		URL url = new URL("http://" + dest + "/pushdata");
-
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		try {
-			conn.setDoOutput(true);
-			conn.setRequestMethod(reqType);
-
-			if (reqType.equals("POST")) {
-				OutputStream os = conn.getOutputStream();
-				os.write(body);
-				os.flush();
-			}
-
-			if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-				Logger logger = Logger.getLogger(CrawlerCluster.class);
-				logger.error("Failed to pushdata to: " + url.toString());
-			}
-		} finally {
-			conn.disconnect();
+	
+	// use apache HttpClient instead of HttpURLConnection
+	private void sendData(String dest, String reqType, byte[] body) throws IOException {
+		String strURL = "http://" + dest + "/pushdata";
+		HttpPost httpPost = new HttpPost(strURL);
+		HttpEntity entity = new ByteArrayEntity(body);
+		httpPost.setEntity(entity);
+		
+		CloseableHttpResponse response = m_client.execute(httpPost);
+		if (response.getStatusLine().getStatusCode() != 200) {
+			Logger logger = Logger.getLogger(CrawlerCluster.class);
+			logger.error("Failed to pushdata to: " + strURL);
+		} else {
+			//logger.info("Send content \"" + new String(body) + "\" from Worker " + m_myIndex + " to " + strURL + " succeed.");
 		}
+		response.close();
 	}
+	
+//	private void sendData(String dest, String reqType, byte[] body) throws IOException {
+//		URL url = new URL("http://" + dest + "/pushdata");
+//
+//		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//		try {
+//			conn.setDoOutput(true);
+//			conn.setRequestMethod(reqType);
+//
+//			if (reqType.equals("POST")) {
+//				OutputStream os = conn.getOutputStream();
+//				os.write(body);
+//				os.flush();
+//			}
+//
+//			if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+//				Logger logger = Logger.getLogger(CrawlerCluster.class);
+//				logger.error("Failed to pushdata to: " + url.toString());
+//			}
+//		} finally {
+//			conn.disconnect();
+//		}
+//	}
 
 	private int getURLWorkerIndex(URL url) {
 		return Math.abs(url.hashCode()) % m_workerConfig.length;
@@ -144,21 +165,16 @@ public class CrawlerCluster {
 				headRequest.url = url;
 				headRequest.method = "HEAD";
 
-				long lastScheduledTime =
-					m_frontier.lastScheduledTime(url.getAuthority());
+				long lastScheduledTime = m_frontier.lastScheduledTime(url.getAuthority());
 				RobotInfo info = m_cache.getInfoForUrl(url);
 				int crawlDelaySeconds = 2;
 				if (info != null) {
-					crawlDelaySeconds = Math.max(crawlDelaySeconds,
-							info.getCrawlDelay(Crawler.k_USER_AGENT));
+					crawlDelaySeconds = Math.max(crawlDelaySeconds, info.getCrawlDelay(Crawler.k_USER_AGENT));
 				}
-				logger.debug(url.toString() + " has delay: "
-						+ crawlDelaySeconds
-						+ " seconds");
+				logger.debug(url.toString() + " has delay: " + crawlDelaySeconds + " seconds");
 
 				if (RobotInfoCache.canCrawl(info, url, Crawler.k_USER_AGENT)) {
-					m_frontier.put(headRequest,
-							URLFrontier.Priority.Medium,
+					m_frontier.put(headRequest, URLFrontier.Priority.Medium,
 							lastScheduledTime + crawlDelaySeconds * 1000);
 				}
 			}
@@ -166,5 +182,15 @@ public class CrawlerCluster {
 			String dest = m_workerConfig[workerIndex];
 			sendData(dest, "POST", url.toString().getBytes());
 		}
+	}
+	
+	// currently it's never called
+	public void close() {
+		try {
+			m_client.close();
+		} catch (IOException e) {
+			logger.error("Failed to close http client in crawler cluster.");
+		}
+		m_poolingConnManager.close();
 	}
 }
