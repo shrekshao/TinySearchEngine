@@ -21,6 +21,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -64,13 +65,14 @@ public class Crawler {
 	 *            crawler cluster listening port
 	 * @param nThread
 	 *            number of threads in the thread pool
+	 * @throws IOReactorException 
 	 */
 	public Crawler(String dbDir,
 			int port,
 			int nThread,
 			Set<URL> seedUrls,
 			ArrayList<String> workerList,
-			int crawlerIndex) {
+			int crawlerIndex) throws IOReactorException {
 		m_downloadThreads = new Thread[nThread];
 		File dbRoot = new File(dbDir);
 		dbRoot.mkdirs();
