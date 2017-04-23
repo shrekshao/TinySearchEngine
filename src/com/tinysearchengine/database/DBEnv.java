@@ -52,7 +52,7 @@ public class DBEnv {
 			d_environment.close();
 		} catch (DatabaseException e) {
 			Logger logger = Logger.getLogger(DBEnv.class);
-			logger.info(e.getStackTrace());
+			logger.info("DBException", e);
 		}
 	}
 }

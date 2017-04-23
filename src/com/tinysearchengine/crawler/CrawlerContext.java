@@ -1,14 +1,10 @@
 package com.tinysearchengine.crawler;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import com.tinysearchengine.crawler.frontier.URLFrontier;
@@ -52,8 +48,7 @@ public class CrawlerContext {
 			m_cluster.distributeURL(url);
 		} catch (IOException e) {
 			Logger logger = Logger.getLogger(CrawlerContext.class);
-			logger.error("Failed to put task: " + e.getMessage());
-			logger.error(e.getStackTrace());
+			logger.error("Failed to put task: " + e.getMessage(), e);
 		}
 	}
 

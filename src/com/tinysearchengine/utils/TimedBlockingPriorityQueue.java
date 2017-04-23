@@ -98,6 +98,15 @@ public class TimedBlockingPriorityQueue<T> {
 		}
 	}
 
+	public Pair<T, Long> peek() {
+		try {
+			d_queueLock.lock();
+			return d_queue.peek();
+		} finally {
+			d_queueLock.unlock();
+		}
+	}
+
 	public boolean isEmpty() {
 		try {
 			d_queueLock.lock();

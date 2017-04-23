@@ -43,7 +43,7 @@ public class Crawler {
 
 	private static int k_MAX_DOC_SIZE = 5 * 1024 * 1024;
 	private static int k_MAX_DUE_SIZE = 10000;
-	private static int k_DOC_COUNT = 10;
+	private static int k_DOC_COUNT = 1000000;
 
 	private DBEnv m_dbEnv = null;
 	private URLFrontier m_URLFrontier = null;
@@ -275,9 +275,7 @@ public class Crawler {
 						resp = doRequest(req.method, req.url);
 					} catch (IOException e) {
 						logger.debug("IOException when requesting: "
-								+ req.url.toString());
-						logger.debug(e.getMessage());
-						logger.debug(e.getStackTrace());
+								+ req.url.toString(), e);
 						continue;
 					}
 
@@ -374,14 +372,14 @@ public class Crawler {
 					}
 				} catch (IOException e) {
 					logger.warn(
-							"IOException when requesting " + req.url.toString()
-									+ ", message: "
-									+ e.getMessage());
-					logger.warn(e.getStackTrace());
+							"IOException when requesting " + req.url.toString(),
+							e);
 				}
 
 			} catch (InterruptedException e) {
-				logger.info(e.getStackTrace());
+				logger.info("Interrupted!", e);
+			} catch (Throwable e) {
+				logger.warn("Unexpected exception", e);
 			}
 		}
 	}

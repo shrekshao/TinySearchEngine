@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
  *
  */
 public class RobotInfoCache {
-	
+
 	static Logger logger = Logger.getLogger(RobotInfoCache.class);
-	
+
 	public static class RobotInfo {
 		Map<String, List<String>> d_disallowedLinks = new HashMap<>();
 		Map<String, Integer> d_crawlDelay = new HashMap<>();
@@ -86,7 +86,7 @@ public class RobotInfoCache {
 			Integer delayAny = d_crawlDelay.get("*");
 			if (delay == null && delayAny == null) {
 				return 0;
-			} else if (delay != null){
+			} else if (delay != null) {
 				return delay.intValue();
 			} else {
 				return delayAny.intValue();
@@ -169,7 +169,7 @@ public class RobotInfoCache {
 
 			return info;
 		} catch (IOException e) {
-			logger.debug(e.getStackTrace());
+			logger.debug("IOException when getting robots.txt", e);
 			return null;
 		}
 	}
@@ -217,13 +217,13 @@ public class RobotInfoCache {
 			return info;
 
 		} catch (MalformedURLException e) {
-			logger.debug(e.getStackTrace());
+			logger.debug("Failed to parse url", e);
 			return null;
 		} catch (ProtocolException e) {
-			logger.debug(e.getStackTrace());
+			logger.debug("Unknown protocol", e);
 			return null;
 		} catch (IOException e) {
-			logger.debug(e.getStackTrace());
+			logger.debug("IOException", e);
 			return null;
 		}
 	}

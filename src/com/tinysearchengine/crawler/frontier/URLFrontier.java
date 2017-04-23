@@ -16,11 +16,19 @@ import java.util.TimerTask;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.amazonaws.util.json.Jackson;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.model.Persistent;
 import com.tinysearchengine.database.DBEnv;
 import com.tinysearchengine.utils.TimedBlockingPriorityQueue;
+
+import spark.Request;
+import spark.Response;
+import spark.Route;
+import spark.Spark;
 
 import java.util.Map;
 
@@ -52,6 +60,16 @@ public class URLFrontier {
 		public int toInt() {
 			return d_value;
 		}
+	}
+
+	static public class URLFrontierStats {
+		public int lowFrontendQueueCount;
+		public int medFrontendQueueCount;
+		public int highFrontendQueueCount;
+		public String nextUrl;
+		public long nextUrlReleaseTime;
+		public String nextUrlReleaseTimeStr;
+		public int[] backendQueueCounts;
 	}
 
 	@Persistent
@@ -156,6 +174,36 @@ public class URLFrontier {
 			long now = (new Date()).getTime();
 			put(req, Priority.Medium, now);
 		}
+	}
+
+	private synchronized URLFrontierStats getStats() {
+		URLFrontierStats stats = new URLFrontierStats();
+		stats.lowFrontendQueueCount = d_frontendQueues[0].size();
+		stats.medFrontendQueueCount = d_frontendQueues[1].size();
+		stats.highFrontendQueueCount = d_frontendQueues[2].size();
+		stats.backendQueueCounts = new int[d_backendQueues.length];
+		for (int i = 0; i < d_backendQueues.length; ++i) {
+			stats.backendQueueCounts[i] = d_backendQueues[i].size();
+		}
+
+		Pair<String, Long> domain = d_domainQueue.peek();
+
+		if (domain == null) {
+			stats.nextUrl = "Unknown";
+			stats.nextUrlReleaseTime = 0;
+			stats.nextUrlReleaseTimeStr = "Unknown";
+		} else {
+			int qid = d_domainToQueue.get(domain.getLeft());
+			Request req = d_backendQueues[qid].peek();
+			stats.nextUrl = req.url.toString();
+			stats.nextUrlReleaseTime = domain.getRight();
+			stats.nextUrlReleaseTimeStr =
+				new Date(domain.getRight()).toString();
+		}
+
+		assert stats.nextUrl != null;
+		assert stats.nextUrlReleaseTimeStr != null;
+		return stats;
 	}
 
 	/**
@@ -446,6 +494,18 @@ public class URLFrontier {
 				}
 			}
 		}, 0, k_SNAPSHOT_INTERVAL);
+
+		Spark.get("/frontierstats", new Route() {
+			@Override
+			public Object handle(spark.Request arg0, Response arg1)
+					throws Exception {
+				URLFrontierStats stats = self.get().getStats();
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.enable(SerializationFeature.INDENT_OUTPUT);
+				return mapper.writerWithDefaultPrettyPrinter()
+						.writeValueAsString(stats);
+			}
+		});
 	}
 
 	public void stop() {

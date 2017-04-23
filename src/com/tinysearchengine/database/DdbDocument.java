@@ -119,7 +119,7 @@ public class DdbDocument {
 			return md.digest(document);
 		} catch (NoSuchAlgorithmException e) {
 			Logger logger = Logger.getLogger(DdbDocument.class);
-			logger.error(e.getStackTrace());
+			logger.error("NoHashAlgorithm", e);
 			assert false;
 			return null;
 		}

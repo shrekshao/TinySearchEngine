@@ -19,7 +19,7 @@ public class URLPersistentProxy implements PersistentProxy<URL> {
 		} catch (MalformedURLException e) {
 			// Should be impossible.
 			Logger logger = Logger.getLogger(URLPersistentProxy.class);
-			logger.error(e.getStackTrace());
+			logger.error("Failed to parse url proxy", e);
 			return null;
 		}
 	}

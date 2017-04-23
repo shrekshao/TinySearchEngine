@@ -17,6 +17,8 @@ import com.tinysearchengine.crawler.frontier.URLFrontier;
 import com.tinysearchengine.crawler.frontier.URLFrontier.Request;
 import com.tinysearchengine.database.DBEnv;
 
+import spark.Spark;
+
 public class URLFrontierTests {
 
 	static DBEnv d_testEnv;
@@ -32,7 +34,7 @@ public class URLFrontierTests {
 	public static void closeStorage() {
 		d_testEnv.close();
 	}
-
+	
 	@BeforeClass
 	public static void setUpLogging() {
 		ConsoleAppender appender = new ConsoleAppender();
@@ -44,6 +46,11 @@ public class URLFrontierTests {
 		if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
 			Logger.getRootLogger().addAppender(appender);
 		}
+	}
+	
+	@BeforeClass
+	public static void setUpSpark() {
+		Spark.port(8080);
 	}
 
 	@Before

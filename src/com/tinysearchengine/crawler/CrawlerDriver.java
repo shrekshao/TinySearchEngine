@@ -7,12 +7,13 @@ import java.util.Date;
 import java.util.HashSet;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
 
 import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.RollingFileAppender;
 
 public class CrawlerDriver {
 
@@ -29,12 +30,16 @@ public class CrawlerDriver {
 			Logger.getRootLogger().addAppender(appender);
 		}
 
-		long now = (new Date()).getTime();
-		FileAppender fileAppender =
-			new FileAppender(new PatternLayout(pattern), "crawler.log." + now);
+		Date now = new Date();
+		SimpleDateFormat dateFormat =
+			new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+		RollingFileAppender fileAppender =
+			new RollingFileAppender(new PatternLayout(pattern),
+					"crawler.log." + dateFormat.format(now));
 		fileAppender.setThreshold(Level.DEBUG);
+		fileAppender.setMaxFileSize("50MB");
 		fileAppender.activateOptions();
-		
+
 		Logger.getRootLogger().addAppender(fileAppender);
 	}
 
