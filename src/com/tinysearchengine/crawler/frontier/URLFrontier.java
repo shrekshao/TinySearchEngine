@@ -208,6 +208,7 @@ public class URLFrontier {
 		stats.medFrontendQueueCount = d_frontendQueues[1].size();
 		stats.highFrontendQueueCount = d_frontendQueues[2].size();
 		stats.backendQueueCounts = new HashMap<>();
+		stats.frontierSize = d_frontierSize;
 
 		for (Map.Entry<String, Integer> d2bidx : d_domainToQueue.entrySet()) {
 			stats.backendQueueCounts.put(d2bidx.getKey(),
