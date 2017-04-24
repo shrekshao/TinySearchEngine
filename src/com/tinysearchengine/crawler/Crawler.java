@@ -359,7 +359,7 @@ public class Crawler {
 							// Extract the URLs
 							String[] urls =
 								URLExtractor.extract(ddbDoc.getContent());
-							logger.info(
+							logger.debug(
 									"Extracted urls: " + Arrays.toString(urls));
 							for (int i = 0; i < urls.length; ++i) {
 								try {
