@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.ConsoleAppender;
@@ -88,7 +89,7 @@ public class DdbConnectorTests {
 		String[] urlsToMatch = { "www.google.com/foobar",
 				"www.google.com/foobar/index.html",
 				"www.facebook.com/foobar?q=123",
-				"www.google.com/foobar"};
+				"www.google.com/foobar" };
 
 		assertEquals(urlsToTest.length, urlsToMatch.length);
 
@@ -99,4 +100,22 @@ public class DdbConnectorTests {
 		}
 	}
 
+	@Test
+	public void testGetAllDocumentsLazily() {
+		List<DdbDocument> docs = d_connector.getAllDocumentsLazily();
+		Iterator<DdbDocument> docIt = docs.iterator();
+		int totalIterations = 1000;
+		int iteration = totalIterations;
+		long startTime = System.nanoTime();
+		while (iteration >= 0 && docIt.hasNext()) {
+			DdbDocument doc = docIt.next();
+			System.out.println(doc.getUrlAsString());
+			iteration -= 1;
+		}
+		long dur = System.nanoTime() - startTime;
+
+		System.out.println("Remaining it: " + iteration);
+		System.out.println(
+				"Avg latency: " + (dur / (long) totalIterations) + " ns");
+	}
 }

@@ -11,6 +11,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.s3.model.Region;
@@ -97,21 +98,31 @@ public class DdbConnector {
 	}
 
 	/**
+	 * Return a lazy list of all documents in the table. Be very careful and not
+	 * call methods like .size() on the returned list because that would require
+	 * the entire database to be loaded into memory.
+	 * 
+	 * @return
+	 */
+	public List<DdbDocument> getAllDocumentsLazily() {
+		DynamoDBScanExpression expr =
+			new DynamoDBScanExpression().withConsistentRead(false);
+		return d_mapper.parallelScan(DdbDocument.class, expr, 4);
+	}
+
+	/**
 	 * Converts a url into a name appropriate as an S3Link key.
 	 * 
 	 * For example,
 	 * 
-	 * http://www.google.com/foobar
-	 * 	-> www.google.com/foobar
+	 * http://www.google.com/foobar -> www.google.com/foobar
 	 * 
-	 * http://www.google.com/foobar/
-	 * 	-> www.google.com/foobar
+	 * http://www.google.com/foobar/ -> www.google.com/foobar
 	 * 
-	 * http://www.google.com/foobar/index.html
-	 * 	-> www.google.com/foobar/index.html
+	 * http://www.google.com/foobar/index.html ->
+	 * www.google.com/foobar/index.html
 	 * 
-	 * http://www.facebook.com/foobar?q=123
-	 * 	-> www.facebook.com/foobar?q=123
+	 * http://www.facebook.com/foobar?q=123 -> www.facebook.com/foobar?q=123
 	 * 
 	 * @param url
 	 * @return
