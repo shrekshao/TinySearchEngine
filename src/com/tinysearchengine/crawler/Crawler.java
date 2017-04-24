@@ -18,6 +18,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
@@ -56,7 +58,8 @@ public class Crawler {
 	private DdbConnector d_ddbConnector = new DdbConnector();
 	private DocumentFingerprintCache d_contentSeenCache =
 		new DocumentFingerprintCache(d_ddbConnector);
-	private HttpClient m_client = HttpClientBuilder.create().build();
+	private PoolingHttpClientConnectionManager m_manager = null;
+	private HttpClient m_client = null;
 
 	/**
 	 * @param dbDir
@@ -77,14 +80,16 @@ public class Crawler {
 		File dbRoot = new File(dbDir);
 		dbRoot.mkdirs();
 		m_dbEnv = new DBEnv(dbRoot);
-		
+
 		ConcurrentLinkedHashMap.Builder<URL, Boolean> builder =
 			new ConcurrentLinkedHashMap.Builder<>();
-		m_LRUdue = builder
-				.concurrencyLevel(nThread)
-				.initialCapacity(1000)
-				.maximumWeightedCapacity(k_MAX_DUE_SIZE)
-				.build();
+		m_LRUdue = builder.concurrencyLevel(nThread).initialCapacity(1000)
+				.maximumWeightedCapacity(k_MAX_DUE_SIZE).build();
+
+		m_manager = new PoolingHttpClientConnectionManager();
+		m_manager.setMaxTotal(20 * nThread);
+		m_manager.setDefaultMaxPerRoute(20);
+		m_client = HttpClients.custom().setConnectionManager(m_manager).build();
 
 		Spark.port(port);
 
