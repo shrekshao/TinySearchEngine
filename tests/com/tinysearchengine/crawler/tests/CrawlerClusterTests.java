@@ -37,7 +37,7 @@ public class CrawlerClusterTests {
 	}
 	
 	@Before
-	public void setUp() throws MalformedURLException {
+	public void setUp() throws MalformedURLException, InterruptedException {
 		Set<URL> seeds = new HashSet<>();
 		seeds.add(new URL("http://www.google.com"));
 		d_frontier = new URLFrontier(20, seeds, d_testEnv);

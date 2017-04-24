@@ -8,6 +8,11 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.HttpEntity;
@@ -33,6 +38,7 @@ import spark.Spark;
 public class CrawlerCluster {
 
 	private final static int k_MAX_BUFFER_SIZE = 1024;
+	private final static int k_MAX_THREADPOOL_CAP = 1000000;
 
 	private int m_myIndex = -1;
 	private URLFrontier m_frontier = null;
@@ -45,6 +51,12 @@ public class CrawlerCluster {
 	private Map<String, StringBuffer> d_urlBuffer = null;
 
 	private static Logger logger = Logger.getLogger(CrawlerCluster.class);
+
+	private ExecutorService d_threadPool = new ThreadPoolExecutor(1,
+			10,
+			30,
+			TimeUnit.SECONDS,
+			new LinkedBlockingDeque<Runnable>(k_MAX_THREADPOOL_CAP));
 
 	public CrawlerCluster(URLFrontier frontier,
 			RobotInfoCache cache,
@@ -81,7 +93,10 @@ public class CrawlerCluster {
 							continue;
 						}
 						assert url != null;
-						insertReceivedUrl(url);
+						final URL urlToInsert = url;
+						d_threadPool.submit(() -> {
+							return insertReceivedUrl(urlToInsert);
+						});
 					}
 				} catch (IOException e) {
 					logger.error("IOException when parsing URLs received", e);
@@ -89,7 +104,7 @@ public class CrawlerCluster {
 				return "";
 			}
 
-			private void insertReceivedUrl(URL url) {
+			private boolean insertReceivedUrl(URL url) {
 				Map<URL, Boolean> due = m_due;
 
 				// DUE
@@ -116,10 +131,18 @@ public class CrawlerCluster {
 							+ crawlDelaySeconds
 							+ " seconds.");
 
-					frontier.put(headRequest,
-							URLFrontier.Priority.Medium,
-							lastScheduledTime + crawlDelaySeconds * 1000);
+					try {
+						frontier.put(headRequest,
+								URLFrontier.Priority.Medium,
+								lastScheduledTime + crawlDelaySeconds * 1000);
+						return true;
+					} catch (InterruptedException e) {
+						logger.error("frontier put interrupted", e);
+						return false;
+					}
 				}
+
+				return false;
 			}
 		});
 
@@ -183,9 +206,13 @@ public class CrawlerCluster {
 						+ " seconds");
 
 				if (RobotInfoCache.canCrawl(info, url, Crawler.k_USER_AGENT)) {
-					m_frontier.put(headRequest,
-							URLFrontier.Priority.Medium,
-							lastScheduledTime + crawlDelaySeconds * 1000);
+					try {
+						m_frontier.put(headRequest,
+								URLFrontier.Priority.Medium,
+								lastScheduledTime + crawlDelaySeconds * 1000);
+					} catch (InterruptedException e) {
+						logger.error("Frontier put interrupted", e);
+					}
 				}
 			}
 		} else {
@@ -198,6 +225,7 @@ public class CrawlerCluster {
 	public void close() {
 		try {
 			m_asyncClient.close();
+			d_threadPool.shutdown();
 		} catch (IOException e) {
 			logger.error("Failed to close http client in crawler cluster.");
 		}

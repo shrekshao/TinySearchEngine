@@ -93,7 +93,12 @@ public class Crawler {
 
 		Spark.port(port);
 
-		m_URLFrontier = new URLFrontier(nThread * 3, seedUrls, m_dbEnv);
+		try {
+			m_URLFrontier = new URLFrontier(nThread * 3, seedUrls, m_dbEnv);
+		} catch (InterruptedException e) {
+			logger.error("Frontier creation interrupted", e);
+			System.exit(1);
+		}
 		String[] workerConfig = workerList.toArray(new String[0]);
 		m_cluster = new CrawlerCluster(m_URLFrontier,
 				m_robotCache,

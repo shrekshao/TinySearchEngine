@@ -44,6 +44,11 @@ public class URLFrontier {
 	private final static long k_ONE_DAY = 1000 * 3600 * 24;
 
 	/**
+	 * Maximum size of the frontier.
+	 */
+	private final static long k_MAX_SIZE = 1500000;
+
+	/**
 	 * This represents the priority of a given URL to be enqueued into the
 	 * frontier.
 	 * 
@@ -73,6 +78,7 @@ public class URLFrontier {
 		public String nextUrlReleaseTimeStr;
 		public Map<String, Integer> backendQueueCounts;
 		public String collectedAtTime;
+		public long frontierSize;
 	}
 
 	@Persistent
@@ -150,6 +156,11 @@ public class URLFrontier {
 	 */
 	private volatile URLFrontierStats d_lastStat = new URLFrontierStats();
 
+	/**
+	 * Current size of the frontier.
+	 */
+	private long d_frontierSize = 0;
+
 	@SuppressWarnings("unchecked")
 	private void initialize(int numBackendQueues) {
 		for (int i = 0; i < 3; ++i) {
@@ -163,7 +174,8 @@ public class URLFrontier {
 		}
 	}
 
-	public URLFrontier(int numBackendQueues, Set<URL> seeds, DBEnv dbEnv) {
+	public URLFrontier(int numBackendQueues, Set<URL> seeds, DBEnv dbEnv)
+			throws InterruptedException {
 		initialize(numBackendQueues);
 		d_dbEnv = dbEnv;
 		d_snapshotByTime = d_dbEnv.getStore().getPrimaryIndex(Long.class,
@@ -246,11 +258,14 @@ public class URLFrontier {
 				d_domainToQueue.remove(domain);
 			}
 
+			d_frontierSize--;
+			this.notify();
 			return req;
 		}
 	}
 
-	public void put(URL url, Priority priority, long releaseTime) {
+	public void put(URL url, Priority priority, long releaseTime)
+			throws InterruptedException {
 		Request req = new Request();
 		req.url = url;
 		req.method = "GET";
@@ -268,7 +283,7 @@ public class URLFrontier {
 	 */
 	public synchronized void put(Request req,
 			Priority priority,
-			long releaseTime) {
+			long releaseTime) throws InterruptedException {
 		Logger logger = Logger.getLogger(URLFrontier.class);
 		logger.debug("Putting url: " + req.url
 				+ ", method: "
@@ -277,6 +292,11 @@ public class URLFrontier {
 				+ priority.toString()
 				+ ", releasing at: "
 				+ new Date(releaseTime).toString());
+
+		while (d_frontierSize > k_MAX_SIZE) {
+			logger.warn("Maximum size reached, throttling frontier put!");
+			this.wait();
+		}
 
 		// Some sanity check on the inputs.
 		int frontendQueueId = priority.toInt();
@@ -295,6 +315,7 @@ public class URLFrontier {
 		if (lastScheduledTime == null || releaseTime > lastScheduledTime) {
 			d_lastScheduledTime.put(domain, releaseTime);
 		}
+		d_frontierSize++;
 	}
 
 	public long lastScheduledTime(String domain) {
@@ -427,6 +448,7 @@ public class URLFrontier {
 			snap.domainToQueue = new HashMap<>(d_domainToQueue);
 			snap.domainQueue = d_domainQueue.dumpQueue(new Pair[0]);
 			snap.lastScheduledTimes = new HashMap<>(d_lastScheduledTime);
+			snap.frontierSize = d_frontierSize;
 		}
 
 		d_snapshotByTime.put(snap);
@@ -501,6 +523,8 @@ public class URLFrontier {
 			Long time = entry.getValue() + dur;
 			d_lastScheduledTime.put(domain, time);
 		}
+
+		d_frontierSize = snapshot.frontierSize;
 	}
 
 	private void removeOldSnapshots(long olderThan) {

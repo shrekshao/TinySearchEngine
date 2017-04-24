@@ -20,4 +20,5 @@ public class URLFrontierSnapshot {
 	public HashMap<String, Integer> domainToQueue;
 	public Pair<String, Long>[] domainQueue;
 	public HashMap<String, Long> lastScheduledTimes;
+	public long frontierSize;
 }

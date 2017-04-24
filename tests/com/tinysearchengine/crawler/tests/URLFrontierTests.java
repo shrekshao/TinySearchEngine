@@ -54,7 +54,7 @@ public class URLFrontierTests {
 	}
 
 	@Before
-	public void setUp() throws MalformedURLException {
+	public void setUp() throws MalformedURLException, InterruptedException {
 		setUpStorage();
 
 		Set<URL> seeds = new HashSet<>();
@@ -130,10 +130,20 @@ public class URLFrontierTests {
 
 		Thread t1 = new Thread(() -> {
 			long now = (new Date()).getTime();
-			d_frontier.put(g2, URLFrontier.Priority.Medium, now + 5000);
+			try {
+				d_frontier.put(g2, URLFrontier.Priority.Medium, now + 5000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
 			now = (new Date()).getTime();
-			d_frontier.put(fb, URLFrontier.Priority.Medium, now + 1000);
+			try {
+				d_frontier.put(fb, URLFrontier.Priority.Medium, now + 1000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
 			Request url;
 			try {
@@ -147,10 +157,20 @@ public class URLFrontierTests {
 
 		Thread t2 = new Thread(() -> {
 			long now = (new Date()).getTime();
-			d_frontier.put(ap, URLFrontier.Priority.Medium, now + 2000);
+			try {
+				d_frontier.put(ap, URLFrontier.Priority.Medium, now + 2000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
 			now = (new Date()).getTime();
-			d_frontier.put(ts, URLFrontier.Priority.Medium, now + 3000);
+			try {
+				d_frontier.put(ts, URLFrontier.Priority.Medium, now + 3000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
 			Request url;
 			try {
