@@ -15,6 +15,7 @@ import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -47,6 +48,7 @@ public class Crawler {
 	private static int k_MAX_DOC_SIZE = 5 * 1024 * 1024;
 	private static int k_MAX_DUE_SIZE = 10000;
 	private static int k_DOC_COUNT = 1000000;
+	private static int k_TIMEOUT = 2000;
 
 	private DBEnv m_dbEnv = null;
 	private URLFrontier m_URLFrontier = null;
@@ -89,7 +91,16 @@ public class Crawler {
 		m_manager = new PoolingHttpClientConnectionManager();
 		m_manager.setMaxTotal(20 * nThread);
 		m_manager.setDefaultMaxPerRoute(20);
-		m_client = HttpClients.custom().setConnectionManager(m_manager).build();
+		
+		RequestConfig.Builder reqCfgBuilder = RequestConfig.custom();
+		reqCfgBuilder.setSocketTimeout(k_TIMEOUT);
+		reqCfgBuilder.setConnectTimeout(k_TIMEOUT);
+		reqCfgBuilder.setConnectionRequestTimeout(k_TIMEOUT);
+		
+		m_client = HttpClients.custom()
+				.setConnectionManager(m_manager)
+				.setDefaultRequestConfig(reqCfgBuilder.build())
+				.build();
 
 		Spark.port(port);
 
