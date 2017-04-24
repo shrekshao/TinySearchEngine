@@ -1,10 +1,8 @@
 package com.tinysearchengine.crawler;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.tinysearchengine.database.DdbConnector;
 import com.tinysearchengine.database.DdbDocument;
 
@@ -24,32 +22,27 @@ public class DocumentFingerprintCache {
 	/**
 	 * The cache from
 	 */
-	private LinkedHashMap<byte[], Boolean> d_cache =
-		new LinkedHashMap<byte[], Boolean>(2000) {
-			private static final long serialVersionUID = -174763602709570347L;
-
-			@Override
-			protected boolean
-					removeEldestEntry(Map.Entry<byte[], Boolean> entry) {
-				if (size() > k_MAX_ENTRIES) {
-					return true;
-				}
-
-				return false;
-			}
-		};
+	private Map<byte[], Boolean> d_cache;
 
 	/**
 	 * The connector to dynamo db.
 	 */
 	private DdbConnector d_connector;
-	
+
 	public DocumentFingerprintCache(DdbConnector connector) {
 		d_connector = connector;
+
+		ConcurrentLinkedHashMap.Builder<byte[], Boolean> builder =
+			new ConcurrentLinkedHashMap.Builder<>();
+		d_cache = builder
+				.concurrencyLevel(10)
+				.initialCapacity(2000)
+				.maximumWeightedCapacity(k_MAX_ENTRIES).build();
 	}
-	
+
 	/**
 	 * Add the given fingerprint to the cache.
+	 * 
 	 * @param fp
 	 */
 	public synchronized void addFingerprint(byte[] fp) {

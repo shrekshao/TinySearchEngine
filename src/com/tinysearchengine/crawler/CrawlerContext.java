@@ -7,7 +7,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.tinysearchengine.crawler.frontier.URLFrontier;
+
+import spark.Request;
+import spark.Response;
+import spark.Route;
+import spark.Spark;
 
 public class CrawlerContext {
 	private AtomicInteger m_totalDocs = null;
@@ -16,6 +23,11 @@ public class CrawlerContext {
 	private String[] m_workerList = null; // ip:port
 	private RobotInfoCache m_robotInfoCache = null;
 	private CrawlerCluster m_cluster = null;
+
+	public static class CrawlerStats {
+		public long docsCrawled;
+		public long urlsSent;
+	}
 
 	public CrawlerContext(URLFrontier frontier,
 			Map<URL, Boolean> due,
@@ -28,6 +40,29 @@ public class CrawlerContext {
 		m_workerList = workerList;
 		m_cluster = cluster;
 		m_robotInfoCache = robotCache;
+
+		Spark.get("/frontierstats", new Route() {
+			@Override
+			public Object handle(Request req, Response resp) throws Exception {
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.enable(SerializationFeature.INDENT_OUTPUT);
+				return mapper.writerWithDefaultPrettyPrinter()
+						.writeValueAsString(m_URLFrontier.stats());
+			}
+		});
+
+		Spark.get("/crawlerstats", new Route() {
+			@Override
+			public Object handle(Request req, Response resp) throws Exception {
+				CrawlerStats stats = new CrawlerStats();
+				stats.docsCrawled = m_totalDocs.get();
+				stats.urlsSent = m_cluster.urlsSent();
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.enable(SerializationFeature.INDENT_OUTPUT);
+				return mapper.writerWithDefaultPrettyPrinter()
+						.writeValueAsBytes(stats);
+			}
+		});
 	}
 
 	public void incDocsCounter() {
@@ -39,8 +74,8 @@ public class CrawlerContext {
 	}
 
 	public void putTask(URL url) {
-		if (!url.getProtocol().equals("http") &&
-				!url.getProtocol().equals("https")) {
+		if (!url.getProtocol().equals("http")
+				&& !url.getProtocol().equals("https")) {
 			// Just ignore.
 			return;
 		}

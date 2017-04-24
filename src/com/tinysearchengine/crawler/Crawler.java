@@ -6,10 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,11 +23,14 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.tinysearchengine.crawler.RobotInfoCache.RobotInfo;
 import com.tinysearchengine.crawler.frontier.URLFrontier;
 import com.tinysearchengine.database.DBEnv;
 import com.tinysearchengine.database.DdbConnector;
 import com.tinysearchengine.database.DdbDocument;
+
+import spark.Spark;
 
 /**
  * @author MIAO
@@ -65,7 +65,7 @@ public class Crawler {
 	 *            crawler cluster listening port
 	 * @param nThread
 	 *            number of threads in the thread pool
-	 * @throws IOReactorException 
+	 * @throws IOReactorException
 	 */
 	public Crawler(String dbDir,
 			int port,
@@ -77,28 +77,20 @@ public class Crawler {
 		File dbRoot = new File(dbDir);
 		dbRoot.mkdirs();
 		m_dbEnv = new DBEnv(dbRoot);
-		m_LRUdue =
-			Collections.synchronizedMap(new LinkedHashMap<URL, Boolean>(1000) {
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID =
-					8477355007704742260L;
+		
+		ConcurrentLinkedHashMap.Builder<URL, Boolean> builder =
+			new ConcurrentLinkedHashMap.Builder<>();
+		m_LRUdue = builder
+				.concurrencyLevel(nThread)
+				.initialCapacity(1000)
+				.maximumWeightedCapacity(k_MAX_DUE_SIZE)
+				.build();
 
-				@Override
-				protected boolean
-						removeEldestEntry(Map.Entry<URL, Boolean> entry) {
-					if (size() > k_MAX_DUE_SIZE) {
-						return true;
-					}
-					return false;
-				}
-			});
+		Spark.port(port);
 
 		m_URLFrontier = new URLFrontier(nThread * 3, seedUrls, m_dbEnv);
 		String[] workerConfig = workerList.toArray(new String[0]);
-		m_cluster = new CrawlerCluster(port,
-				m_URLFrontier,
+		m_cluster = new CrawlerCluster(m_URLFrontier,
 				m_robotCache,
 				m_LRUdue,
 				workerConfig,
@@ -130,17 +122,6 @@ public class Crawler {
 
 			return response;
 		}
-	}
-
-	private List<String> getHeaderValues(Map<String, List<String>> headers,
-			String key) {
-		for (String k : headers.keySet()) {
-			if (key.equalsIgnoreCase(k)) {
-				return headers.get(k);
-			}
-		}
-
-		return null;
 	}
 
 	/**

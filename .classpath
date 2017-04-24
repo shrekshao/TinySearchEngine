@@ -55,5 +55,6 @@
 	<classpathentry kind="lib" path="lib/httpasyncclient-cache-4.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/httpasyncclient-4.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-nio-4.4.6.jar"/>
+	<classpathentry kind="lib" path="lib/concurrentlinkedhashmap-lru-1.4.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

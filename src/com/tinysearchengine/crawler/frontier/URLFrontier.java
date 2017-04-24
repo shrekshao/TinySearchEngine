@@ -2,7 +2,6 @@ package com.tinysearchengine.crawler.frontier;
 
 import java.lang.ref.WeakReference;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,23 +11,16 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.amazonaws.util.json.Jackson;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.model.Persistent;
 import com.tinysearchengine.database.DBEnv;
 import com.tinysearchengine.utils.TimedBlockingPriorityQueue;
-
-import spark.Request;
-import spark.Response;
-import spark.Route;
-import spark.Spark;
 
 import java.util.Map;
 
@@ -40,6 +32,16 @@ public class URLFrontier {
 	 * Every 10 minutes;
 	 */
 	private final static long k_SNAPSHOT_INTERVAL = 1000 * 60 * 10;
+
+	/**
+	 * Every 10 seconds.
+	 */
+	private final static long k_STAT_INTERVAL = 1000 * 10;
+
+	/**
+	 * Number of milliseconds in a day.
+	 */
+	private final static long k_ONE_DAY = 1000 * 3600 * 24;
 
 	/**
 	 * This represents the priority of a given URL to be enqueued into the
@@ -70,6 +72,7 @@ public class URLFrontier {
 		public long nextUrlReleaseTime;
 		public String nextUrlReleaseTimeStr;
 		public int[] backendQueueCounts;
+		public String collectedAtTime;
 	}
 
 	@Persistent
@@ -109,7 +112,7 @@ public class URLFrontier {
 	/**
 	 * The map from domain strings to when their last request was scheduled.
 	 */
-	Map<String, Long> d_lastScheduledTime = new HashMap<>();
+	Map<String, Long> d_lastScheduledTime = new ConcurrentHashMap<>();
 
 	/**
 	 * The priority queue from where we fetch the next domains.
@@ -136,6 +139,16 @@ public class URLFrontier {
 	 * The timer used to trigger snapshots.
 	 */
 	Timer d_snapshotTimer;
+
+	/**
+	 * The timer used to start collecting stats.
+	 */
+	Timer d_statTimer;
+
+	/**
+	 * The last stat object.
+	 */
+	private volatile URLFrontierStats d_lastStat = new URLFrontierStats();
 
 	@SuppressWarnings("unchecked")
 	private void initialize(int numBackendQueues) {
@@ -164,6 +177,7 @@ public class URLFrontier {
 
 			logger.info("Restoring from last snapshot.");
 			restoreFromSnapshot(snapshot);
+			removeOldSnapshots(snapshot.snapshotTime - k_ONE_DAY);
 			logger.info("Finished restoring.");
 		}
 
@@ -203,6 +217,8 @@ public class URLFrontier {
 
 		assert stats.nextUrl != null;
 		assert stats.nextUrlReleaseTimeStr != null;
+	
+		stats.collectedAtTime = new Date().toString();
 		return stats;
 	}
 
@@ -274,14 +290,13 @@ public class URLFrontier {
 
 		String domain = req.url.getAuthority();
 		Long lastScheduledTime = d_lastScheduledTime.get(domain);
-		if (lastScheduledTime == null) {
-			d_lastScheduledTime.put(domain, releaseTime);
-		} else if (releaseTime > lastScheduledTime) {
+		if (lastScheduledTime == null
+				|| releaseTime > lastScheduledTime) {
 			d_lastScheduledTime.put(domain, releaseTime);
 		}
 	}
 
-	public synchronized long lastScheduledTime(String domain) {
+	public long lastScheduledTime(String domain) {
 		Long time = d_lastScheduledTime.get(domain);
 		if (time == null) {
 			return (new Date()).getTime();
@@ -410,10 +425,13 @@ public class URLFrontier {
 
 			snap.domainToQueue = new HashMap<>(d_domainToQueue);
 			snap.domainQueue = d_domainQueue.dumpQueue(new Pair[0]);
+			snap.lastScheduledTimes = new HashMap<>(d_lastScheduledTime);
 		}
 
 		d_snapshotByTime.put(snap);
 		d_dbEnv.getStore().sync();
+
+		removeOldSnapshots(snap.snapshotTime - k_ONE_DAY);
 
 		logger.info("Finished snapshot.");
 	}
@@ -443,9 +461,11 @@ public class URLFrontier {
 	 * @param snapshot
 	 */
 	private void restoreFromSnapshot(URLFrontierSnapshot snapshot) {
+		Logger logger = Logger.getLogger(URLFrontier.class);
 		long now = new Date().getTime();
 		long dur = now - snapshot.snapshotTime;
-
+		logger.info("Restoration shifts time by: " + dur + " ms.");
+		
 		d_backendQueues = new Queue[snapshot.backendQueues.size()];
 		for (int i = 0; i < d_backendQueues.length; ++i) {
 			d_backendQueues[i] = new LinkedList<>();
@@ -472,6 +492,32 @@ public class URLFrontier {
 			long releaseTime = snapshot.domainQueue[i].getRight() + dur;
 			d_domainQueue.put(domain, releaseTime);
 		}
+
+		d_lastScheduledTime =
+			new ConcurrentHashMap<>(snapshot.lastScheduledTimes);
+		for (Map.Entry<String, Long> entry : d_lastScheduledTime.entrySet()) {
+			String domain = entry.getKey();
+			Long time = entry.getValue() + dur;
+			d_lastScheduledTime.put(domain, time);
+		}
+	}
+
+	private void removeOldSnapshots(long olderThan) {
+		Logger logger = Logger.getLogger(URLFrontier.class);
+		EntityCursor<Long> keyCursor = d_snapshotByTime.keys();
+		try {
+			Long time = null;
+			while ((time = keyCursor.next()) != null) {
+				if (time < olderThan) {
+					logger.info("Removing snapshot from: "
+							+ new Date(time).toString());
+					keyCursor.delete();
+				}
+			}
+		} finally {
+			keyCursor.close();
+			d_dbEnv.getStore().sync();
+		}
 	}
 
 	/**
@@ -495,21 +541,30 @@ public class URLFrontier {
 			}
 		}, 0, k_SNAPSHOT_INTERVAL);
 
-		Spark.get("/frontierstats", new Route() {
+		d_statTimer = new Timer("URLFrontierStats");
+		d_statTimer.schedule(new TimerTask() {
 			@Override
-			public Object handle(spark.Request arg0, Response arg1)
-					throws Exception {
-				URLFrontierStats stats = self.get().getStats();
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.enable(SerializationFeature.INDENT_OUTPUT);
-				return mapper.writerWithDefaultPrettyPrinter()
-						.writeValueAsString(stats);
+			public void run() {
+				if (self.get() != null) {
+					d_lastStat = self.get().getStats();
+				}
 			}
-		});
+		}, 0, k_STAT_INTERVAL);
 	}
 
 	public void stop() {
-		d_snapshotTimer.cancel();
-		d_snapshotTimer = null;
+		if (d_snapshotTimer != null) {
+			d_snapshotTimer.cancel();
+			d_snapshotTimer = null;
+		}
+
+		if (d_statTimer != null) {
+			d_statTimer.cancel();
+			d_statTimer = null;
+		}
+	}
+
+	public URLFrontierStats stats() {
+		return d_lastStat;
 	}
 }

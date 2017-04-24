@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
@@ -42,12 +41,12 @@ public class CrawlerCluster {
 	private String[] m_workerConfig = null;
 	private CloseableHttpAsyncClient m_asyncClient = null;
 
+	private AtomicInteger d_urlsSent = new AtomicInteger(0);
 	private Map<String, StringBuffer> d_urlBuffer = null;
 
 	private static Logger logger = Logger.getLogger(CrawlerCluster.class);
 
-	public CrawlerCluster(int port,
-			URLFrontier frontier,
+	public CrawlerCluster(URLFrontier frontier,
 			RobotInfoCache cache,
 			Map<URL, Boolean> due,
 			String[] workerConfig,
@@ -63,7 +62,6 @@ public class CrawlerCluster {
 
 		d_urlBuffer = Collections.synchronizedMap(new HashMap<>());
 
-		Spark.port(port);
 		Spark.post("/pushdata", new Route() {
 			@Override
 			public Object handle(Request req, Response resp) {
@@ -131,20 +129,6 @@ public class CrawlerCluster {
 		}
 	}
 
-	private static String
-			getParamString(ArrayList<Pair<String, String>> parameters) {
-		String params = new String();
-		int c = 0;
-		for (Pair<String, String> p : parameters) {
-			if (c == 0)
-				params += p.getLeft() + "=" + p.getRight();
-			else
-				params += "&" + p.getLeft() + "=" + p.getRight();
-			c++;
-		}
-		return params;
-	}
-
 	private synchronized void flushSendBuffer(String dest) {
 		String strURL = "http://" + dest + "/pushdata";
 		// Get all the URLs.
@@ -169,6 +153,8 @@ public class CrawlerCluster {
 		if (buf.length() > k_MAX_BUFFER_SIZE) {
 			flushSendBuffer(dest);
 		}
+
+		d_urlsSent.incrementAndGet();
 	}
 
 	private int getURLWorkerIndex(URL url) {
@@ -215,5 +201,9 @@ public class CrawlerCluster {
 		} catch (IOException e) {
 			logger.error("Failed to close http client in crawler cluster.");
 		}
+	}
+
+	public long urlsSent() {
+		return d_urlsSent.get();
 	}
 }

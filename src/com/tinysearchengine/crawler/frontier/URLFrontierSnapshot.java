@@ -19,4 +19,5 @@ public class URLFrontierSnapshot {
 	public HashMap<Integer, Request[]> backendQueues;
 	public HashMap<String, Integer> domainToQueue;
 	public Pair<String, Long>[] domainQueue;
+	public HashMap<String, Long> lastScheduledTimes;
 }

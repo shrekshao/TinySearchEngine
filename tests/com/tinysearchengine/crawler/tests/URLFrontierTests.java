@@ -34,7 +34,7 @@ public class URLFrontierTests {
 	public static void closeStorage() {
 		d_testEnv.close();
 	}
-	
+
 	@BeforeClass
 	public static void setUpLogging() {
 		ConsoleAppender appender = new ConsoleAppender();
@@ -47,7 +47,7 @@ public class URLFrontierTests {
 			Logger.getRootLogger().addAppender(appender);
 		}
 	}
-	
+
 	@BeforeClass
 	public static void setUpSpark() {
 		Spark.port(8080);
@@ -179,6 +179,11 @@ public class URLFrontierTests {
 	public void testRestoration()
 			throws MalformedURLException, InterruptedException {
 		long startTime = System.nanoTime();
+		d_frontier.stop();
+		
+		Set<URL> seeds = new HashSet<>();
+		seeds.add(new URL("http://www.google.com"));
+		d_frontier = new URLFrontier(20, seeds, d_testEnv);
 
 		long now = (new Date()).getTime();
 		d_frontier.put(new URL("http://www.google2.com"),
@@ -187,6 +192,7 @@ public class URLFrontierTests {
 
 		long lastScheduledTime =
 			d_frontier.lastScheduledTime("www.google2.com");
+		System.out.println("Time for google2: " + lastScheduledTime);
 		assertEquals(now + 10000, lastScheduledTime);
 
 		now = (new Date()).getTime();
@@ -204,11 +210,15 @@ public class URLFrontierTests {
 				URLFrontier.Priority.Medium,
 				now + 3000);
 
-		Thread.sleep(5000);
-		d_frontier.stop();
-		d_frontier = new URLFrontier(20, new HashSet<>(), d_testEnv);
 		d_frontier.start();
+		Thread.sleep(2000);
+		d_frontier.stop();
+		
+		d_frontier = new URLFrontier(20, new HashSet<>(), d_testEnv);
 
+		lastScheduledTime = d_frontier.lastScheduledTime("www.google2.com");
+		System.out.println("Time for google2: " + lastScheduledTime);
+		
 		URLFrontier.Request r = d_frontier.get();
 		assertEquals("http://www.google.com", r.url.toString());
 
