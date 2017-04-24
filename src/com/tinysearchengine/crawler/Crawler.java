@@ -91,16 +91,14 @@ public class Crawler {
 		m_manager = new PoolingHttpClientConnectionManager();
 		m_manager.setMaxTotal(20 * nThread);
 		m_manager.setDefaultMaxPerRoute(20);
-		
+
 		RequestConfig.Builder reqCfgBuilder = RequestConfig.custom();
 		reqCfgBuilder.setSocketTimeout(k_TIMEOUT);
 		reqCfgBuilder.setConnectTimeout(k_TIMEOUT);
 		reqCfgBuilder.setConnectionRequestTimeout(k_TIMEOUT);
-		
-		m_client = HttpClients.custom()
-				.setConnectionManager(m_manager)
-				.setDefaultRequestConfig(reqCfgBuilder.build())
-				.build();
+
+		m_client = HttpClients.custom().setConnectionManager(m_manager)
+				.setDefaultRequestConfig(reqCfgBuilder.build()).build();
 
 		Spark.port(port);
 
@@ -313,9 +311,18 @@ public class Crawler {
 								k_USER_AGENT)) {
 							logger.debug("Adding " + req.url.toString()
 									+ " for GET.");
-							m_URLFrontier.put(req.url,
-									computePriority(req.url, resp),
-									computeReleaseTime(req.url));
+							URLFrontier.Priority prio =
+								computePriority(req.url, resp);
+							long releaseTime = computeReleaseTime(req.url);
+							m_cluster.putUrlThreadPool().submit(() -> {
+								try {
+									m_URLFrontier.put(req.url,
+											prio,
+											releaseTime);
+								} catch (InterruptedException e) {
+									logger.warn("Frontier put interrupted", e);
+								}
+							});
 						}
 					} else if (req.method.equals("GET")) {
 

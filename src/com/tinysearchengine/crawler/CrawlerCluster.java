@@ -212,4 +212,8 @@ public class CrawlerCluster {
 	public long urlsSent() {
 		return d_urlsSent.get();
 	}
+	
+	public ExecutorService putUrlThreadPool() {
+		return d_threadPool;
+	}
 }

@@ -27,6 +27,7 @@ public class CrawlerContext {
 	public static class CrawlerStats {
 		public long docsCrawled;
 		public long urlsSent;
+		public String threadPoolState;
 	}
 
 	public CrawlerContext(URLFrontier frontier,
@@ -57,6 +58,7 @@ public class CrawlerContext {
 				CrawlerStats stats = new CrawlerStats();
 				stats.docsCrawled = m_totalDocs.get();
 				stats.urlsSent = m_cluster.urlsSent();
+				stats.threadPoolState = m_cluster.putUrlThreadPool().toString();
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.enable(SerializationFeature.INDENT_OUTPUT);
 				return mapper.writerWithDefaultPrettyPrinter()
