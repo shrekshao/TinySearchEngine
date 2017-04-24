@@ -13,9 +13,9 @@ public class DdbKeyword {
 
 	private String d_word;
 	private int d_globalCount;
-	private float idf;		// log( N/n )
+	private float d_idf;		// log( N/n )
 
-	@DynamoDBHashKey(attributeName = "d_word")
+	@DynamoDBHashKey(attributeName = "word")
 	public String getKeyword() {
 		return d_word;
 	}
@@ -23,44 +23,20 @@ public class DdbKeyword {
 		this.d_word = word;
 	}
 
-	@DynamoDBAttribute(attributeName = "content")
-	public byte[] getContent() {
-		return d_content;
+	@DynamoDBAttribute(attributeName = "globalCount")
+	public int getGlobalCount() {
+		return d_globalCount;
 	}
-	public void setContent(byte[] content) {
-		d_content = content;
-	}
-
-	@DynamoDBAttribute(attributeName = "contentType")
-	public String getContentType() {
-		return d_contentType;
-	}
-	public void setContentType(String contentType) {
-		d_contentType = contentType;
+	public void setContent(int count) {
+		d_globalCount = count;
 	}
 
-	@DynamoDBAttribute(attributeName = "crawledTime")
-	public long getCrawledTime() {
-		return d_crawledTime;
+	@DynamoDBAttribute(attributeName = "idf")
+	public float getContentType() {
+		return d_idf;
 	}
-	public void setCrawledTime(long time) {
-		d_crawledTime = time;
-	}
-	
-	@DynamoDBAttribute(attributeName = "charset")
-	public String getCharset() {
-		return d_charset;
-	}
-	public void setCharset(String charset) {
-		d_charset = charset;
-	}
-	
-	@DynamoDBIgnore
-	public URL getUrl() {
-		return d_url;
-	}
-	public void setUrl(URL url) {
-		d_url = url;
+	public void setContentType(float idf) {
+		d_idf = idf;
 	}
 
 }
