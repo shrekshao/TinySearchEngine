@@ -103,53 +103,53 @@ public class CrawlerCluster {
 				}
 				return "";
 			}
-
-			private boolean insertReceivedUrl(URL url) {
-				Map<URL, Boolean> due = m_due;
-
-				// DUE
-				if (!due.containsKey(url)) {
-					due.put(url, true);
-
-					URLFrontier frontier = m_frontier;
-
-					// put head request into URLFrontier
-					URLFrontier.Request headRequest = new URLFrontier.Request();
-					headRequest.url = url;
-					headRequest.method = "HEAD";
-
-					long lastScheduledTime =
-						frontier.lastScheduledTime(url.getAuthority());
-					RobotInfo info = m_cache.getInfoForUrl(url);
-
-					int crawlDelaySeconds = 2;
-					if (info != null) {
-						crawlDelaySeconds = Math.max(crawlDelaySeconds,
-								info.getCrawlDelay(Crawler.k_USER_AGENT));
-					}
-					logger.debug(url.toString() + " has delay: "
-							+ crawlDelaySeconds
-							+ " seconds.");
-
-					try {
-						frontier.put(headRequest,
-								URLFrontier.Priority.Medium,
-								lastScheduledTime + crawlDelaySeconds * 1000);
-						return true;
-					} catch (InterruptedException e) {
-						logger.error("frontier put interrupted", e);
-						return false;
-					}
-				}
-
-				return false;
-			}
 		});
 
 		// Populate the URL buffers.
 		for (int i = 0; i < workerConfig.length; ++i) {
 			d_urlBuffer.put(workerConfig[i], new StringBuffer());
 		}
+	}
+
+	private boolean insertReceivedUrl(URL url) {
+		Map<URL, Boolean> due = m_due;
+
+		// DUE
+		if (!due.containsKey(url)) {
+			due.put(url, true);
+
+			URLFrontier frontier = m_frontier;
+
+			// put head request into URLFrontier
+			URLFrontier.Request headRequest = new URLFrontier.Request();
+			headRequest.url = url;
+			headRequest.method = "HEAD";
+
+			long lastScheduledTime =
+				frontier.lastScheduledTime(url.getAuthority());
+			RobotInfo info = m_cache.getInfoForUrl(url);
+
+			int crawlDelaySeconds = 2;
+			if (info != null) {
+				crawlDelaySeconds = Math.max(crawlDelaySeconds,
+						info.getCrawlDelay(Crawler.k_USER_AGENT));
+			}
+			logger.debug(url.toString() + " has delay: "
+					+ crawlDelaySeconds
+					+ " seconds.");
+
+			try {
+				frontier.put(headRequest,
+						URLFrontier.Priority.Medium,
+						lastScheduledTime + crawlDelaySeconds * 1000);
+				return true;
+			} catch (InterruptedException e) {
+				logger.error("frontier put interrupted", e);
+				return false;
+			}
+		}
+
+		return false;
 	}
 
 	private synchronized void flushSendBuffer(String dest) {
@@ -189,31 +189,9 @@ public class CrawlerCluster {
 		if (workerIndex == m_myIndex) {
 			if (!m_due.containsKey(url)) {
 				m_due.put(url, true);
-				URLFrontier.Request headRequest = new URLFrontier.Request();
-				headRequest.url = url;
-				headRequest.method = "HEAD";
-
-				long lastScheduledTime =
-					m_frontier.lastScheduledTime(url.getAuthority());
-				RobotInfo info = m_cache.getInfoForUrl(url);
-				int crawlDelaySeconds = 2;
-				if (info != null) {
-					crawlDelaySeconds = Math.max(crawlDelaySeconds,
-							info.getCrawlDelay(Crawler.k_USER_AGENT));
-				}
-				logger.debug(url.toString() + " has delay: "
-						+ crawlDelaySeconds
-						+ " seconds");
-
-				if (RobotInfoCache.canCrawl(info, url, Crawler.k_USER_AGENT)) {
-					try {
-						m_frontier.put(headRequest,
-								URLFrontier.Priority.Medium,
-								lastScheduledTime + crawlDelaySeconds * 1000);
-					} catch (InterruptedException e) {
-						logger.error("Frontier put interrupted", e);
-					}
-				}
+				d_threadPool.submit(() -> {
+					insertReceivedUrl(url);
+				});
 			}
 		} else {
 			String dest = m_workerConfig[workerIndex];
