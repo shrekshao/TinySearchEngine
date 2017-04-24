@@ -71,7 +71,7 @@ public class URLFrontier {
 		public String nextUrl;
 		public long nextUrlReleaseTime;
 		public String nextUrlReleaseTimeStr;
-		public int[] backendQueueCounts;
+		public Map<String, Integer> backendQueueCounts;
 		public String collectedAtTime;
 	}
 
@@ -195,9 +195,11 @@ public class URLFrontier {
 		stats.lowFrontendQueueCount = d_frontendQueues[0].size();
 		stats.medFrontendQueueCount = d_frontendQueues[1].size();
 		stats.highFrontendQueueCount = d_frontendQueues[2].size();
-		stats.backendQueueCounts = new int[d_backendQueues.length];
-		for (int i = 0; i < d_backendQueues.length; ++i) {
-			stats.backendQueueCounts[i] = d_backendQueues[i].size();
+		stats.backendQueueCounts = new HashMap<>();
+
+		for (Map.Entry<String, Integer> d2bidx : d_domainToQueue.entrySet()) {
+			stats.backendQueueCounts.put(d2bidx.getKey(),
+					d_backendQueues[d2bidx.getValue()].size());
 		}
 
 		Pair<String, Long> domain = d_domainQueue.peek();
@@ -217,7 +219,7 @@ public class URLFrontier {
 
 		assert stats.nextUrl != null;
 		assert stats.nextUrlReleaseTimeStr != null;
-	
+
 		stats.collectedAtTime = new Date().toString();
 		return stats;
 	}
@@ -290,8 +292,7 @@ public class URLFrontier {
 
 		String domain = req.url.getAuthority();
 		Long lastScheduledTime = d_lastScheduledTime.get(domain);
-		if (lastScheduledTime == null
-				|| releaseTime > lastScheduledTime) {
+		if (lastScheduledTime == null || releaseTime > lastScheduledTime) {
 			d_lastScheduledTime.put(domain, releaseTime);
 		}
 	}
@@ -465,7 +466,7 @@ public class URLFrontier {
 		long now = new Date().getTime();
 		long dur = now - snapshot.snapshotTime;
 		logger.info("Restoration shifts time by: " + dur + " ms.");
-		
+
 		d_backendQueues = new Queue[snapshot.backendQueues.size()];
 		for (int i = 0; i < d_backendQueues.length; ++i) {
 			d_backendQueues[i] = new LinkedList<>();
