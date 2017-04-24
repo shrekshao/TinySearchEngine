@@ -2,6 +2,8 @@ package com.tinysearchengine.database;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
+
 import com.sleepycat.je.*;
 import com.sleepycat.persist.*;
 import com.sleepycat.persist.model.AnnotationModel;
@@ -49,7 +51,8 @@ public class DBEnv {
 			d_store.close();
 			d_environment.close();
 		} catch (DatabaseException e) {
-			e.printStackTrace();
+			Logger logger = Logger.getLogger(DBEnv.class);
+			logger.info("DBException", e);
 		}
 	}
 }

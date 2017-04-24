@@ -3,9 +3,8 @@ package com.tinysearchengine.crawler.frontier;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.commons.lang3.tuple.Pair;
 import com.tinysearchengine.crawler.frontier.URLFrontier.Request;
@@ -15,9 +14,11 @@ public class URLFrontierSnapshot {
 	@PrimaryKey
 	public Long snapshotTime;
 	
-	public Queue<Pair<Request, Long>> frontendQueues[];
-	public Set<Integer> emptyBackendQueues;
-	public Queue<Request> backendQueues[];
-	public Map<String, Integer> domainToQueue;
+	public HashMap<Integer, Pair<Request, Long>[]> frontendQueues;
+	public HashSet<Integer> emptyBackendQueues;
+	public HashMap<Integer, Request[]> backendQueues;
+	public HashMap<String, Integer> domainToQueue;
 	public Pair<String, Long>[] domainQueue;
+	public HashMap<String, Long> lastScheduledTimes;
+	public long frontierSize;
 }

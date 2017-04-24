@@ -11,10 +11,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.model.Persistent;
 import com.tinysearchengine.database.DBEnv;
@@ -25,12 +27,27 @@ import java.util.Map;
 import org.apache.log4j.*;
 
 public class URLFrontier {
-	
+
 	/**
 	 * Every 10 minutes;
 	 */
 	private final static long k_SNAPSHOT_INTERVAL = 1000 * 60 * 10;
-	
+
+	/**
+	 * Every 10 seconds.
+	 */
+	private final static long k_STAT_INTERVAL = 1000 * 10;
+
+	/**
+	 * Number of milliseconds in a day.
+	 */
+	private final static long k_ONE_DAY = 1000 * 3600 * 24;
+
+	/**
+	 * Maximum size of the frontier.
+	 */
+	private final static long k_MAX_SIZE = 1500000;
+
 	/**
 	 * This represents the priority of a given URL to be enqueued into the
 	 * frontier.
@@ -50,6 +67,18 @@ public class URLFrontier {
 		public int toInt() {
 			return d_value;
 		}
+	}
+
+	static public class URLFrontierStats {
+		public int lowFrontendQueueCount;
+		public int medFrontendQueueCount;
+		public int highFrontendQueueCount;
+		public String nextUrl;
+		public long nextUrlReleaseTime;
+		public String nextUrlReleaseTimeStr;
+		public Map<String, Integer> backendQueueCounts;
+		public String collectedAtTime;
+		public long frontierSize;
 	}
 
 	@Persistent
@@ -89,7 +118,7 @@ public class URLFrontier {
 	/**
 	 * The map from domain strings to when their last request was scheduled.
 	 */
-	Map<String, Long> d_lastScheduledTime = new HashMap<>();
+	Map<String, Long> d_lastScheduledTime = new ConcurrentHashMap<>();
 
 	/**
 	 * The priority queue from where we fetch the next domains.
@@ -111,11 +140,26 @@ public class URLFrontier {
 	 * The primary index used to access snapshots.
 	 */
 	PrimaryIndex<Long, URLFrontierSnapshot> d_snapshotByTime;
-	
+
 	/**
 	 * The timer used to trigger snapshots.
 	 */
 	Timer d_snapshotTimer;
+
+	/**
+	 * The timer used to start collecting stats.
+	 */
+	Timer d_statTimer;
+
+	/**
+	 * The last stat object.
+	 */
+	private volatile URLFrontierStats d_lastStat = new URLFrontierStats();
+
+	/**
+	 * Current size of the frontier.
+	 */
+	private long d_frontierSize = 0;
 
 	@SuppressWarnings("unchecked")
 	private void initialize(int numBackendQueues) {
@@ -130,11 +174,24 @@ public class URLFrontier {
 		}
 	}
 
-	public URLFrontier(int numBackendQueues, Set<URL> seeds, DBEnv dbEnv) {
+	public URLFrontier(int numBackendQueues, Set<URL> seeds, DBEnv dbEnv)
+			throws InterruptedException {
 		initialize(numBackendQueues);
 		d_dbEnv = dbEnv;
 		d_snapshotByTime = d_dbEnv.getStore().getPrimaryIndex(Long.class,
 				URLFrontierSnapshot.class);
+
+		URLFrontierSnapshot snapshot = fetchLatestSnapshot();
+		if (snapshot != null) {
+			Logger logger = Logger.getLogger(URLFrontier.class);
+			logger.info("Found a snapshot at: "
+					+ new Date(snapshot.snapshotTime).toString());
+
+			logger.info("Restoring from last snapshot.");
+			restoreFromSnapshot(snapshot);
+			removeOldSnapshots(snapshot.snapshotTime - k_ONE_DAY);
+			logger.info("Finished restoring.");
+		}
 
 		for (URL url : seeds) {
 			Request req = new Request();
@@ -143,6 +200,41 @@ public class URLFrontier {
 			long now = (new Date()).getTime();
 			put(req, Priority.Medium, now);
 		}
+	}
+
+	private synchronized URLFrontierStats getStats() {
+		URLFrontierStats stats = new URLFrontierStats();
+		stats.lowFrontendQueueCount = d_frontendQueues[0].size();
+		stats.medFrontendQueueCount = d_frontendQueues[1].size();
+		stats.highFrontendQueueCount = d_frontendQueues[2].size();
+		stats.backendQueueCounts = new HashMap<>();
+		stats.frontierSize = d_frontierSize;
+
+		for (Map.Entry<String, Integer> d2bidx : d_domainToQueue.entrySet()) {
+			stats.backendQueueCounts.put(d2bidx.getKey(),
+					d_backendQueues[d2bidx.getValue()].size());
+		}
+
+		Pair<String, Long> domain = d_domainQueue.peek();
+
+		if (domain == null) {
+			stats.nextUrl = "Unknown";
+			stats.nextUrlReleaseTime = 0;
+			stats.nextUrlReleaseTimeStr = "Unknown";
+		} else {
+			int qid = d_domainToQueue.get(domain.getLeft());
+			Request req = d_backendQueues[qid].peek();
+			stats.nextUrl = req.url.toString();
+			stats.nextUrlReleaseTime = domain.getRight();
+			stats.nextUrlReleaseTimeStr =
+				new Date(domain.getRight()).toString();
+		}
+
+		assert stats.nextUrl != null;
+		assert stats.nextUrlReleaseTimeStr != null;
+
+		stats.collectedAtTime = new Date().toString();
+		return stats;
 	}
 
 	/**
@@ -167,11 +259,14 @@ public class URLFrontier {
 				d_domainToQueue.remove(domain);
 			}
 
+			d_frontierSize--;
+			this.notify();
 			return req;
 		}
 	}
 
-	public void put(URL url, Priority priority, long releaseTime) {
+	public void put(URL url, Priority priority, long releaseTime)
+			throws InterruptedException {
 		Request req = new Request();
 		req.url = url;
 		req.method = "GET";
@@ -189,7 +284,21 @@ public class URLFrontier {
 	 */
 	public synchronized void put(Request req,
 			Priority priority,
-			long releaseTime) {
+			long releaseTime) throws InterruptedException {
+		Logger logger = Logger.getLogger(URLFrontier.class);
+		logger.debug("Putting url: " + req.url
+				+ ", method: "
+				+ req.method
+				+ ", priority: "
+				+ priority.toString()
+				+ ", releasing at: "
+				+ new Date(releaseTime).toString());
+
+		while (d_frontierSize > k_MAX_SIZE) {
+			logger.warn("Maximum size reached, throttling frontier put!");
+			this.wait();
+		}
+
 		// Some sanity check on the inputs.
 		int frontendQueueId = priority.toInt();
 		assert 0 <= frontendQueueId && frontendQueueId < 3;
@@ -204,14 +313,13 @@ public class URLFrontier {
 
 		String domain = req.url.getAuthority();
 		Long lastScheduledTime = d_lastScheduledTime.get(domain);
-		if (lastScheduledTime == null) {
-			d_lastScheduledTime.put(domain, releaseTime);
-		} else if (releaseTime > lastScheduledTime) {
+		if (lastScheduledTime == null || releaseTime > lastScheduledTime) {
 			d_lastScheduledTime.put(domain, releaseTime);
 		}
+		d_frontierSize++;
 	}
 
-	public synchronized long lastScheduledTime(String domain) {
+	public long lastScheduledTime(String domain) {
 		Long time = d_lastScheduledTime.get(domain);
 		if (time == null) {
 			return (new Date()).getTime();
@@ -222,14 +330,14 @@ public class URLFrontier {
 
 	/**
 	 * Select a frontend queue based on the following intervals: [0, 10] -> low
-	 * priority [10, 50] -> medium priority [50, 120] -> high priority
+	 * priority [10, 50] -> medium priority [50, 200] -> high priority
 	 * 
 	 * @return
 	 */
 	private int selectFrontendQueue() {
 		int lowPrioEnd = d_frontendQueues[0].isEmpty() ? 0 : 10;
 		int medPrioEnd = d_frontendQueues[1].isEmpty() ? lowPrioEnd : 50;
-		int hiPrioEnd = d_frontendQueues[2].isEmpty() ? medPrioEnd : 120;
+		int hiPrioEnd = d_frontendQueues[2].isEmpty() ? medPrioEnd : 200;
 
 		int rand = d_generator.nextInt(hiPrioEnd);
 		if (0 <= rand && rand < lowPrioEnd) {
@@ -324,17 +432,118 @@ public class URLFrontier {
 
 		snap.snapshotTime = now.getTime();
 		synchronized (this) {
-			snap.frontendQueues = d_frontendQueues;
-			snap.emptyBackendQueues = d_emptyBackendQueues;
-			snap.backendQueues = d_backendQueues;
-			snap.domainToQueue = d_domainToQueue;
+			snap.frontendQueues = new HashMap<>();
+			for (int i = 0; i < d_frontendQueues.length; ++i) {
+				snap.frontendQueues.put(i,
+						d_frontendQueues[i].toArray(new Pair[0]));
+			}
+
+			snap.emptyBackendQueues = new HashSet<>(d_emptyBackendQueues);
+
+			snap.backendQueues = new HashMap<>();
+			for (int i = 0; i < d_backendQueues.length; ++i) {
+				snap.backendQueues.put(i,
+						d_backendQueues[i].toArray(new Request[0]));
+			}
+
+			snap.domainToQueue = new HashMap<>(d_domainToQueue);
 			snap.domainQueue = d_domainQueue.dumpQueue(new Pair[0]);
+			snap.lastScheduledTimes = new HashMap<>(d_lastScheduledTime);
+			snap.frontierSize = d_frontierSize;
 		}
 
 		d_snapshotByTime.put(snap);
 		d_dbEnv.getStore().sync();
-		
+
+		removeOldSnapshots(snap.snapshotTime - k_ONE_DAY);
+
 		logger.info("Finished snapshot.");
+	}
+
+	/**
+	 * Return the latest snapshot, if none exists, return null.
+	 * 
+	 * @return
+	 */
+	private URLFrontierSnapshot fetchLatestSnapshot() {
+		EntityCursor<Long> keyCursor = d_snapshotByTime.keys();
+		try {
+			Long lastKey = keyCursor.last();
+			if (lastKey != null) {
+				return d_snapshotByTime.get(lastKey);
+			}
+
+			return null;
+		} finally {
+			keyCursor.close();
+		}
+	}
+
+	/**
+	 * Restore the state of the frontier from the given snapshot.
+	 * 
+	 * @param snapshot
+	 */
+	private void restoreFromSnapshot(URLFrontierSnapshot snapshot) {
+		Logger logger = Logger.getLogger(URLFrontier.class);
+		long now = new Date().getTime();
+		long dur = now - snapshot.snapshotTime;
+		logger.info("Restoration shifts time by: " + dur + " ms.");
+
+		d_backendQueues = new Queue[snapshot.backendQueues.size()];
+		for (int i = 0; i < d_backendQueues.length; ++i) {
+			d_backendQueues[i] = new LinkedList<>();
+			Request[] reqs = snapshot.backendQueues.get(i);
+			for (int j = 0; j < reqs.length; ++j) {
+				d_backendQueues[i].offer(reqs[j]);
+			}
+		}
+
+		d_domainToQueue = new HashMap<>(snapshot.domainToQueue);
+		d_frontendQueues = new Queue[snapshot.frontendQueues.size()];
+		for (int i = 0; i < d_frontendQueues.length; ++i) {
+			d_frontendQueues[i] = new LinkedList<>();
+			Pair<Request, Long>[] reqs = snapshot.frontendQueues.get(i);
+			for (int j = 0; j < reqs.length; ++j) {
+				d_frontendQueues[i].offer(reqs[j]);
+			}
+		}
+
+		d_emptyBackendQueues = new HashSet<>(snapshot.emptyBackendQueues);
+
+		for (int i = 0; i < snapshot.domainQueue.length; ++i) {
+			String domain = snapshot.domainQueue[i].getLeft();
+			long releaseTime = snapshot.domainQueue[i].getRight() + dur;
+			d_domainQueue.put(domain, releaseTime);
+		}
+
+		d_lastScheduledTime =
+			new ConcurrentHashMap<>(snapshot.lastScheduledTimes);
+		for (Map.Entry<String, Long> entry : d_lastScheduledTime.entrySet()) {
+			String domain = entry.getKey();
+			Long time = entry.getValue() + dur;
+			d_lastScheduledTime.put(domain, time);
+		}
+
+		d_frontierSize = snapshot.frontierSize;
+	}
+
+	private void removeOldSnapshots(long olderThan) {
+		Logger logger = Logger.getLogger(URLFrontier.class);
+		EntityCursor<Long> keyCursor = d_snapshotByTime.keys();
+		try {
+			Long time = null;
+			while ((time = keyCursor.next()) != null) {
+				if (time < olderThan) {
+					logger.info("Removing snapshot from: "
+							+ new Date(time).toString());
+					keyCursor.delete();
+				}
+			}
+		} finally {
+			keyCursor.close();
+			d_dbEnv.getStore().sync();
+		}
 	}
 
 	/**
@@ -345,11 +554,11 @@ public class URLFrontier {
 		if (d_snapshotTimer != null) {
 			return;
 		}
-		
+
 		WeakReference<URLFrontier> self = new WeakReference<>(this);
 		d_snapshotTimer = new Timer("URLFrontierSnapshot");
 		d_snapshotTimer.schedule(new TimerTask() {
-			
+
 			@Override
 			public void run() {
 				if (self.get() != null) {
@@ -357,10 +566,31 @@ public class URLFrontier {
 				}
 			}
 		}, 0, k_SNAPSHOT_INTERVAL);
+
+		d_statTimer = new Timer("URLFrontierStats");
+		d_statTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (self.get() != null) {
+					d_lastStat = self.get().getStats();
+				}
+			}
+		}, 0, k_STAT_INTERVAL);
 	}
-	
+
 	public void stop() {
-		d_snapshotTimer.cancel();
-		d_snapshotTimer = null;
+		if (d_snapshotTimer != null) {
+			d_snapshotTimer.cancel();
+			d_snapshotTimer = null;
+		}
+
+		if (d_statTimer != null) {
+			d_statTimer.cancel();
+			d_statTimer = null;
+		}
+	}
+
+	public URLFrontierStats stats() {
+		return d_lastStat;
 	}
 }
