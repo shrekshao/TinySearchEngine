@@ -2,9 +2,10 @@
 
 * Tables
     + Parsed Document
-        - docid
-        - doc pointer to S3 (manual node hash)
+        - docid (url)
+        - doc pointer to S3 (manual node hash) / url (if stored in db)
         - total word count
+        - page rank score
         - (other general info)
     + KeyWord
         - wordid
