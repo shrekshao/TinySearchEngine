@@ -14,7 +14,7 @@ public class PageRankUrlProcessDriver extends Configured implements Tool{
 		// TODO Auto-generated method stub
 
 		//Start A Job
-	    Job job=new Job();	    
+	    Job job = new Job();	    
 	    job.setJobName("Step 1: Extract links and Invalidate");
 	    
 	    //Set Related Classes: driver, mapper, reducer

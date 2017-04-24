@@ -18,15 +18,15 @@ import org.apache.hadoop.util.Tool;
 
 //now assume input is key: url, value: {a set of output urls}
 
-public class PageRankUrlProcessMapper extends Mapper<LongWritable,Text, Text,Text> {
+public class PageRankUrlProcessMapper extends Mapper<LongWritable, Text, Text, Text> {
 	@Override 
 	//input format : LongWritables, Text
-	//Need to accomodate to Crawler input
+	//Need to accommodate to Crawler input
 	public void map(LongWritable key, Text values, Context context) throws IOException, InterruptedException {
 		int counter = 0;
 		String[] urls = values.toString().split("\t", 2);
 		if(urls.length != 2) {
-			System.out.println("this url is not valid"); //maybe the url does has any outlinks, etc, a lot needs to be considered
+			System.out.println("this url is not valid"); //maybe the url is not valid, the url does not have any outlinks, etc. A lot needs to be considered
 			return;
 		}
 		String url = urls[0]; 
