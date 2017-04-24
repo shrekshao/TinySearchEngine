@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.Reducer.Context;
 
 public class PageRankUrlProcessReducer extends Reducer<Text,Text,Text,Text> {
 	@Override 
