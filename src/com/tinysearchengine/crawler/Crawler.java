@@ -180,10 +180,10 @@ public class Crawler {
 		return null;
 	}
 
-	private static boolean isEnglish(HttpResponse headResp) {
+	public static boolean isEnglish(HttpResponse headResp) {
 		Header[] headers = headResp.getHeaders("content-language");
 		if (headers == null || headers.length == 0) {
-			return false;
+			return true;
 		}
 
 		for (int i = 0; i < headers.length; ++i) {
