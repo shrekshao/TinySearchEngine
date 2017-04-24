@@ -9,7 +9,7 @@
         - (other general info)
     + KeyWord
         - wordid (* might not be necessary)
-        - word (text, probably after)
+        - word (text, probably after Porterstemmer)
         - global count
         - idf (log(N/n))
     + KeyWord Document relation

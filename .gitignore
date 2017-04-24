@@ -3,3 +3,4 @@ build/
 *.class
 credentials.csv
 database/
+.metadata/
