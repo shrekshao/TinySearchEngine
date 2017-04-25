@@ -54,7 +54,7 @@ public class Crawler {
 	private static int k_MAX_DOC_SIZE = 5 * 1024 * 1024;
 	private static int k_MAX_DUE_SIZE = 10000;
 	private static int k_DOC_COUNT = 1000000;
-	private static int k_TIMEOUT = 2000;
+	private static int k_TIMEOUT = 20000;
 
 	private DBEnv m_dbEnv = null;
 	private URLFrontier m_URLFrontier = null;
