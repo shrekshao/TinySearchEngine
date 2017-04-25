@@ -100,10 +100,8 @@ public class Crawler {
 		reqCfgBuilder.setConnectionRequestTimeout(k_TIMEOUT);
 		reqCfgBuilder.setCookieSpec(CookieSpecs.STANDARD);
 
-		m_client = HttpClients.custom()
-				.setConnectionManager(m_manager)
-				.setDefaultRequestConfig(reqCfgBuilder.build())
-				.build();
+		m_client = HttpClients.custom().setConnectionManager(m_manager)
+				.setDefaultRequestConfig(reqCfgBuilder.build()).build();
 
 		Spark.port(port);
 
@@ -383,8 +381,10 @@ public class Crawler {
 									// Ignore.
 								}
 							}
-							
+
 							ddbDoc.setLinks(extractedLinks);
+							// new documents have links
+							ddbDoc.setRepaired(true);
 							d_ddbConnector.putDocument(ddbDoc);
 						} else {
 							logger.info(

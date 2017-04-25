@@ -10,11 +10,14 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.PaginationLoadingStrategy;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.s3.model.Region;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DdbConnector {
 
@@ -107,7 +110,20 @@ public class DdbConnector {
 	public List<DdbDocument> getAllDocumentsLazily() {
 		DynamoDBScanExpression expr =
 			new DynamoDBScanExpression().withConsistentRead(false);
-		return d_mapper.parallelScan(DdbDocument.class, expr, 4);
+		DynamoDBMapperConfig config =
+			DynamoDBMapperConfig.builder().withPaginationLoadingStrategy(
+					PaginationLoadingStrategy.ITERATION_ONLY).build();
+		return d_mapper.parallelScan(DdbDocument.class, expr, 4, config);
+	}
+
+	public List<DdbDocument> getAllNonRepairedDocumentsLazily() {
+		DynamoDBScanExpression expr =
+			new DynamoDBScanExpression().withConsistentRead(false)
+					.withFilterExpression("attribute_not_exists(repaired)");
+		DynamoDBMapperConfig config =
+			DynamoDBMapperConfig.builder().withPaginationLoadingStrategy(
+					PaginationLoadingStrategy.ITERATION_ONLY).build();
+		return d_mapper.scan(DdbDocument.class, expr, config);
 	}
 
 	/**
