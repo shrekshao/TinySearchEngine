@@ -6,8 +6,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
@@ -47,6 +49,11 @@ public class DdbConnectorTests {
 		doc.setContentType("application/html");
 		doc.setCrawledTime(new Date().getTime());
 		doc.setCharset("UTF-8");
+		
+		Set<String> links = new HashSet<>();
+		links.add("www.barfoo.com");
+		links.add("www.barbaz.com");
+		doc.setLinks(links);
 
 		String s3LinkName = DdbConnector.urlToS3LinkKey(doc.getUrl());
 		doc.setContentLink(d_connector.createS3Link(s3LinkName));
@@ -67,6 +74,8 @@ public class DdbConnectorTests {
 		assertEquals(doc.getContentType(), doc2.getContentType());
 		assertEquals(doc.getCrawledTime(), doc2.getCrawledTime());
 		assertEquals(doc.getCharset(), doc2.getCharset());
+		assertTrue(doc.getLinks().contains("www.barfoo.com"));
+		assertTrue(doc.getLinks().contains("www.barbaz.com"));
 
 		System.out.println("Querying by fingerprint.");
 		List<DdbDocument> docs = d_connector.getDocumentByFingerprint(fp);
@@ -77,6 +86,8 @@ public class DdbConnectorTests {
 		assertEquals(doc.getContentType(), doc2.getContentType());
 		assertEquals(doc.getCrawledTime(), doc2.getCrawledTime());
 		assertEquals(doc.getCharset(), doc2.getCharset());
+		assertTrue(doc.getLinks().contains("www.barfoo.com"));
+		assertTrue(doc.getLinks().contains("www.barbaz.com"));
 	}
 
 	@Test

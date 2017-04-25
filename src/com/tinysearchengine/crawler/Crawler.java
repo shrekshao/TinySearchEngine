@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -357,7 +358,6 @@ public class Crawler {
 									.computeFingerprint(ddbDoc.getContent()));
 							ddbDoc.setContentType(contentType);
 
-							d_ddbConnector.putDocument(ddbDoc);
 							logger.debug("Stored " + req.url.toString()
 									+ " to the database.");
 
@@ -366,16 +366,21 @@ public class Crawler {
 							// Extract the URLs
 							String[] urls =
 								URLExtractor.extract(ddbDoc.getContent());
+							HashSet<String> extractedLinks = new HashSet<>();
 							logger.debug(
 									"Extracted urls: " + Arrays.toString(urls));
 							for (int i = 0; i < urls.length; ++i) {
 								try {
 									URL resolvedUrl = new URL(req.url, urls[i]);
+									extractedLinks.add(resolvedUrl.toString());
 									m_context.putTask(resolvedUrl);
 								} catch (MalformedURLException e) {
 									// Ignore.
 								}
 							}
+							
+							ddbDoc.setLinks(extractedLinks);
+							d_ddbConnector.putDocument(ddbDoc);
 						} else {
 							logger.info(
 									"Has already seen: " + req.url.toString());

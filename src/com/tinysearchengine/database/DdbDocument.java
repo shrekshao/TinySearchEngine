@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -25,6 +26,7 @@ public class DdbDocument {
 	private String d_charset;
 	private byte[] d_fingerprint;
 	private S3Link d_contentLink;
+	private Set<String> d_links;
 
 	@DynamoDBHashKey(attributeName = "url")
 	public String getUrlAsString() {
@@ -76,6 +78,14 @@ public class DdbDocument {
 	}
 	public void setFingerprint(byte[] fingerprint) {
 		d_fingerprint = fingerprint;
+	}
+	
+	@DynamoDBAttribute(attributeName = "links")
+	public Set<String> getLinks() {
+		return d_links;
+	}
+	public void setLinks(Set<String> links) {
+		d_links = links;
 	}
 
 	@DynamoDBIgnore
