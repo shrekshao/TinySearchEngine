@@ -117,9 +117,9 @@ public class DdbConnector {
 	}
 
 	public List<DdbDocument> getAllNonRepairedDocumentsLazily() {
-		DynamoDBScanExpression expr =
-			new DynamoDBScanExpression().withConsistentRead(false)
-					.withFilterExpression("attribute_not_exists(repaired)");
+		DynamoDBScanExpression expr = new DynamoDBScanExpression()
+				.withConsistentRead(false).withFilterExpression(
+						"attribute_not_exists(repaired) AND attribute_not_exists(links)");
 		DynamoDBMapperConfig config =
 			DynamoDBMapperConfig.builder().withPaginationLoadingStrategy(
 					PaginationLoadingStrategy.ITERATION_ONLY).build();

@@ -130,4 +130,26 @@ public class DdbConnectorTests {
 		System.out.println(
 				"Avg latency: " + (dur / (long) totalIterations) + " ns");
 	}
+	
+	@Test
+	public void testGetNonRepairedDocuments() {
+		List<DdbDocument> docs = d_connector.getAllNonRepairedDocumentsLazily();
+		Iterator<DdbDocument> docIt = docs.iterator();
+		int totalIterations = 100;
+		int iteration = totalIterations;
+		long startTime = System.nanoTime();
+		while (iteration >= 0 && docIt.hasNext()) {
+			DdbDocument doc = docIt.next();
+			System.out.println(doc.getUrlAsString());
+			assertFalse(doc.getRepaired());
+			assertNull(doc.getLinks());
+			iteration -= 1;
+		}
+		long dur = System.nanoTime() - startTime;
+
+		System.out.println("Remaining it: " + iteration);
+		System.out.println(
+				"Avg latency: " + (dur / (long) totalIterations) + " ns");
+
+	}
 }
