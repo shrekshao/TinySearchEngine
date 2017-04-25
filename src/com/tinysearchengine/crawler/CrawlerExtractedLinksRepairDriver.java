@@ -49,8 +49,6 @@ public class CrawlerExtractedLinksRepairDriver {
 	public static void main(String[] args) throws IOException {
 		setUpLogging();
 
-		int delay = Math.max(100, Integer.parseInt(args[0]));
-		logger.info("Running with delay: " + delay + " ms");
 		DdbConnector connector = new DdbConnector();
 
 		List<DdbDocument> docs = connector.getAllDocumentsLazily();
@@ -58,26 +56,20 @@ public class CrawlerExtractedLinksRepairDriver {
 
 		while (docsIt.hasNext()) {
 			try {
-				Thread.sleep(delay);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			try {
 				DdbDocument doc = docsIt.next();
 
 				if (doc.getLinks() == null && !doc.getRepaired()) {
 					HashSet<String> extractedLinks = new HashSet<>();
 					logger.info("Repairing " + doc.getUrlAsString());
 					byte[] content = doc.getContent();
-					
+
 					if (content == null) {
 						logger.warn("No S3 content: " + doc.getUrlAsString());
 						doc.setRepaired(true);
 						connector.putDocument(doc);
 						continue;
 					}
-					
+
 					String[] links = URLExtractor.extract(content);
 					for (String link : links) {
 						try {
