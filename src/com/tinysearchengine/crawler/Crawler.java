@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import org.apache.http.Header;
@@ -136,13 +137,18 @@ public class Crawler {
 			URL url,
 			Consumer<HttpResponse> cb) {
 		if (method.equals("HEAD")) {
-			HttpHead req = new HttpHead(url.toString());
+			String urlStr = url.toString();
+			HttpHead req = new HttpHead(urlStr);
 			req.addHeader("User-agent", k_USER_AGENT);
 			m_asyncClient.execute(req, new FutureCallback<HttpResponse>() {
 
 				@Override
 				public void failed(Exception e) {
-					logger.info("Exception occured in async request", e);
+					if (e instanceof TimeoutException) {
+						logger.info("TIMEOUT: " + urlStr, e);
+					} else {
+						logger.debug(urlStr + " failed", e);
+					}
 				}
 
 				@Override
