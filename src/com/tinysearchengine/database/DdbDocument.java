@@ -41,6 +41,7 @@ public class DdbDocument {
 	public S3Link getContentLink() {
 		return d_contentLink;
 	}
+
 	public void setContentLink(S3Link link) {
 		d_contentLink = link;
 	}
@@ -67,6 +68,7 @@ public class DdbDocument {
 	public String getCharset() {
 		return d_charset;
 	}
+
 	public void setCharset(String charset) {
 		d_charset = charset;
 	}
@@ -76,26 +78,33 @@ public class DdbDocument {
 	public byte[] getFingerprint() {
 		return d_fingerprint;
 	}
+
 	public void setFingerprint(byte[] fingerprint) {
 		d_fingerprint = fingerprint;
 	}
-	
+
 	@DynamoDBAttribute(attributeName = "links")
 	public Set<String> getLinks() {
 		return d_links;
 	}
+
 	public void setLinks(Set<String> links) {
-		d_links = links;
+		if (links == null || links.isEmpty()) {
+			d_links = null;
+		} else {
+			d_links = links;
+		}
 	}
 
 	@DynamoDBIgnore
 	public URL getUrl() {
 		return d_url;
 	}
+
 	public void setUrl(URL url) {
 		d_url = url;
 	}
-	
+
 	@DynamoDBIgnore
 	public byte[] getContent() {
 		if (d_content == null) {
@@ -103,7 +112,7 @@ public class DdbDocument {
 			d_contentLink.downloadTo(output);
 			d_content = output.toByteArray();
 		}
-		
+
 		return d_content;
 	}
 
@@ -111,11 +120,10 @@ public class DdbDocument {
 		d_hasNewContent = true;
 		d_content = content;
 	}
-	
+
 	public boolean hasNewContent() {
 		return d_hasNewContent;
 	}
-
 
 	/**
 	 * Computes a short fingerprint of the document.
