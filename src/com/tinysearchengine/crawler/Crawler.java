@@ -20,6 +20,7 @@ import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
@@ -67,7 +68,7 @@ public class Crawler {
 		new DocumentFingerprintCache(d_ddbConnector);
 
 	private PoolingNHttpClientConnectionManager m_asyncManager = null;
-	private HttpAsyncClient m_asyncClient = null;
+	private CloseableHttpAsyncClient m_asyncClient = null;
 
 	/**
 	 * @param dbDir
@@ -108,6 +109,7 @@ public class Crawler {
 		m_asyncClient = HttpAsyncClients.custom()
 				.setDefaultRequestConfig(reqCfgBuilder.build())
 				.setConnectionManager(m_asyncManager).build();
+		m_asyncClient.start();
 
 		Spark.port(port);
 
