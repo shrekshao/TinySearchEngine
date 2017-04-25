@@ -231,10 +231,11 @@ public class Crawler {
 	private long computeReleaseTime(URL url) {
 		long lastScheduledTime =
 			m_URLFrontier.lastScheduledTime(url.getAuthority());
-		int delay = 2;
+		int delay = 10;
 		RobotInfo info = m_robotCache.getInfoForUrl(url);
 		if (info != null) {
-			delay = Math.max(delay, info.getCrawlDelay(k_USER_AGENT));
+			int robotDelay = info.getCrawlDelay(k_USER_AGENT);
+			delay = robotDelay == 0 ? delay : robotDelay;
 			logger.debug(url.toString() + " has delay: " + delay + " seconds");
 		}
 

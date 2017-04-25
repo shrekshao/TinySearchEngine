@@ -129,10 +129,11 @@ public class CrawlerCluster {
 				frontier.lastScheduledTime(url.getAuthority());
 			RobotInfo info = m_cache.getInfoForUrl(url);
 
-			int crawlDelaySeconds = 2;
+			int crawlDelaySeconds = 10;
 			if (info != null) {
-				crawlDelaySeconds = Math.max(crawlDelaySeconds,
-						info.getCrawlDelay(Crawler.k_USER_AGENT));
+				int robotDelay = info.getCrawlDelay(Crawler.k_USER_AGENT);
+				crawlDelaySeconds =
+					robotDelay == 0 ? crawlDelaySeconds : robotDelay;
 			}
 			logger.debug(url.toString() + " has delay: "
 					+ crawlDelaySeconds
@@ -212,7 +213,7 @@ public class CrawlerCluster {
 	public long urlsSent() {
 		return d_urlsSent.get();
 	}
-	
+
 	public ExecutorService putUrlThreadPool() {
 		return d_threadPool;
 	}
