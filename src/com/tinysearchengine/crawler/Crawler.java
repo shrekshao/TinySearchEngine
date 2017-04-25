@@ -55,7 +55,7 @@ public class Crawler {
 	private static int k_MAX_DOC_SIZE = 5 * 1024 * 1024;
 	private static int k_MAX_DUE_SIZE = 10000;
 	private static int k_DOC_COUNT = 1000000;
-	private static int k_TIMEOUT = 4000;
+	private static int k_TIMEOUT = 60000; // 60 seconds
 
 	private DBEnv m_dbEnv = null;
 	private URLFrontier m_URLFrontier = null;
@@ -97,8 +97,12 @@ public class Crawler {
 				.maximumWeightedCapacity(k_MAX_DUE_SIZE).build();
 
 		IOReactorConfig reactorConfig = IOReactorConfig.custom()
-				.setConnectTimeout(k_TIMEOUT)
-				.setSoTimeout(k_TIMEOUT).build();
+				.setConnectTimeout(k_TIMEOUT).setSoTimeout(k_TIMEOUT).build();
+
+		// This should help with timeouts?
+		System.setProperty("http.maxConnections", "100");
+		System.setProperty("http.conn-manager.timeout",
+				Integer.toString(k_TIMEOUT));
 
 		ConnectingIOReactor ioreactor =
 			new DefaultConnectingIOReactor(reactorConfig);
@@ -151,7 +155,7 @@ public class Crawler {
 				@Override
 				public void failed(Exception e) {
 					if (e instanceof TimeoutException) {
-						logger.info("TIMEOUT: " + urlStr, e);
+						logger.info("TIMEOUT: " + urlStr);
 						m_context.incTimeout();
 					} else {
 						logger.debug(urlStr + " failed", e);
