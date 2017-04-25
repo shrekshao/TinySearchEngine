@@ -49,12 +49,20 @@ public class CrawlerExtractedLinksRepairDriver {
 	public static void main(String[] args) throws IOException {
 		setUpLogging();
 
+		int delay = Math.max(100, Integer.parseInt(args[0]));
+		logger.info("Running with delay: " + delay + " ms");
 		DdbConnector connector = new DdbConnector();
 
 		List<DdbDocument> docs = connector.getAllDocumentsLazily();
 		Iterator<DdbDocument> docsIt = docs.iterator();
 
 		while (docsIt.hasNext()) {
+			try {
+				Thread.sleep(delay);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			try {
 				DdbDocument doc = docsIt.next();
 
