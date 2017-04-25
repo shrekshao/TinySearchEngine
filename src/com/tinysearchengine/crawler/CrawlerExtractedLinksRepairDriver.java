@@ -51,7 +51,7 @@ public class CrawlerExtractedLinksRepairDriver {
 
 		DdbConnector connector = new DdbConnector();
 
-		List<DdbDocument> docs = connector.getAllDocumentsLazily();
+		List<DdbDocument> docs = connector.getAllNonRepairedDocumentsLazily();
 		Iterator<DdbDocument> docsIt = docs.iterator();
 
 		while (docsIt.hasNext()) {
@@ -69,7 +69,7 @@ public class CrawlerExtractedLinksRepairDriver {
 						connector.putDocument(doc);
 						continue;
 					}
-
+					
 					String[] links = URLExtractor.extract(content);
 					for (String link : links) {
 						try {
@@ -81,6 +81,9 @@ public class CrawlerExtractedLinksRepairDriver {
 					}
 
 					doc.setLinks(extractedLinks);
+					doc.setRepaired(true);
+					connector.putDocument(doc);
+				} else if (doc.getLinks() != null) {
 					doc.setRepaired(true);
 					connector.putDocument(doc);
 				}
