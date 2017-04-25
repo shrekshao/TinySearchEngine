@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,11 +53,19 @@ public class CrawlerCluster {
 
 	private static Logger logger = Logger.getLogger(CrawlerCluster.class);
 
-	private ExecutorService d_threadPool = new ThreadPoolExecutor(1,
+	private ExecutorService d_threadPool = new ThreadPoolExecutor(2,
 			10,
 			30,
 			TimeUnit.SECONDS,
-			new LinkedBlockingDeque<Runnable>(k_MAX_THREADPOOL_CAP));
+			new LinkedBlockingDeque<Runnable>(k_MAX_THREADPOOL_CAP),
+			Executors.defaultThreadFactory(),
+			new RejectedExecutionHandler() {
+				@Override
+				public void rejectedExecution(Runnable r,
+						ThreadPoolExecutor executor) {
+					// Just Ignore
+				}
+			});
 
 	public CrawlerCluster(URLFrontier frontier,
 			RobotInfoCache cache,
