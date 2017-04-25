@@ -16,6 +16,7 @@ import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
@@ -97,9 +98,12 @@ public class Crawler {
 		reqCfgBuilder.setSocketTimeout(k_TIMEOUT);
 		reqCfgBuilder.setConnectTimeout(k_TIMEOUT);
 		reqCfgBuilder.setConnectionRequestTimeout(k_TIMEOUT);
+		reqCfgBuilder.setCookieSpec(CookieSpecs.STANDARD);
 
-		m_client = HttpClients.custom().setConnectionManager(m_manager)
-				.setDefaultRequestConfig(reqCfgBuilder.build()).build();
+		m_client = HttpClients.custom()
+				.setConnectionManager(m_manager)
+				.setDefaultRequestConfig(reqCfgBuilder.build())
+				.build();
 
 		Spark.port(port);
 
