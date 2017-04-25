@@ -18,6 +18,7 @@ import spark.Spark;
 
 public class CrawlerContext {
 	private AtomicInteger m_totalDocs = null;
+	private AtomicInteger m_timeouts = null;
 	private URLFrontier m_URLFrontier = null;
 	private Map<URL, Boolean> m_LRUdue = null;
 	private String[] m_workerList = null; // ip:port
@@ -27,6 +28,7 @@ public class CrawlerContext {
 	public static class CrawlerStats {
 		public long docsCrawled;
 		public long urlsSent;
+		public long timeouts;
 		public String threadPoolState;
 	}
 
@@ -36,6 +38,7 @@ public class CrawlerContext {
 			CrawlerCluster cluster,
 			RobotInfoCache robotCache) {
 		m_totalDocs = new AtomicInteger(0);
+		m_timeouts = new AtomicInteger(0);
 		m_URLFrontier = frontier;
 		m_LRUdue = due;
 		m_workerList = workerList;
@@ -57,6 +60,7 @@ public class CrawlerContext {
 			public Object handle(Request req, Response resp) throws Exception {
 				CrawlerStats stats = new CrawlerStats();
 				stats.docsCrawled = m_totalDocs.get();
+				stats.timeouts = m_timeouts.get();
 				stats.urlsSent = m_cluster.urlsSent();
 				stats.threadPoolState = m_cluster.putUrlThreadPool().toString();
 				ObjectMapper mapper = new ObjectMapper();
@@ -107,5 +111,9 @@ public class CrawlerContext {
 
 	public RobotInfoCache getRobotInfoCache() {
 		return m_robotInfoCache;
+	}
+	
+	public void incTimeout() {
+		m_timeouts.incrementAndGet();
 	}
 }

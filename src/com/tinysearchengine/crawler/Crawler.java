@@ -25,7 +25,7 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
-import org.apache.http.nio.client.HttpAsyncClient;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.util.EntityUtils;
@@ -55,7 +55,7 @@ public class Crawler {
 	private static int k_MAX_DOC_SIZE = 5 * 1024 * 1024;
 	private static int k_MAX_DUE_SIZE = 10000;
 	private static int k_DOC_COUNT = 1000000;
-	private static int k_TIMEOUT = 20000;
+	private static int k_TIMEOUT = 4000;
 
 	private DBEnv m_dbEnv = null;
 	private URLFrontier m_URLFrontier = null;
@@ -96,7 +96,12 @@ public class Crawler {
 		m_LRUdue = builder.concurrencyLevel(nThread).initialCapacity(1000)
 				.maximumWeightedCapacity(k_MAX_DUE_SIZE).build();
 
-		ConnectingIOReactor ioreactor = new DefaultConnectingIOReactor();
+		IOReactorConfig reactorConfig = IOReactorConfig.custom()
+				.setConnectTimeout(k_TIMEOUT)
+				.setSoTimeout(k_TIMEOUT).build();
+
+		ConnectingIOReactor ioreactor =
+			new DefaultConnectingIOReactor(reactorConfig);
 		m_asyncManager = new PoolingNHttpClientConnectionManager(ioreactor);
 		m_asyncManager.setDefaultMaxPerRoute(20);
 		m_asyncManager.setMaxTotal(500);
@@ -136,8 +141,9 @@ public class Crawler {
 	private void doRequestAsync(String method,
 			URL url,
 			Consumer<HttpResponse> cb) {
+		String urlStr = url.toString();
+
 		if (method.equals("HEAD")) {
-			String urlStr = url.toString();
 			HttpHead req = new HttpHead(urlStr);
 			req.addHeader("User-agent", k_USER_AGENT);
 			m_asyncClient.execute(req, new FutureCallback<HttpResponse>() {
@@ -146,6 +152,7 @@ public class Crawler {
 				public void failed(Exception e) {
 					if (e instanceof TimeoutException) {
 						logger.info("TIMEOUT: " + urlStr, e);
+						m_context.incTimeout();
 					} else {
 						logger.debug(urlStr + " failed", e);
 					}
@@ -178,7 +185,12 @@ public class Crawler {
 
 				@Override
 				public void failed(Exception e) {
-					logger.info("Exception occured in async request", e);
+					if (e instanceof TimeoutException) {
+						logger.info("TIMEOUT: " + urlStr, e);
+						m_context.incTimeout();
+					} else {
+						logger.debug(urlStr + " failed", e);
+					}
 				}
 			});
 		}
