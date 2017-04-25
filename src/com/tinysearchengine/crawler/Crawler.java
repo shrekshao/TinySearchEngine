@@ -186,7 +186,7 @@ public class Crawler {
 				@Override
 				public void failed(Exception e) {
 					if (e instanceof TimeoutException) {
-						logger.info("TIMEOUT: " + urlStr, e);
+						logger.info("TIMEOUT: " + urlStr);
 						m_context.incTimeout();
 					} else {
 						logger.debug(urlStr + " failed", e);
