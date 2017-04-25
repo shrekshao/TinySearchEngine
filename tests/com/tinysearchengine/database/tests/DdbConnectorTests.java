@@ -74,8 +74,9 @@ public class DdbConnectorTests {
 		assertEquals(doc.getContentType(), doc2.getContentType());
 		assertEquals(doc.getCrawledTime(), doc2.getCrawledTime());
 		assertEquals(doc.getCharset(), doc2.getCharset());
-		assertTrue(doc.getLinks().contains("www.barfoo.com"));
-		assertTrue(doc.getLinks().contains("www.barbaz.com"));
+		assertTrue(doc2.getLinks().contains("www.barfoo.com"));
+		assertTrue(doc2.getLinks().contains("www.barbaz.com"));
+		assertFalse(doc2.getRepaired());
 
 		System.out.println("Querying by fingerprint.");
 		List<DdbDocument> docs = d_connector.getDocumentByFingerprint(fp);

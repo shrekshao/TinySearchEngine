@@ -66,13 +66,15 @@ public class CrawlerExtractedLinksRepairDriver {
 			try {
 				DdbDocument doc = docsIt.next();
 
-				if (doc.getLinks() == null) {
+				if (doc.getLinks() == null && !doc.getRepaired()) {
 					HashSet<String> extractedLinks = new HashSet<>();
 					logger.info("Repairing " + doc.getUrlAsString());
 					byte[] content = doc.getContent();
 					
 					if (content == null) {
 						logger.warn("No S3 content: " + doc.getUrlAsString());
+						doc.setRepaired(true);
+						connector.putDocument(doc);
 						continue;
 					}
 					
@@ -87,10 +89,11 @@ public class CrawlerExtractedLinksRepairDriver {
 					}
 
 					doc.setLinks(extractedLinks);
+					doc.setRepaired(true);
 					connector.putDocument(doc);
 				}
 			} catch (Throwable e) {
-				logger.warn("Unexpected exception", e);
+				logger.error("Unexpected exception", e);
 			}
 		}
 	}

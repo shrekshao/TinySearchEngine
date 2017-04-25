@@ -27,6 +27,7 @@ public class DdbDocument {
 	private byte[] d_fingerprint;
 	private S3Link d_contentLink;
 	private Set<String> d_links;
+	private boolean d_repaired;
 
 	@DynamoDBHashKey(attributeName = "url")
 	public String getUrlAsString() {
@@ -94,6 +95,15 @@ public class DdbDocument {
 		} else {
 			d_links = links;
 		}
+	}
+	
+	@DynamoDBAttribute(attributeName = "repaired")
+	public boolean getRepaired() {
+		return d_repaired;
+	}
+	
+	public void setRepaired(boolean repaired) {
+		d_repaired = repaired;
 	}
 
 	@DynamoDBIgnore
