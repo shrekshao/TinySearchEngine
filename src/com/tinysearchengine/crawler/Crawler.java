@@ -27,6 +27,7 @@ import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.tinysearchengine.crawler.RobotInfoCache.RobotInfo;
@@ -100,8 +101,12 @@ public class Crawler {
 		reqCfgBuilder.setConnectionRequestTimeout(k_TIMEOUT);
 		reqCfgBuilder.setCookieSpec(CookieSpecs.STANDARD);
 
-		m_client = HttpClients.custom().setConnectionManager(m_manager)
-				.setDefaultRequestConfig(reqCfgBuilder.build()).build();
+		m_client = HttpClients
+				.custom()
+				.setConnectionManager(m_manager)
+				.setDefaultRequestConfig(reqCfgBuilder.build())
+				.disableAutomaticRetries()
+				.build();
 
 		Spark.port(port);
 
