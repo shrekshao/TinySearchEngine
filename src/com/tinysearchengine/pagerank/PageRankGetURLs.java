@@ -54,7 +54,7 @@ public class PageRankGetURLs {
 			Writer w = new BufferedWriter(osw);
 			while (counter > 0 && docIt.hasNext()) {
 				DdbDocument doc = docIt.next();
-				w.write(doc.getUrlAsString() + "	StartScore|1.0");
+				w.write(doc.getUrlAsString() + "	Score|1.0");
 				if (doc.getLinks() == null) { 
 					byte[] curByte = doc.getContent();
 					String[] links = URLExtractor.extract(curByte);
