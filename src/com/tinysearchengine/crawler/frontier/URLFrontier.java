@@ -1,6 +1,7 @@
 package com.tinysearchengine.crawler.frontier;
 
 import java.lang.ref.WeakReference;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -46,7 +48,7 @@ public class URLFrontier {
 	/**
 	 * Maximum size of the frontier.
 	 */
-	private final static long k_MAX_SIZE = 1500000;
+	private final static int k_MAX_SIZE = 1500000;
 
 	/**
 	 * This represents the priority of a given URL to be enqueued into the
@@ -160,6 +162,8 @@ public class URLFrontier {
 	 * Current size of the frontier.
 	 */
 	private long d_frontierSize = 0;
+	
+	private Semaphore d_frontierSpaceSem = new Semaphore(k_MAX_SIZE, true);
 
 	@SuppressWarnings("unchecked")
 	private void initialize(int numBackendQueues) {
@@ -260,7 +264,7 @@ public class URLFrontier {
 			}
 
 			d_frontierSize--;
-			this.notify();
+			d_frontierSpaceSem.release();
 			return req;
 		}
 	}
@@ -294,11 +298,8 @@ public class URLFrontier {
 				+ ", releasing at: "
 				+ new Date(releaseTime).toString());
 
-		while (d_frontierSize > k_MAX_SIZE) {
-			// logger.warn("Maximum size reached, throttling frontier put!");
-			this.wait();
-		}
-
+		d_frontierSpaceSem.acquire();
+		
 		// Some sanity check on the inputs.
 		int frontendQueueId = priority.toInt();
 		assert 0 <= frontendQueueId && frontendQueueId < 3;

@@ -6,7 +6,10 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.*;
@@ -16,6 +19,7 @@ import org.junit.*;
 import com.tinysearchengine.crawler.frontier.URLFrontier;
 import com.tinysearchengine.crawler.frontier.URLFrontier.Request;
 import com.tinysearchengine.database.DBEnv;
+import com.tinysearchengine.utils.TimedBlockingPriorityQueue;
 
 import spark.Spark;
 
@@ -200,7 +204,7 @@ public class URLFrontierTests {
 			throws MalformedURLException, InterruptedException {
 		long startTime = System.nanoTime();
 		d_frontier.stop();
-		
+
 		Set<URL> seeds = new HashSet<>();
 		seeds.add(new URL("http://www.google.com"));
 		d_frontier = new URLFrontier(20, seeds, d_testEnv);
@@ -233,12 +237,12 @@ public class URLFrontierTests {
 		d_frontier.start();
 		Thread.sleep(2000);
 		d_frontier.stop();
-		
+
 		d_frontier = new URLFrontier(20, new HashSet<>(), d_testEnv);
 
 		lastScheduledTime = d_frontier.lastScheduledTime("www.google2.com");
 		System.out.println("Time for google2: " + lastScheduledTime);
-		
+
 		URLFrontier.Request r = d_frontier.get();
 		assertEquals("http://www.google.com", r.url.toString());
 
@@ -257,6 +261,81 @@ public class URLFrontierTests {
 		long elapsedTime = System.nanoTime() - startTime;
 		System.out
 				.println("Took " + elapsedTime / 1000000 + " milliseconds...");
+
+	}
+
+	private Map<Integer, Long>
+			setupDelayUrls(TimedBlockingPriorityQueue<Integer> q, int numUrls)
+					throws MalformedURLException, InterruptedException {
+		Map<Integer, Long> delayTime = new HashMap<>();
+		Random gen = new Random();
+		for (int i = 0; i < numUrls; ++i) {
+			// A random delay less than 10 seconds, larger than 5 seconds.
+			long delay = gen.nextInt(5) + 5;
+			long releaseTime = System.currentTimeMillis() + delay * 1000;
+			q.put(i, releaseTime);
+			delayTime.put(i, releaseTime);
+		}
+
+		return delayTime;
+	}
+
+	@Test
+	public void testTimedQueueDelay()
+			throws MalformedURLException, InterruptedException {
+		long start = System.currentTimeMillis();
+		TimedBlockingPriorityQueue<Integer> q =
+			new TimedBlockingPriorityQueue<>();
+		Map<Integer, Long> delay = setupDelayUrls(q, 10000);
+		long end = System.currentTimeMillis();
+
+		System.out.println("Setup took " + (end - start) + " ms");
+
+		System.out.println("Getting: " + delay.size() + " items");
+		start = System.currentTimeMillis();
+		Map<Integer, Long> readTime = new HashMap<>();
+		for (int i = 0; i < delay.size(); ++i) {
+			Integer v = q.get();
+			readTime.put(v, System.currentTimeMillis());
+		}
+		end = System.currentTimeMillis();
+		System.out.println(
+				"Experiment took: " + (end - start) * 1.0 / 1000 + " seconds.");
+
+		long maxDelay = 0;
+		long avgDelay = 0;
+		long minDelay = Long.MAX_VALUE;
+		for (Map.Entry<Integer, Long> kv : delay.entrySet()) {
+			Integer i = kv.getKey();
+			Long readT = readTime.get(i);
+			if (readT != null) {
+				long d = readT - kv.getValue();
+				if (d > maxDelay) {
+					maxDelay = d;
+				}
+				if (d < minDelay) {
+					minDelay = d;
+				}
+				avgDelay += d;
+			}
+		}
+
+		System.out.println("Max delay: " + maxDelay);
+		System.out.println("Min delay: " + minDelay);
+		System.out.println("Avg delay: " + avgDelay * 1.0 / delay.size());
+	}
+
+	private void setupFrontierForDelayTesting(int numItems)
+			throws MalformedURLException {
+		for (int i = 0; i < numItems; ++i) {
+			String urlStr = "http://" + i + ".com";
+			URL url = new URL(urlStr);
+
+		}
+	}
+
+	@Test
+	public void testFrontierDelay() {
 
 	}
 }
