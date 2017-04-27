@@ -1,6 +1,7 @@
 package com.tinysearchengine.indexer.test;
 
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -51,12 +52,26 @@ public class TestPorterStemmer
        
         System.out.println(e.text());
         
-        String[] words = (e.text()).split("(\\s)+|\"|,|\\.|\\?|\\!|\\(|\\)");
+//        String[] words = (e.text()).split("(\\s)+|\"|,|\\.|\\?|\\!|\\(|\\)");
+//        String[] words = (e.text()).split("(\\s)+|(\\s)*(\"|,|\\.|\\?|\\!|\\(|\\))(\\s)*");
+        String[] words = (e.text()).split("[^a-zA-Z0-9']+");
+
+//        Pattern r = Pattern.compile("\\b[^\\s]+\\b");
+        
+        
         
         SnowballStemmer stemmer = new englishStemmer();
         
-        for (String word : words)
+        for (String w : words)
         {
+//        	if (w.equals(""))
+//        	{
+//        		continue;
+//        	}
+        	
+        	
+        	String word = w.toLowerCase();
+        	
         	// stop words
         	if (StopWordList.stopwords.contains(word))
         	{
