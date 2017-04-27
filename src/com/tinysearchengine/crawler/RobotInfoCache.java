@@ -17,6 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -117,6 +125,24 @@ public class RobotInfoCache {
 			}
 		};
 
+	private HttpClient d_client;
+	{
+		RequestConfig.Builder reqCfgBuilder = RequestConfig.custom();
+		reqCfgBuilder.setSocketTimeout(60000);
+		reqCfgBuilder.setConnectTimeout(60000);
+		reqCfgBuilder.setConnectionRequestTimeout(60000);
+		reqCfgBuilder.setCookieSpec(CookieSpecs.STANDARD);
+
+		PoolingHttpClientConnectionManager manager =
+			new PoolingHttpClientConnectionManager();
+		manager.setMaxTotal(100);
+		manager.setDefaultMaxPerRoute(20);
+
+		d_client = HttpClients.custom().setConnectionManager(manager)
+				.setDefaultRequestConfig(reqCfgBuilder.build())
+				.disableAutomaticRetries().build();
+	}
+
 	/**
 	 * A method for parsing robot.txt. Return null if the string can't be parsed
 	 * as a robot.txt file.
@@ -190,27 +216,12 @@ public class RobotInfoCache {
 		}
 
 		try {
-			URL robotTxtUrl = new URL(url, "/robots.txt");
-			URLConnection conn = robotTxtUrl.openConnection();
-			if (!(conn instanceof HttpURLConnection)) {
-				return null;
-			}
+			HttpGet request =
+				new HttpGet(new URL(url, "/robots.txt").toString());
+			HttpResponse resp = d_client.execute(request);
 
-			HttpURLConnection connection = (HttpURLConnection) conn;
-			connection.setRequestMethod("GET");
-			connection.setConnectTimeout(2000);
-			connection.setDoInput(true);
-
-			StringBuilder output = new StringBuilder();
-			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(connection.getInputStream()));
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				output.append(line);
-				output.append('\n');
-			}
-
-			RobotInfo info = parserRobotTxt(output.toString());
+			RobotInfo info =
+				parserRobotTxt(EntityUtils.toString(resp.getEntity()));
 			synchronized (this) {
 				d_lruCache.put(url.getAuthority(), info);
 			}
