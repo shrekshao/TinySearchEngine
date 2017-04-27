@@ -6,7 +6,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
@@ -46,6 +49,11 @@ public class DdbConnectorTests {
 		doc.setContentType("application/html");
 		doc.setCrawledTime(new Date().getTime());
 		doc.setCharset("UTF-8");
+		
+		Set<String> links = new HashSet<>();
+		links.add("www.barfoo.com");
+		links.add("www.barbaz.com");
+		doc.setLinks(links);
 
 		String s3LinkName = DdbConnector.urlToS3LinkKey(doc.getUrl());
 		doc.setContentLink(d_connector.createS3Link(s3LinkName));
@@ -66,6 +74,9 @@ public class DdbConnectorTests {
 		assertEquals(doc.getContentType(), doc2.getContentType());
 		assertEquals(doc.getCrawledTime(), doc2.getCrawledTime());
 		assertEquals(doc.getCharset(), doc2.getCharset());
+		assertTrue(doc2.getLinks().contains("www.barfoo.com"));
+		assertTrue(doc2.getLinks().contains("www.barbaz.com"));
+		assertFalse(doc2.getRepaired());
 
 		System.out.println("Querying by fingerprint.");
 		List<DdbDocument> docs = d_connector.getDocumentByFingerprint(fp);
@@ -76,6 +87,8 @@ public class DdbConnectorTests {
 		assertEquals(doc.getContentType(), doc2.getContentType());
 		assertEquals(doc.getCrawledTime(), doc2.getCrawledTime());
 		assertEquals(doc.getCharset(), doc2.getCharset());
+		assertTrue(doc.getLinks().contains("www.barfoo.com"));
+		assertTrue(doc.getLinks().contains("www.barbaz.com"));
 	}
 
 	@Test
@@ -88,7 +101,7 @@ public class DdbConnectorTests {
 		String[] urlsToMatch = { "www.google.com/foobar",
 				"www.google.com/foobar/index.html",
 				"www.facebook.com/foobar?q=123",
-				"www.google.com/foobar"};
+				"www.google.com/foobar" };
 
 		assertEquals(urlsToTest.length, urlsToMatch.length);
 
@@ -99,4 +112,44 @@ public class DdbConnectorTests {
 		}
 	}
 
+	@Test
+	public void testGetAllDocumentsLazily() {
+		List<DdbDocument> docs = d_connector.getAllDocumentsLazily();
+		Iterator<DdbDocument> docIt = docs.iterator();
+		int totalIterations = 1000;
+		int iteration = totalIterations;
+		long startTime = System.nanoTime();
+		while (iteration >= 0 && docIt.hasNext()) {
+			DdbDocument doc = docIt.next();
+			System.out.println(doc.getUrlAsString());
+			iteration -= 1;
+		}
+		long dur = System.nanoTime() - startTime;
+
+		System.out.println("Remaining it: " + iteration);
+		System.out.println(
+				"Avg latency: " + (dur / (long) totalIterations) + " ns");
+	}
+	
+	@Test
+	public void testGetNonRepairedDocuments() {
+		List<DdbDocument> docs = d_connector.getAllNonRepairedDocumentsLazily();
+		Iterator<DdbDocument> docIt = docs.iterator();
+		int totalIterations = 100;
+		int iteration = totalIterations;
+		long startTime = System.nanoTime();
+		while (iteration >= 0 && docIt.hasNext()) {
+			DdbDocument doc = docIt.next();
+			System.out.println(doc.getUrlAsString());
+			assertFalse(doc.getRepaired());
+			assertNull(doc.getLinks());
+			iteration -= 1;
+		}
+		long dur = System.nanoTime() - startTime;
+
+		System.out.println("Remaining it: " + iteration);
+		System.out.println(
+				"Avg latency: " + (dur / (long) totalIterations) + " ns");
+
+	}
 }

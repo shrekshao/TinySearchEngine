@@ -36,7 +36,7 @@ public class CrawlerDriver {
 		RollingFileAppender fileAppender =
 			new RollingFileAppender(new PatternLayout(pattern),
 					"crawler.log." + dateFormat.format(now));
-		fileAppender.setThreshold(Level.DEBUG);
+		fileAppender.setThreshold(Level.INFO);
 		fileAppender.setMaxFileSize("50MB");
 		fileAppender.activateOptions();
 

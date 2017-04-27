@@ -295,7 +295,7 @@ public class URLFrontier {
 				+ new Date(releaseTime).toString());
 
 		while (d_frontierSize > k_MAX_SIZE) {
-			logger.warn("Maximum size reached, throttling frontier put!");
+			// logger.warn("Maximum size reached, throttling frontier put!");
 			this.wait();
 		}
 

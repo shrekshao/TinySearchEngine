@@ -67,6 +67,20 @@
           </jar>
         </target>
 
+        <target name="jar-repairer" depends="crawler-classes,compute-crawler-class-path">
+          <jar destfile="build/repairer.jar" update="true">
+            <fileset dir="build/classes">
+              <include name="**/*.class"/>
+            </fileset>
+            <manifest>
+              <attribute name="Main-Class"
+                         value="com.tinysearchengine.crawler.CrawlerExtractedLinksRepairDriver"/>
+              <attribute name="Class-Path" value="${lib.crawler.classpath}"/>
+            </manifest>
+          </jar>
+
+        </target>
+
         <target name="tests-classes" depends="crawler-classes,util-classes">
                 <javac srcdir="tests"
                        includes="com/tinysearchengine/**/*.java"
