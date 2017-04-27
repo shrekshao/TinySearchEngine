@@ -1,7 +1,6 @@
 package com.tinysearchengine.crawler.frontier;
 
 import java.lang.ref.WeakReference;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,6 +38,11 @@ public class URLFrontier {
 	 * Every 10 seconds.
 	 */
 	private final static long k_STAT_INTERVAL = 1000 * 10;
+
+	/**
+	 * Every 2 seconds.
+	 */
+	private final static long k_HOUSE_KEEPING_INTERVAL = 1000 * 2;
 
 	/**
 	 * Number of milliseconds in a day.
@@ -153,6 +157,8 @@ public class URLFrontier {
 	 */
 	Timer d_statTimer;
 
+	Timer d_houseKeepingTimer;
+
 	/**
 	 * The last stat object.
 	 */
@@ -162,7 +168,7 @@ public class URLFrontier {
 	 * Current size of the frontier.
 	 */
 	private long d_frontierSize = 0;
-	
+
 	private Semaphore d_frontierSpaceSem = new Semaphore(k_MAX_SIZE, true);
 
 	@SuppressWarnings("unchecked")
@@ -299,7 +305,7 @@ public class URLFrontier {
 				+ new Date(releaseTime).toString());
 
 		d_frontierSpaceSem.acquire();
-		
+
 		// Some sanity check on the inputs.
 		int frontendQueueId = priority.toInt();
 		assert 0 <= frontendQueueId && frontendQueueId < 3;
@@ -339,6 +345,10 @@ public class URLFrontier {
 		int lowPrioEnd = d_frontendQueues[0].isEmpty() ? 0 : 10;
 		int medPrioEnd = d_frontendQueues[1].isEmpty() ? lowPrioEnd : 50;
 		int hiPrioEnd = d_frontendQueues[2].isEmpty() ? medPrioEnd : 200;
+
+		if (hiPrioEnd == 0) {
+			return 0;
+		}
 
 		int rand = d_generator.nextInt(hiPrioEnd);
 		if (0 <= rand && rand < lowPrioEnd) {
@@ -577,6 +587,19 @@ public class URLFrontier {
 				}
 			}
 		}, 0, k_STAT_INTERVAL);
+
+		d_houseKeepingTimer = new Timer("URLFrontierHouseKeeping");
+		d_houseKeepingTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				if (self.get() != null) {
+					synchronized (self.get()) {
+						self.get().moveFrontendToBackend();
+					}
+				}
+			}
+		}, 1000, k_HOUSE_KEEPING_INTERVAL);
 	}
 
 	public void stop() {
@@ -588,6 +611,11 @@ public class URLFrontier {
 		if (d_statTimer != null) {
 			d_statTimer.cancel();
 			d_statTimer = null;
+		}
+		
+		if (d_houseKeepingTimer != null) {
+			d_houseKeepingTimer.cancel();
+			d_houseKeepingTimer = null;
 		}
 	}
 

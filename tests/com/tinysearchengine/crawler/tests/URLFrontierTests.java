@@ -21,8 +21,6 @@ import com.tinysearchengine.crawler.frontier.URLFrontier.Request;
 import com.tinysearchengine.database.DBEnv;
 import com.tinysearchengine.utils.TimedBlockingPriorityQueue;
 
-import spark.Spark;
-
 public class URLFrontierTests {
 
 	static DBEnv d_testEnv;
@@ -50,11 +48,6 @@ public class URLFrontierTests {
 		if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
 			Logger.getRootLogger().addAppender(appender);
 		}
-	}
-
-	@BeforeClass
-	public static void setUpSpark() {
-		Spark.port(8080);
 	}
 
 	@Before
@@ -325,17 +318,40 @@ public class URLFrontierTests {
 		System.out.println("Avg delay: " + avgDelay * 1.0 / delay.size());
 	}
 
-	private void setupFrontierForDelayTesting(int numItems)
-			throws MalformedURLException {
+	private Map<String, Long> setupFrontierForDelayTesting(int numItems)
+			throws MalformedURLException, InterruptedException {
+		Random g = new Random();
+		Map<String, Long> delays = new HashMap<>();
 		for (int i = 0; i < numItems; ++i) {
 			String urlStr = "http://" + i + ".com";
 			URL url = new URL(urlStr);
-
+			int delay = g.nextInt(5) + 5;
+			long releaseTime = System.currentTimeMillis() + delay * 1000;
+			d_frontier.put(url, URLFrontier.Priority.Medium, releaseTime);
+			delays.put(urlStr, releaseTime);
 		}
+		return delays;
 	}
 
 	@Test
-	public void testFrontierDelay() {
+	public void testFrontierDelay()
+			throws InterruptedException, MalformedURLException {
+		d_frontier.get();
+		long start = System.currentTimeMillis();
+		Map<String, Long> delays = setupFrontierForDelayTesting(1000);
+		long end = System.currentTimeMillis();
+		System.out.println("Setup took " + (end - start) + " ms");
 
+		start = System.currentTimeMillis();
+		Map<String, Long> retrievedTime = new HashMap<>();
+		for (int i = 0; i < delays.size(); ++i) {
+			Request req = d_frontier.get();
+			System.out.println(req.url.toString());
+			retrievedTime.put(req.url.toString(), System.currentTimeMillis());
+		}
+		end = System.currentTimeMillis();
+		
+		System.out.println(
+				"Experiment took: " + (end - start) * 1.0 / 1000 + " seconds.");
 	}
 }
