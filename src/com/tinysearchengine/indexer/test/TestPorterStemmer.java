@@ -9,6 +9,8 @@ import org.jsoup.select.Elements;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
 
+import com.tinysearchengine.indexer.StopWordList;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -49,12 +51,19 @@ public class TestPorterStemmer
        
         System.out.println(e.text());
         
-        String[] words = (e.text()).split("(\\s)+|'|\"|,|\\.|\\?|\\!|\\(|\\)");
+        String[] words = (e.text()).split("(\\s)+|\"|,|\\.|\\?|\\!|\\(|\\)");
         
         SnowballStemmer stemmer = new englishStemmer();
         
         for (String word : words)
         {
+        	// stop words
+        	if (StopWordList.stopwords.contains(word))
+        	{
+        		continue;
+        	}
+        	
+        	// stem
         	stemmer.setCurrent(word);
         	stemmer.stem();
         	String stemmed = stemmer.getCurrent();
