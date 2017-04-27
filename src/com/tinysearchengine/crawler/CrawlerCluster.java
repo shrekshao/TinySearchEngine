@@ -97,8 +97,7 @@ public class CrawlerCluster {
 							logger.debug("Received: " + line);
 							url = new URL(line);
 						} catch (MalformedURLException e) {
-							logger.info(req.params("url") + " is a bad url!",
-									e);
+							logger.info(line + " is a bad url!", e);
 							continue;
 						}
 						assert url != null;
