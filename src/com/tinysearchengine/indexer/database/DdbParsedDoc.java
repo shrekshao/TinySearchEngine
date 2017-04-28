@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 //import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName = "ParsedDocTable")
+@DynamoDBTable(tableName = "ParsedDoc")
 public class DdbParsedDoc {
 	private String d_docid;
 	
