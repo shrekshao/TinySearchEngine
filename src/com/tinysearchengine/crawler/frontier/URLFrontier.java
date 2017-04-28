@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,6 +40,11 @@ public class URLFrontier {
 	private final static long k_STAT_INTERVAL = 1000 * 10;
 
 	/**
+	 * Every 2 seconds.
+	 */
+	private final static long k_HOUSE_KEEPING_INTERVAL = 1000 * 2;
+
+	/**
 	 * Number of milliseconds in a day.
 	 */
 	private final static long k_ONE_DAY = 1000 * 3600 * 24;
@@ -46,7 +52,7 @@ public class URLFrontier {
 	/**
 	 * Maximum size of the frontier.
 	 */
-	private final static long k_MAX_SIZE = 1500000;
+	private final static int k_MAX_SIZE = 1500000;
 
 	/**
 	 * This represents the priority of a given URL to be enqueued into the
@@ -151,6 +157,8 @@ public class URLFrontier {
 	 */
 	Timer d_statTimer;
 
+	Timer d_houseKeepingTimer;
+
 	/**
 	 * The last stat object.
 	 */
@@ -160,6 +168,8 @@ public class URLFrontier {
 	 * Current size of the frontier.
 	 */
 	private long d_frontierSize = 0;
+
+	private Semaphore d_frontierSpaceSem = new Semaphore(k_MAX_SIZE, true);
 
 	@SuppressWarnings("unchecked")
 	private void initialize(int numBackendQueues) {
@@ -260,7 +270,7 @@ public class URLFrontier {
 			}
 
 			d_frontierSize--;
-			this.notify();
+			d_frontierSpaceSem.release();
 			return req;
 		}
 	}
@@ -294,10 +304,7 @@ public class URLFrontier {
 				+ ", releasing at: "
 				+ new Date(releaseTime).toString());
 
-		while (d_frontierSize > k_MAX_SIZE) {
-			// logger.warn("Maximum size reached, throttling frontier put!");
-			this.wait();
-		}
+		d_frontierSpaceSem.acquire();
 
 		// Some sanity check on the inputs.
 		int frontendQueueId = priority.toInt();
@@ -338,6 +345,10 @@ public class URLFrontier {
 		int lowPrioEnd = d_frontendQueues[0].isEmpty() ? 0 : 10;
 		int medPrioEnd = d_frontendQueues[1].isEmpty() ? lowPrioEnd : 50;
 		int hiPrioEnd = d_frontendQueues[2].isEmpty() ? medPrioEnd : 200;
+
+		if (hiPrioEnd == 0) {
+			return 0;
+		}
 
 		int rand = d_generator.nextInt(hiPrioEnd);
 		if (0 <= rand && rand < lowPrioEnd) {
@@ -576,6 +587,19 @@ public class URLFrontier {
 				}
 			}
 		}, 0, k_STAT_INTERVAL);
+
+		d_houseKeepingTimer = new Timer("URLFrontierHouseKeeping");
+		d_houseKeepingTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				if (self.get() != null) {
+					synchronized (self.get()) {
+						self.get().moveFrontendToBackend();
+					}
+				}
+			}
+		}, 1000, k_HOUSE_KEEPING_INTERVAL);
 	}
 
 	public void stop() {
@@ -587,6 +611,11 @@ public class URLFrontier {
 		if (d_statTimer != null) {
 			d_statTimer.cancel();
 			d_statTimer = null;
+		}
+		
+		if (d_houseKeepingTimer != null) {
+			d_houseKeepingTimer.cancel();
+			d_houseKeepingTimer = null;
 		}
 	}
 

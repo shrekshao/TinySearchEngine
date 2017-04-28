@@ -44,7 +44,7 @@ public class TimedBlockingPriorityQueue<T> {
 		}
 
 		Pair<T, Long> item = d_queue.peek();
-		long now = new Date().getTime();
+		long now = System.currentTimeMillis();
 		return now >= item.getRight().longValue();
 	}
 
