@@ -6,13 +6,13 @@
         - doc pointer to S3 (manual node hash) / url (if stored in db)
         - total word count
         - page rank score
-        - HashSet ( p: wordid, tf )
+        - Map < p: wordid, tf >
     + KeyWord
         - wordid ( still needed, cuz string for primiary key cost more space) 
         - word (text, probably after Porterstemmer)
         - global count
         - idf (log(N/n))  (probably unavailable)
-        - HashSet ( p: docid, count, (tf) )
+        - Set ( docid )
 
 
 
@@ -53,6 +53,8 @@
             - [x] sum up total count of this wordid
             - [ ] store to dynamoDB table Keyword
 
+
+Another round of simple map reduce to fill in idf for each keyword (if found better for performance)
 
 
 
