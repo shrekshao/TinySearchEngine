@@ -1,7 +1,7 @@
 # Indexer DynamoDB Design
 
 * Tables
-    + Parsed Document
+    + ParsedDoc
         - docid (url)
         - doc pointer to S3 (manual node hash) / url (if stored in db)
         - total word count
@@ -11,7 +11,7 @@
         - wordid ( still needed, cuz string for primiary key cost more space) 
         - word (text, probably after Porterstemmer)
         - global count
-        - idf (log(N/n))
+        - idf (log(N/n))  (probably unavailable)
         - HashSet ( p: docid, count, (tf) )
 
 
@@ -30,7 +30,34 @@
 
 --------------
 
-# Calulation needed when querying
+
+# Hadoop batch task for calculating indexer (static)
+
+* mapper
+    - input: < `docid`, body:string >
+    - tasks:
+        - [x] Jsoup parse
+        - [x] Select elements (e.g. <p>)
+        - [x] Split to keywords
+        - [x] porterstemmer
+        - [ ] store to dynamoDB table ParsedDoc
+    - emit: < `wordid`, docid, count >
+    - emit: < `@@@`, Null, localTotalCount >  (For calculate global word counts used by idf)
+* reducer
+    - input: < `wordid`, docid, count >
+    - tasks:
+        - if wordid == `@@@`
+            - sum up
+            - store without doc hashset
+        - else
+            - [x] sum up total count of this wordid
+            - [ ] store to dynamoDB table Keyword
+
+
+
+
+
+# Calculation needed when querying
 
 Incoming query
 {k_x0, k_x1, ..., k_xn}
