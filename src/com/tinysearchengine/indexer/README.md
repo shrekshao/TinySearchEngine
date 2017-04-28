@@ -37,7 +37,7 @@
     - input: < `docid`, body:string >
     - tasks:
         - [x] Jsoup parse
-        - [x] Select elements (e.g. <p>)
+        - [x] Select elements (e.g. < p >)
         - [x] Split to keywords
         - [x] porterstemmer
         - [ ] store to dynamoDB table ParsedDoc
