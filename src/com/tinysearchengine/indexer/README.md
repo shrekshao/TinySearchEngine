@@ -6,7 +6,7 @@
         - doc pointer to S3 (manual node hash) / url (if stored in db)
         - total word count
         - page rank score
-        - Map < p: wordid, tf >
+        - Map < wordid, tf >
     + KeyWord
         - wordid ( still needed, cuz string for primiary key cost more space) 
         - word (text, probably after Porterstemmer)
