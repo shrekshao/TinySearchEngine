@@ -50,11 +50,14 @@ public class TestPorterStemmer
         Document doc = Jsoup.parse(html);
     	Elements e = doc.select("p");
        
-        System.out.println(e.text());
+    	
+    	String content = e.text() + "\nPS2 1993 1 Xbox1 china";
+    	
+        System.out.println(content);
         
 //        String[] words = (e.text()).split("(\\s)+|\"|,|\\.|\\?|\\!|\\(|\\)");
 //        String[] words = (e.text()).split("(\\s)+|(\\s)*(\"|,|\\.|\\?|\\!|\\(|\\))(\\s)*");
-        String[] words = (e.text()).split("[^a-zA-Z0-9']+");
+        String[] words = (content).split("[^a-zA-Z0-9']+");
 
 //        Pattern r = Pattern.compile("\\b[^\\s]+\\b");
         
