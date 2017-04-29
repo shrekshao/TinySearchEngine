@@ -17,6 +17,11 @@ public class DdbParsedDoc {
 	
 	private Map<String, Float> d_word2tf;	// < word, tf >
 	
+	// TODO:other info useful for answering queries
+	// titles, abstracts
+	private String d_title;
+	private String d_abstract;
+	
 	
 	@DynamoDBHashKey(attributeName = "url")
 	public String getDocId() {
@@ -53,5 +58,24 @@ public class DdbParsedDoc {
 		} else {
 			d_word2tf = word2tf;
 		}
+	}
+	
+	
+	// info for display
+	
+	@DynamoDBAttribute(attributeName = "title")
+	public String getTitle() {
+		return d_title;
+	}
+	public void setTitle(String title) {
+		d_title = title;
+	}
+	
+	@DynamoDBAttribute(attributeName = "abstract")
+	public String getAbstract() {
+		return d_abstract;
+	}
+	public void setAbstract(String a) {
+		d_abstract = a;
 	}
 }

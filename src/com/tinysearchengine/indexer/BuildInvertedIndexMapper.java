@@ -120,9 +120,12 @@ public class BuildInvertedIndexMapper extends Mapper<Text, Object, Text, Text> {
 		// -----------------------
 		
 		Document doc = Jsoup.parse(content);
-    	Elements e = doc.select("p");
+    	Elements p = doc.select("p");
+    	Elements title = doc.select("title");
     	
-        String[] words = (e.text()).split("[^a-zA-Z0-9']+");
+    	String text = title.text() +"\n" + p.text();
+    	
+        String[] words = (text).split("[^a-zA-Z0-9']+");
         
         HashMap<String, Integer> keyword2count = new HashMap<String, Integer>();
         int totalCount = 0;		// total num of words abstract from this doc
