@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.Reducer.Context;
 
 //input: URL    PageRankScore(current round)
 //  or
@@ -16,7 +15,7 @@ import org.apache.hadoop.mapreduce.Reducer.Context;
 public class PageRankMainReducer extends Reducer<Text,Text,Text,Text> {
 	public static final double decay = 0.85;
 	@Override 
-	public void reduce(Text key ,Iterable<Text> values,Context context) throws IOException, InterruptedException {
+	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 		double newScore = 0.0;
 		String urlString = "";
 		//now we get two kinds of values
@@ -30,9 +29,9 @@ public class PageRankMainReducer extends Reducer<Text,Text,Text,Text> {
 		}	
 		newScore += 1 - decay;
 		if(urlString != "") { //has outURLs
-			context.write(key, new Text("\t" + "Score|" + newScore + " " + urlString));
+			context.write(key, new Text("Score|" + newScore + " " + urlString));
 		} else {
-			context.write(key, new Text("\t" + "Score|" + newScore));
+			context.write(key, new Text("Score|" + newScore));
 		}
 	}
 }
