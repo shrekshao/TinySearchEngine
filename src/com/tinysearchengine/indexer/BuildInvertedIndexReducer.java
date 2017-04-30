@@ -21,7 +21,7 @@ public class BuildInvertedIndexReducer extends Reducer<Text, Text, Text, Object>
 		
 //		context.write(key, new Text(Integer.toString(sum)));
 		
-		// TODO: store to dynamoDB table: Keyword
+		
 	}
 	
 }

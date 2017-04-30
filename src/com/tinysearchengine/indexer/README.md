@@ -40,13 +40,13 @@
         - [x] Select elements (e.g. < p >)
         - [x] Split to keywords
         - [x] porterstemmer
-        - [ ] store to dynamoDB table ParsedDoc
+        - [ ] store to dynamoDB table ParsedDoc (or, emit with a special key to label as document tuple)
     - emit: < `wordid`, docid, count >
-    - emit: < `@@@`, Null, localTotalCount >  (For calculate global word counts used by idf)
+    - emit: < `@totalCount@`, Null, localTotalCount >  (For calculate global word counts used by idf)
 * reducer
     - input: < `wordid`, docid, count >
     - tasks:
-        - if wordid == `@@@`
+        - if wordid == `@totalCount@`
             - sum up
             - store without doc hashset
         - else
@@ -57,6 +57,27 @@
 Another round of simple map reduce to fill in idf for each keyword (if found better for performance)
 
 
+## Alternative design (to make sure all write to db happens after output from reducer)
+
+* pass 1 (write forward index)
+    * input DdbDocument from dynamoDB, crawled doc from S3
+    * mapper emit < word, docid(url), count( freq(word, this doc)  ) > 
+    * reducer emit as is
+* pass 2 (write forward index)
+    * input (intermediate text files from pass 1 output)
+        * < word, `docid`, count > (group by docid)
+    * mapper emit as is (docid is aggregation key)
+    * reducer emit as is ( batch write output to dynamoDB table: Parsed Doc (forward index)  )
+* pass3 (write inverted index)
+    * input (intermediate text files from pass 1 output)
+        * < `word`, docid, count > (group by docid)
+    * mapper emit as is
+    * reducer emit as is
+
+(Such many emitting as is, is it really efficient or necessary?)
+
+
+----------
 
 
 # Calculation needed when querying

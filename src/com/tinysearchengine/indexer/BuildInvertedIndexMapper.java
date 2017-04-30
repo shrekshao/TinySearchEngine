@@ -115,7 +115,7 @@ public class BuildInvertedIndexMapper extends Mapper<Text, Object, Text, Text> {
 		
 		// TODO: use URL to read data from dynamoDB (might use batch load save ...)
 		// TODO: use S3link to get document as a string
-		String url = "";
+		String url = key.toString();
 		String content = "";
 		// -----------------------
 		
@@ -163,13 +163,26 @@ public class BuildInvertedIndexMapper extends Mapper<Text, Object, Text, Text> {
         
         context.write(GLOBAL_TOTAL_COUNT_KEY, new Text(SEPARATOR + Integer.toString(totalCount)));
 		
+        
+        // for this docuemnt (key)
+        HashMap<String, Float> keyword2tf = new HashMap<String, Float>();
+        
         for(Map.Entry<String, Integer> entry : keyword2count.entrySet())
         {
+        	String w = entry.getKey();
+        	int count = entry.getValue();
         	context.write(
-        			new Text(entry.getKey()), 
-        			new Text(Integer.toString(entry.getValue()))
+        			new Text(w), 
+        			new Text(Integer.toString(count))
         			);
+        	
+        	float tf = (float) count / totalCount;
+        	keyword2tf.put(w, tf);
         }
+        
+        // TODO: write dynamoDB table ParsedDoc with dynamodbmapper
+        // ? performance issue? write one tuple for each input key
+        // An alternative would be emit a tuple, with url+doc being the key (which I don't find very efficient)
 		
 	}
 }
