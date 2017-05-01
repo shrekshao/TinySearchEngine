@@ -18,37 +18,12 @@ public class PageRankGetURLs {
 	static DdbConnector d_connector = new DdbConnector();
 	static List<DdbDocument> docs = new ArrayList<DdbDocument>();
  	
-//	public void getAllDocuments()  {
-//		docs = d_connector.getAllDocumentsLazily();
-//		Iterator<DdbDocument> docIt = docs.iterator();
-//		int counter = 1000;
-//		File statText = new File("C:/Users/xueyin/Documents/GitHub/TinySearchEngine/pagerankinput");
-//		FileOutputStream is = new FileOutputStream(statText);
-//        OutputStreamWriter osw = new OutputStreamWriter(is);    
-//        Writer w = new BufferedWriter(osw);
-//        try {
-//		while (counter >= 0 && docIt.hasNext()) {
-//			DdbDocument doc = docIt.next();
-//	        w.write(doc.getUrlAsString() + " ");
-//	        for(String link : doc.getLinks()) {
-//	        	w.write(" " +  link);
-//	        }
-//	        counter --;
-//			System.out.println(doc.getUrlAsString());
-//			System.out.println(doc.getLinks());
-//		}
-//			w.close(); 
-//        } catch (IOException e) {
-//        	e.printStackTrace();
-//        }
-//	}
-	
 	public static void main(String args[]) {
 		docs = d_connector.getAllDocumentsLazily();
 		Iterator<DdbDocument> docIt = docs.iterator();
 		int counter = 500;
 		try {
-			File statText = new File("C:/Users/xueyin/Documents/GitHub/TinySearchEngine/pagerankinput/input.txt");
+			File statText = new File("C:/Users/xueyin/Documents/GitHub/TinySearchEngine/pagerankinput/input1.txt");
 			FileOutputStream is = new FileOutputStream(statText);
 			OutputStreamWriter osw = new OutputStreamWriter(is);    
 			Writer w = new BufferedWriter(osw);
@@ -67,7 +42,7 @@ public class PageRankGetURLs {
 					}
 				}
 				w.write("\r\n");
-				counter --;
+				counter--;
 			}
 			w.close();
 			System.out.println("PageRank Test File Formation Finished :)");
