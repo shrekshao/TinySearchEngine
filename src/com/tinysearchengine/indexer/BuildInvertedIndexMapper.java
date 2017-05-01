@@ -240,7 +240,7 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
         String[] words = (text).split("[^a-zA-Z0-9']+");
         
         HashMap<String, Integer> keyword2count = new HashMap<String, Integer>();
-        int totalCount = 0;		// total num of words abstracted from this doc
+        int totalCount = words.length;		// total num of words abstracted from this doc
         
         
         SnowballStemmer stemmer = new englishStemmer();
@@ -260,7 +260,6 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
         	stemmer.stem();
         	String stemmed = stemmer.getCurrent();
         	
-        	totalCount++;
         	
         	if (keyword2count.containsKey(stemmed))
         	{
