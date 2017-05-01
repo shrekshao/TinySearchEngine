@@ -40,6 +40,9 @@ public class BuildInvertedIndex {
 	
 	public static void main(String[] args) throws Exception {
 		int res = ToolRunner.run(new Configuration(), new BuildInvertedIndexDriver(), args);
+		
+		System.out.println("Test Done");
+		
 		System.exit(res);		
 	}
 }

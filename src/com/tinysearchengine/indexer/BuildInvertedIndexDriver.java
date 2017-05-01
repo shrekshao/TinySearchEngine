@@ -1,6 +1,6 @@
 package com.tinysearchengine.indexer;
 
-import org.apache.hadoop.conf.Configuration;
+//import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
@@ -9,9 +9,6 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
-import com.tinysearchengine.pagerank.PageRankMainDriver;
-import com.tinysearchengine.pagerank.PageRankMainMapper;
-import com.tinysearchengine.pagerank.PageRankMainReducer;
 
 public class BuildInvertedIndexDriver extends Configured implements Tool {
 
@@ -22,10 +19,14 @@ public class BuildInvertedIndexDriver extends Configured implements Tool {
 //		job.setJarByClass(PageRankMainDriver.class);
 //		job.getConfiguration().set("mapreduce.output.basename", "PageRank_Result");
 	    
-		Configuration conf = new Configuration();
+//		Configuration conf = new Configuration();
+//		Job job =  Job.getInstance(conf, "inverted index");
+//		job.setJarByClass(BuildInvertedIndexDriver.class);
 		
-		Job job =  Job.getInstance(conf, "inverted index");
+		Job job = Job.getInstance();
+		job.setJobName("InvertedIndex");
 		job.setJarByClass(BuildInvertedIndexDriver.class);
+		job.getConfiguration().set("mapreduce.output.basename", "InvertedIndex");
 		
 		job.setMapperClass(BuildInvertedIndexMapper.class);
 		job.setReducerClass(BuildInvertedIndexReducer.class);
@@ -41,8 +42,8 @@ public class BuildInvertedIndexDriver extends Configured implements Tool {
 //	    FileInputFormat.setInputPaths(job, new Path(arg0[0]));
 //	    FileOutputFormat.setOutputPath(job, new Path(arg0[1]));
 	    
-//		return job.waitForCompletion(true) ? 0 : 1;
-		return 0;
+		return job.waitForCompletion(true) ? 0 : 1;
+//		return 0;
 	}
 
 }

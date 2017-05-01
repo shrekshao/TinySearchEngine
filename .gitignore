@@ -3,6 +3,7 @@ build/
 *.class
 credentials.csv
 .metadata/
+# filesForTest/invertedIndexer/output/
 
 .classpath
 
