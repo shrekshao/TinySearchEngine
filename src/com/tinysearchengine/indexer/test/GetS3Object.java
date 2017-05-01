@@ -39,16 +39,17 @@ public class GetS3Object {
             System.out.println("Content-Type: "  + 
             		s3object.getObjectMetadata().getContentType());
             displayTextInputStream(s3object.getObjectContent());
+            s3object.close();
             
-           // Get a range of bytes from an object.
-            
-            GetObjectRequest rangeObjectRequest = new GetObjectRequest(
-            		bucketName, key);
-            rangeObjectRequest.setRange(0, 10);
-            S3Object objectPortion = s3Client.getObject(rangeObjectRequest);
-            
-            System.out.println("Printing bytes retrieved.");
-            displayTextInputStream(objectPortion.getObjectContent());
+//           // Get a range of bytes from an object.
+//            
+//            GetObjectRequest rangeObjectRequest = new GetObjectRequest(
+//            		bucketName, key);
+//            rangeObjectRequest.setRange(0, 10);
+//            S3Object objectPortion = s3Client.getObject(rangeObjectRequest);
+//            
+//            System.out.println("Printing bytes retrieved.");
+//            displayTextInputStream(objectPortion.getObjectContent());
             
         } catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which" +

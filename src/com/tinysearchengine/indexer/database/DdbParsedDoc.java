@@ -19,7 +19,7 @@ public class DdbParsedDoc {
 	
 	// TODO:other info useful for answering queries
 	// titles, abstracts
-	private String d_title;
+	private String d_title = "";
 	private String d_abstract = "";
 	
 	

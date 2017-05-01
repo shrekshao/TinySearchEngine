@@ -1,8 +1,11 @@
 package com.tinysearchengine.indexer;
 
+import java.io.BufferedReader;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +20,14 @@ import org.jsoup.select.Elements;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import com.tinysearchengine.database.DdbConnector;
 import com.tinysearchengine.indexer.database.DdbParsedDoc;
 
@@ -113,11 +124,14 @@ import com.tinysearchengine.indexer.database.DdbParsedDoc;
  * 
  * @author shrekshao
  * 
- * Expected Input: < url, S3Link >
+ * Expected Input: < url, s3key >	(assume bucket is tinysearchengine)
+ * Output: < `word`, docid, tf >
  *
  */
 
 public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, Text> {
+	
+	static final String S3BUCKET_NAME = "tinysearchengine";
 	
 //	static final Text GLOBAL_TOTAL_COUNT_KEY = new Text("@totalCount@");
 	static final String SEPARATOR = " ";
@@ -126,10 +140,70 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 	private DdbConnector d_ddbConnector = new DdbConnector();
 	
 	
-//	private String downloadAndReadS3File()
-//	{
-//		
-//	}
+	private AWSCredentialsProvider s3CredentialProvider =
+			DefaultAWSCredentialsProviderChain.getInstance();
+	private AmazonS3 s3Client = 
+			AmazonS3ClientBuilder.standard().withCredentials(s3CredentialProvider).build();
+	
+	
+	
+    private String getStringFromInputStream(InputStream input)
+    		throws IOException 
+    {
+    	// Read one text line at a time and display.
+        BufferedReader reader = new BufferedReader(new 
+        		InputStreamReader(input));
+        
+        StringBuilder sb = new StringBuilder();
+        while (true) {
+            String line = reader.readLine();
+            if (line == null) break;
+
+            sb.append(line);
+            sb.append("\n");
+        }
+        
+        return sb.toString();
+    }
+	
+	
+	private String getS3FileContent(String s3key)
+	{
+		S3Object s3object = s3Client.getObject(
+				new GetObjectRequest(S3BUCKET_NAME, s3key));
+//        System.out.println("Content-Type: "  + 
+//        		s3object.getObjectMetadata().getContentType());
+		
+		String content = null;
+		try
+		{
+			content = getStringFromInputStream(s3object.getObjectContent());
+			s3object.close();
+		} catch (AmazonServiceException ase) {
+            System.out.println("Caught an AmazonServiceException, which" +
+            		" means your request made it " +
+                    "to Amazon S3, but was rejected with an error response" +
+                    " for some reason.");
+            System.out.println("Error Message:    " + ase.getMessage());
+            System.out.println("HTTP Status Code: " + ase.getStatusCode());
+            System.out.println("AWS Error Code:   " + ase.getErrorCode());
+            System.out.println("Error Type:       " + ase.getErrorType());
+            System.out.println("Request ID:       " + ase.getRequestId());
+        } catch (AmazonClientException ace) {
+            System.out.println("Caught an AmazonClientException, which means"+
+            		" the client encountered " +
+                    "an internal error while trying to " +
+                    "communicate with S3, " +
+                    "such as not being able to access the network.");
+            System.out.println("Error Message: " + ace.getMessage());
+        } catch (IOException e)
+		{
+        	e.printStackTrace();
+		}
+		
+		
+		return content;
+	}
 	
 	
 	
@@ -144,17 +218,24 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		
 		
 		
-		String url = parts[0];  
-		String content = "";
+		String url = parts[0]; 
+		String s3key = parts[1];
+		String content = getS3FileContent(s3key);
+		if (content == null)
+		{
+			// exception, no file from s3 acquired
+			return;
+		}
 		// -----------------------
 		
 		Document doc = Jsoup.parse(content);
 		
-		// TODO: change to parse for all text in the content
-    	Elements p = doc.select("p");
-    	Elements title = doc.select("title");
-    	
-    	String text = title.text() +"\n" + p.text();
+//		// TODO: change to parse for all text in the content
+//    	Elements p = doc.select("p");
+//    	Elements title = doc.select("title");
+//    	
+//    	String text = title.text() +"\n" + p.text();
+		String text = doc.text();
     	
         String[] words = (text).split("[^a-zA-Z0-9']+");
         
@@ -208,26 +289,30 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
         	
         	context.write(
         			new Text(w), 
-        			new Text(Integer.toString(count))
+        			new Text(
+        					url
+        					+ SEPARATOR
+        					+ Float.toString(tf)
+        					)
         			);
         	
         	
         }
         
         
-        // TODO: write dynamoDB table ParsedDoc with dynamodbmapper
-        // ? performance issue? write one tuple for each input key
-        // An alternative would be emit a tuple, with url+doc being the key (which I don't find very efficient)
-        DdbParsedDoc parsedDoc = new DdbParsedDoc();
-        
-        parsedDoc.setDocId(url);
-        parsedDoc.setNumWords(totalCount);
-        parsedDoc.setWord2tf(keyword2tf);
-        
-        parsedDoc.setTitle(title.text());
-        
-        
-        d_ddbConnector.putParsedDoc(parsedDoc);
+//        // TODO: write dynamoDB table ParsedDoc with dynamodbmapper
+//        // ? performance issue? write one tuple for each input key
+//        // An alternative would be emit a tuple, with url+doc being the key (which I don't find very efficient)
+//        DdbParsedDoc parsedDoc = new DdbParsedDoc();
+//        
+//        parsedDoc.setDocId(url);
+//        parsedDoc.setNumWords(totalCount);
+//        parsedDoc.setWord2tf(keyword2tf);
+//        
+//        parsedDoc.setTitle(title.text());
+//        
+//        
+//        d_ddbConnector.putParsedDoc(parsedDoc);
         
 	}
 }
