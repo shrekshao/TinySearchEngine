@@ -11,7 +11,7 @@
         - wordid ( still needed, cuz string for primiary key cost more space) 
         - word (text, probably after Porterstemmer)
         - global count
-        - idf (log(N/n))  (probably unavailable)
+        - idf (log(N/n)) log (Total number of documents / documents containing this word) 
         - Set ( docid )
 
 
@@ -30,6 +30,10 @@
 
 --------------
 
+# Got it wrong..
+
+idf = log (Total number of documents / documents containing this word) 
+
 
 # Hadoop batch task for calculating indexer (static)
 
@@ -42,7 +46,7 @@
         - [x] porterstemmer
         - [ ] store to dynamoDB table ParsedDoc (or, emit with a special key to label as document tuple)
     - emit: < `wordid`, docid, count >
-    - emit: < `@totalCount@`, Null, localTotalCount >  (For calculate global word counts used by idf)
+    - emit: < `@totalCount@`, Null, localTotalCount >  (For calculate global word counts used by idf)  (This is not needed..., instead, totalCount of document is needed (can directly get from how many tuples are there in the dynamodb table documenttable) )
 * reducer
     - input: < `wordid`, docid, count >
     - tasks:
@@ -50,7 +54,7 @@
             - sum up
             - store without doc hashset
         - else
-            - [x] sum up total count of this wordid
+            - [x] sum up total count of document this wordid is in
             - [ ] store to dynamoDB table Keyword
 
 

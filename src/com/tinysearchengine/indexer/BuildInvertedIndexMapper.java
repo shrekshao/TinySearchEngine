@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -15,6 +16,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
+
+import com.tinysearchengine.database.DdbConnector;
+import com.tinysearchengine.indexer.database.DdbParsedDoc;
 
 //class BuildInvertedIndexMapperOutValue implements Writable {
 //    private String docid;	//url
@@ -105,21 +109,48 @@ import org.tartarus.snowball.ext.englishStemmer;
 //}
 
 
-public class BuildInvertedIndexMapper extends Mapper<Text, Object, Text, Text> {
+/**
+ * 
+ * @author shrekshao
+ * 
+ * Expected Input: < url, S3Link >
+ *
+ */
+
+public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, Text> {
 	
-	static final Text GLOBAL_TOTAL_COUNT_KEY = new Text("@totalCount@");
+//	static final Text GLOBAL_TOTAL_COUNT_KEY = new Text("@totalCount@");
 	static final String SEPARATOR = " ";
 	
+	
+	private DdbConnector d_ddbConnector = new DdbConnector();
+	
+	
+//	private String downloadAndReadS3File()
+//	{
+//		
+//	}
+	
+	
+	
 	@Override
-	public void map(Text key, Object value, Context context) throws IOException, InterruptedException {
+	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		
 		// TODO: use URL to read data from dynamoDB (might use batch load save ...)
 		// TODO: use S3link to get document as a string
-		String url = key.toString();
+		
+		String line = value.toString();
+		String[] parts = line.split("\\s");
+		
+		
+		
+		String url = parts[0];  
 		String content = "";
 		// -----------------------
 		
 		Document doc = Jsoup.parse(content);
+		
+		// TODO: change to parse for all text in the content
     	Elements p = doc.select("p");
     	Elements title = doc.select("title");
     	
@@ -128,7 +159,7 @@ public class BuildInvertedIndexMapper extends Mapper<Text, Object, Text, Text> {
         String[] words = (text).split("[^a-zA-Z0-9']+");
         
         HashMap<String, Integer> keyword2count = new HashMap<String, Integer>();
-        int totalCount = 0;		// total num of words abstract from this doc
+        int totalCount = 0;		// total num of words abstracted from this doc
         
         
         SnowballStemmer stemmer = new englishStemmer();
@@ -161,7 +192,7 @@ public class BuildInvertedIndexMapper extends Mapper<Text, Object, Text, Text> {
         }
         
         
-        context.write(GLOBAL_TOTAL_COUNT_KEY, new Text(SEPARATOR + Integer.toString(totalCount)));
+//        context.write(GLOBAL_TOTAL_COUNT_KEY, new Text(SEPARATOR + Integer.toString(totalCount)));
 		
         
         // for this docuemnt (key)
@@ -171,18 +202,32 @@ public class BuildInvertedIndexMapper extends Mapper<Text, Object, Text, Text> {
         {
         	String w = entry.getKey();
         	int count = entry.getValue();
+        	
+        	float tf = (float) count / totalCount;
+        	keyword2tf.put(w, tf);
+        	
         	context.write(
         			new Text(w), 
         			new Text(Integer.toString(count))
         			);
         	
-        	float tf = (float) count / totalCount;
-        	keyword2tf.put(w, tf);
+        	
         }
+        
         
         // TODO: write dynamoDB table ParsedDoc with dynamodbmapper
         // ? performance issue? write one tuple for each input key
         // An alternative would be emit a tuple, with url+doc being the key (which I don't find very efficient)
-		
+        DdbParsedDoc parsedDoc = new DdbParsedDoc();
+        
+        parsedDoc.setDocId(url);
+        parsedDoc.setNumWords(totalCount);
+        parsedDoc.setWord2tf(keyword2tf);
+        
+        parsedDoc.setTitle(title.text());
+        
+        
+        d_ddbConnector.putParsedDoc(parsedDoc);
+        
 	}
 }

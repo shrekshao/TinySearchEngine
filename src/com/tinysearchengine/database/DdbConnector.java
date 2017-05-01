@@ -18,6 +18,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.s3.model.Region;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tinysearchengine.indexer.database.DdbParsedDoc;
 
 public class DdbConnector {
 
@@ -157,4 +158,19 @@ public class DdbConnector {
 	public S3Link createS3Link(String linkKey) {
 		return d_mapper.createS3Link(Region.US_East_2, k_BUCKET_NAME, linkKey);
 	}
+	
+	
+	
+	// Methods used for indexer to r/w ParsedDoc table (forward index) and Keyword (inverted index)
+	/**
+	 * Store the given document into DynamoDb.
+	 * 
+	 * @param parsedDoc
+	 */
+	public void putParsedDoc(DdbParsedDoc parsedDoc) {
+		assert parsedDoc != null;
+
+		d_mapper.save(parsedDoc);
+	}
+	
 }
