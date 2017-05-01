@@ -21,7 +21,7 @@ credentials.csv
 .mtj.tmp/
 
 # Package Files #
-*.jar
+# *.jar
 *.war
 *.ear
 *.zip
