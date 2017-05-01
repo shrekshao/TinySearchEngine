@@ -34,11 +34,15 @@ public class PageRankGetURLs {
 					byte[] curByte = doc.getContent();
 					String[] links = URLExtractor.extract(curByte);
 					for(String link: links) {
-						w.write(" " + link);
+						if(link.startsWith("https") || link.startsWith("http")) {
+							w.write(" " + link); //delete mailto: and other cases 
+						}					
 					}
 				} else {
 					for(String link : doc.getLinks()) {
-						w.write(" " +  link);
+						if(link.startsWith("https") || link.startsWith("http")) {
+							w.write(" " +  link);
+						}
 					}
 				}
 				w.write("\r\n");
