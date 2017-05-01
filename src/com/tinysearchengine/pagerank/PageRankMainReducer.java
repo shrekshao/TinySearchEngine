@@ -21,8 +21,13 @@ public class PageRankMainReducer extends Reducer<Text,Text,Text,Text> {
 		//now we get two kinds of values
 		for(Text v : values) {
 			String curOperation = v.toString();
-			if(curOperation.startsWith("Score|")) {
-				urlString = curOperation.split(" ", 2)[1];		
+			System.out.println(curOperation);
+			if(curOperation.startsWith("Score|")) { //make sure curOperation's length == 2
+				if(curOperation.split(" ", 2).length == 1) { //Score| then nothing follows
+					urlString = "";
+				} else {
+					urlString = curOperation.split(" ", 2)[1];
+				}
 			} else {
 				newScore += decay * Double.parseDouble(v.toString());
 			}
