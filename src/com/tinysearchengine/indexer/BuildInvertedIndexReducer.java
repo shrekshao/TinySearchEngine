@@ -21,8 +21,8 @@ public class BuildInvertedIndexReducer extends Reducer<Text, Text, Text, Text> {
 	
 //	static final String SEPARATOR = " ";
 	
-//	static final int GLOBAL_DOC_NUM = 1251461;
-	static final int GLOBAL_DOC_NUM = 4;
+	static final int GLOBAL_DOC_NUM = 1251461;
+//	static final int GLOBAL_DOC_NUM = 4;
 	
 	@Override
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
