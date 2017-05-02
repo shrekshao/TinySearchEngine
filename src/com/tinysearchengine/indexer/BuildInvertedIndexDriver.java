@@ -1,6 +1,6 @@
 package com.tinysearchengine.indexer;
 
-import org.apache.hadoop.conf.Configuration;
+//import org.apache.hadoop.conf.Configuration;
 //import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;

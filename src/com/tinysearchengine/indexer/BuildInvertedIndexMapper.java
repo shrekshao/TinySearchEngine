@@ -21,10 +21,13 @@ import org.tartarus.snowball.ext.englishStemmer;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSCredentialsProvider;
+//import com.amazonaws.auth.AWSCredentials;
+//import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+//import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.AmazonS3Client;
+//import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 
@@ -138,12 +141,20 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 	
 	
 	
-	private AWSCredentialsProvider s3CredentialProvider =
-			DefaultAWSCredentialsProviderChain.getInstance();
+//	private AWSCredentialsProvider s3CredentialProvider =
+//			DefaultAWSCredentialsProviderChain.getInstance();
+//	private AmazonS3 s3Client = 
+//			AmazonS3ClientBuilder.standard().withCredentials(s3CredentialProvider).build();
+	
+//	private AWSCredentials credentials = EnvironmentVariableCredentialsProvider.getCredential();
+//	@SuppressWarnings("deprecation")
+//	private AmazonS3 s3Client = 
+//			new AmazonS3Client(new InstanceProfileCredentialsProvider(false));
+	@SuppressWarnings("deprecation")
 	private AmazonS3 s3Client = 
-			AmazonS3ClientBuilder.standard().withCredentials(s3CredentialProvider).build();
+			new AmazonS3Client(new DefaultAWSCredentialsProviderChain());
 	
-	
+//	private AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(InstanceProfileCredentialsProvider.getInstance()).build();
 	
     private String getStringFromInputStream(InputStream input)
     		throws IOException 
@@ -215,6 +226,13 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		String[] parts = line.split(INPUT_SEPARATOR);
 		
 		
+		if (parts.length < 2)
+		{
+			System.out.println(line);
+			return;
+		}
+		
+		
 		
 		String url = parts[0]; 
 //		String s3key = parts[1];
@@ -227,7 +245,7 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		String content = getS3FileContent(s3key);
 		if (content == null)
 		{
-			// exception, no file from s3 acquired
+			System.out.println(s3key + " content null");
 			return;
 		}
 		// -----------------------

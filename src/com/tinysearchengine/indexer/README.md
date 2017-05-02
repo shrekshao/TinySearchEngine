@@ -114,3 +114,18 @@ idf = log(N/n)
 
 
 * score for each doc: dot( v_q, v_d ) * PageRankScore
+
+--------
+
+EMR custom jar arguments
+
+com.tinysearchengine.indexer.BuildInvertedIndex
+s3n://tinysearchengine-mapreduce/document-table
+s3n://tinysearchengine-mapreduce/inverted-index/output
+
+
+Testing purpose
+
+com.tinysearchengine.indexer.BuildInvertedIndex
+s3n://tinysearchengine-mapreduce/inverted-index-test-input
+s3n://tinysearchengine-mapreduce/inverted-index-test-output/output-a
