@@ -13,8 +13,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 public class PageRankMainMapper extends Mapper<LongWritable,Text,Text,Text> {
 	@Override 
-	public void map(LongWritable key, Text values, Context context) throws IOException, InterruptedException
-	{
+	public void map(LongWritable key, Text values, Context context) throws IOException, InterruptedException {
 		String[] urls = values.toString().split("\t", 2); //based on the tab sign I stored
 		if(urls.length != 2) { return; }
 		//urls[0] curURL
