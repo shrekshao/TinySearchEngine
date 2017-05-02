@@ -250,7 +250,20 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		}
 		// -----------------------
 		
-		Document doc = Jsoup.parse(content);
+		Document doc;
+		try
+		{
+			doc = Jsoup.parse(content);
+		}
+		catch(IllegalArgumentException e)
+		{
+			System.out.println(s3key + " content empty string");
+			return;
+		}
+		
+		
+		try
+		{
 		
 		
 		// kick out explicit non-english page
@@ -343,6 +356,10 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
         	
         }
         
+		} catch(Exception e)
+		{
+			e.printStackTrace();
+		}
         
 //        // Test output
 //        System.out.println(s3key);
