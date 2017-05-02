@@ -5,6 +5,7 @@ CREATE EXTERNAL TABLE ddb_document
 STORED BY 'org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler'
 TBLPROPERTIES(
     "dynamodb.table.name" = "DocumentTable",
+    "dynamodb.throughput.read.percent" = "100",
     "dynamodb.column.mapping"="url:url,content_link:contentLink,links:links"
 );
 
