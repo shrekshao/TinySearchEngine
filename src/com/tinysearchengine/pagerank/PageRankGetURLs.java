@@ -23,7 +23,7 @@ public class PageRankGetURLs {
 		Iterator<DdbDocument> docIt = docs.iterator();
 		int counter = 500;
 		try {
-			File statText = new File("C:/Users/xueyin/Documents/GitHub/TinySearchEngine/pagerankinput/input2.txt");
+			File statText = new File("C:/Users/xueyin/Documents/GitHub/TinySearchEngine/pagerankinput/myinput1.txt");
 			FileOutputStream is = new FileOutputStream(statText);
 			OutputStreamWriter osw = new OutputStreamWriter(is);    
 			Writer w = new BufferedWriter(osw);
@@ -36,7 +36,7 @@ public class PageRankGetURLs {
 					for(String link: links) {
 						if(link.startsWith("https") || link.startsWith("http")) {
 							if(link.contains(" ")) {
-								link.replace(" ", "%20");
+								link = link.replaceAll(" ", "%20");
 							}
 							w.write(" " + link); //delete mailto: and other cases 
 						}					
@@ -45,7 +45,7 @@ public class PageRankGetURLs {
 					for(String link : doc.getLinks()) {
 						if(link.startsWith("https") || link.startsWith("http")) {
 							if(link.contains(" ")) {
-								link.replace(" ", "%20");
+								link = link.replaceAll(" ", "%20");
 							}
 							w.write(" " +  link); //delete " "
 						}
