@@ -1,9 +1,9 @@
 package com.tinysearchengine.indexer;
 
 import java.io.IOException;
-import java.util.HashMap;
+//import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+//import java.util.Map;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;

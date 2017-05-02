@@ -1,5 +1,6 @@
 package com.tinysearchengine.indexer;
 
+import org.apache.hadoop.conf.Configuration;
 //import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -9,19 +10,13 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
+//import com.amazonaws.services.elasticmapreduce.model.Configuration;
+
 
 public class BuildInvertedIndexDriver extends Configured implements Tool {
 
 	@Override
 	public int run(String[] arg0) throws Exception {
-//		Job job = Job.getInstance();
-//		job.setJobName("PageRankMain");
-//		job.setJarByClass(PageRankMainDriver.class);
-//		job.getConfiguration().set("mapreduce.output.basename", "PageRank_Result");
-	    
-//		Configuration conf = new Configuration();
-//		Job job =  Job.getInstance(conf, "inverted index");
-//		job.setJarByClass(BuildInvertedIndexDriver.class);
 		
 		Job job = Job.getInstance();
 		job.setJobName("InvertedIndex");
@@ -35,10 +30,7 @@ public class BuildInvertedIndexDriver extends Configured implements Tool {
 	    job.setMapOutputValueClass(Text.class);
 	    job.setOutputKeyClass(Text.class); //Set Reducer Output
 	    job.setOutputValueClass(Text.class);
-	    
-//	    FileInputFormat.setInputPaths(job, new Path("filesForTest/invertedIndexer/inputreal"));
-//	    FileOutputFormat.setOutputPath(job, new Path("filesForTest/invertedIndexer/outputreal"));
-	  
+
 	    FileInputFormat.setInputPaths(job, new Path(arg0[0]));
 	    FileOutputFormat.setOutputPath(job, new Path(arg0[1]));
 	    

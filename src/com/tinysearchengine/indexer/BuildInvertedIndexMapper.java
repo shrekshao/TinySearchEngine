@@ -1,18 +1,14 @@
 package com.tinysearchengine.indexer;
 
 import java.io.BufferedReader;
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -31,8 +27,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
-import com.tinysearchengine.database.DdbConnector;
-import com.tinysearchengine.indexer.database.DdbParsedDoc;
 
 //class BuildInvertedIndexMapperOutValue implements Writable {
 //    private String docid;	//url
@@ -142,8 +136,6 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 	static final String INPUT_SEPARATOR = "\001";	// mapper input separator
 	static final String SEPARATOR = " ";
 	
-	
-	private DdbConnector d_ddbConnector = new DdbConnector();
 	
 	
 	private AWSCredentialsProvider s3CredentialProvider =
