@@ -242,8 +242,22 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		
 		Document doc = Jsoup.parse(content);
 		
-//		Elements html = doc.select("html");
-//		html.attr("lang");
+		
+		// kick out explicit non-english page
+		Elements html = doc.select("html[lang]");
+		if (html != null)
+		{
+			String language = html.attr("lang");
+//			System.out.println(language);
+			if (language != "")
+			{
+				if (language != "en" && language != "en-US" && language != "en-GB")
+				{
+					return;
+				}
+			}
+			
+		}
 		
 //		// TODO: change to parse for all text in the content
 //    	Elements p = doc.select("p");
@@ -251,7 +265,8 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 //    	
 //    	String text = title.text() +"\n" + p.text();
 		
-		// TODO: parse pages in english only
+		
+		// parse english words only
 		
 		String text = doc.text();
     	

@@ -42,13 +42,13 @@ public class BuildInvertedIndexReducer extends Reducer<Text, Text, Text, Text> {
 		double idf = Math.log10((double) GLOBAL_DOC_NUM / numDocs);
 		
 //		String numDocsStrAppend = SEPARATOR +  Integer.toString(numDocs);
-		String idfStr = BuildInvertedIndexMapper.SEPARATOR +  Double.toString(idf);
+		String idfStr = Double.toString(idf) + BuildInvertedIndexMapper.SEPARATOR;
 
 		for (String line : docs)
 		{
 			context.write(
 					key, 
-					new Text(line + idfStr)
+					new Text(idfStr + line)
 					);
 		}
 		
