@@ -23,7 +23,8 @@ public class PageRankGetURLs {
 		Iterator<DdbDocument> docIt = docs.iterator();
 		int counter = 500;
 		try {
-			File statText = new File("C:/Users/xueyin/Documents/GitHub/TinySearchEngine/pagerankinput/myinput1.txt");
+			//File statText = new File("C:/Users/xueyin/Documents/GitHub/TinySearchEngine/pagerankinput/myinput1.txt");
+			File statText = new File("/Users/owner/TinySearchEngine/pagerankinput/macinput.txt");
 			FileOutputStream is = new FileOutputStream(statText);
 			OutputStreamWriter osw = new OutputStreamWriter(is);    
 			Writer w = new BufferedWriter(osw);
