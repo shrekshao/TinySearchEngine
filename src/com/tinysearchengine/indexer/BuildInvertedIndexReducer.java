@@ -19,7 +19,9 @@ import org.apache.hadoop.mapreduce.Reducer;
  */
 public class BuildInvertedIndexReducer extends Reducer<Text, Text, Text, Text> {
 	
-	static final String SEPARATOR = " ";
+//	static final String SEPARATOR = " ";
+	
+	static final int GLOBAL_DOC_NUM = 1251461;
 	
 	@Override
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
@@ -39,9 +41,10 @@ public class BuildInvertedIndexReducer extends Reducer<Text, Text, Text, Text> {
 		
 		numDocs = docs.size();
 		
-//		float idf = (float) / numDocs
+		double idf = Math.log10((double) GLOBAL_DOC_NUM / numDocs);
 		
-		String numDocsStrAppend = SEPARATOR +  Integer.toString(numDocs);
+//		String numDocsStrAppend = SEPARATOR +  Integer.toString(numDocs);
+		String numDocsStrAppend = BuildInvertedIndexMapper.SEPARATOR +  Double.toString(idf);
 
 		for (Map.Entry<String, Text> entry : docs.entrySet())
 		{

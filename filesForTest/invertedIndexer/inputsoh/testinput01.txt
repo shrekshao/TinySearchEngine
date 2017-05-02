@@ -1,0 +1,4 @@
+http://video.statesman.com/See-How-This-Bride-Made-A-Puppy-Bouquet-For-A-Good-Cause-32307855{"s3":{"bucket":"tinysearchengine","key":"video.statesman.com/See-How-This-Bride-Made-A-Puppy-Bouquet-For-A-Good-Cause-32307855","region":"us-east-2"}}{}
+http://www.google.com/finance?q=USDHKD&ei=Nm_-WKmWEJHwjAHf_ZuYCg{"s3":{"bucket":"tinysearchengine","key":"www.google.com/finance?q=USDHKD&ei=Nm_-WKmWEJHwjAHf_ZuYCg","region":"us-east-2"}}{}
+http://info.yahoo.com/ie/el/yahoo/privacy/index.html{"s3":{"bucket":"tinysearchengine","key":"info.yahoo.com/ie/el/yahoo/privacy/index.html","region":"us-east-2"}}{}
+http://kinja.com/ericvanallen{"s3":{"bucket":"tinysearchengine","key":"kinja.com/ericvanallen","region":"us-east-2"}}{}

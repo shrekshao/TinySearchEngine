@@ -36,8 +36,8 @@ public class BuildInvertedIndexDriver extends Configured implements Tool {
 	    job.setOutputKeyClass(Text.class); //Set Reducer Output
 	    job.setOutputValueClass(Text.class);
 	    
-	    FileInputFormat.setInputPaths(job, new Path("filesForTest/invertedInderxer/input"));
-	    FileOutputFormat.setOutputPath(job, new Path("filesForTest/invertedInderxer/output"));
+	    FileInputFormat.setInputPaths(job, new Path("filesForTest/invertedIndexer/inputsoh"));
+	    FileOutputFormat.setOutputPath(job, new Path("filesForTest/invertedIndexer/output"));
 	  
 //	    FileInputFormat.setInputPaths(job, new Path(arg0[0]));
 //	    FileOutputFormat.setOutputPath(job, new Path(arg0[1]));

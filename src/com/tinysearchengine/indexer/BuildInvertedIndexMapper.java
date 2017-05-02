@@ -14,11 +14,14 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
+
+//import org.json.*;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -134,6 +137,9 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 	static final String S3BUCKET_NAME = "tinysearchengine";
 	
 //	static final Text GLOBAL_TOTAL_COUNT_KEY = new Text("@totalCount@");
+	
+	
+	static final String INPUT_SEPARATOR = "\001";	// mapper input separator
 	static final String SEPARATOR = " ";
 	
 	
@@ -214,12 +220,18 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		// TODO: use S3link to get document as a string
 		
 		String line = value.toString();
-		String[] parts = line.split("\\s");
+		String[] parts = line.split(INPUT_SEPARATOR);
 		
 		
 		
 		String url = parts[0]; 
-		String s3key = parts[1];
+//		String s3key = parts[1];
+		
+		JSONObject obj = new JSONObject(parts[1]);
+		String s3key = obj.getJSONObject("s3").getString("key");
+		
+//		System.out.println(s3key);
+		
 		String content = getS3FileContent(s3key);
 		if (content == null)
 		{
@@ -235,6 +247,9 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 //    	Elements title = doc.select("title");
 //    	
 //    	String text = title.text() +"\n" + p.text();
+		
+		// TODO: parse pages in english only
+		
 		String text = doc.text();
     	
         String[] words = (text).split("[^a-zA-Z0-9']+");
@@ -276,14 +291,14 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		
         
         // for this docuemnt (key)
-        HashMap<String, Float> keyword2tf = new HashMap<String, Float>();
+        HashMap<String, Double> keyword2tf = new HashMap<String, Double>();
         
         for(Map.Entry<String, Integer> entry : keyword2count.entrySet())
         {
         	String w = entry.getKey();
         	int count = entry.getValue();
         	
-        	float tf = (float) count / totalCount;
+        	double tf = (double) count / totalCount;
         	keyword2tf.put(w, tf);
         	
         	context.write(
@@ -291,7 +306,7 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
         			new Text(
         					url
         					+ SEPARATOR
-        					+ Float.toString(tf)
+        					+ Double.toString(tf)
         					)
         			);
         	
