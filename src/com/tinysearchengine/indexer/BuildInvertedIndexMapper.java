@@ -242,6 +242,9 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		
 		Document doc = Jsoup.parse(content);
 		
+//		Elements html = doc.select("html");
+//		html.attr("lang");
+		
 //		// TODO: change to parse for all text in the content
 //    	Elements p = doc.select("p");
 //    	Elements title = doc.select("title");
