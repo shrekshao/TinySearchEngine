@@ -258,6 +258,7 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
         int totalCount = words.length;		// total num of words abstracted from this doc
         
         
+        
         SnowballStemmer stemmer = new englishStemmer();
         
         for (String w : words)
@@ -291,7 +292,8 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		
         
         // for this docuemnt (key)
-        HashMap<String, Double> keyword2tf = new HashMap<String, Double>();
+//        HashMap<String, Double> keyword2tf = new HashMap<String, Double>();
+        
         
         for(Map.Entry<String, Integer> entry : keyword2count.entrySet())
         {
@@ -299,7 +301,7 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
         	int count = entry.getValue();
         	
         	double tf = (double) count / totalCount;
-        	keyword2tf.put(w, tf);
+//        	keyword2tf.put(w, tf);
         	
         	context.write(
         			new Text(w), 
@@ -312,6 +314,12 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
         	
         	
         }
+        
+        
+//        // Test output
+//        System.out.println(s3key);
+//        System.out.println(totalCount);
+//        System.out.println(keyword2count.size());
         
         
 //        // TODO: write dynamoDB table ParsedDoc with dynamodbmapper
