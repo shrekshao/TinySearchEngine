@@ -152,12 +152,15 @@
               <include name="*.jar" />
             </fileset>
           </copy>
+          <copy todir="build/webpages" overwrite="true">
+            <fileset dir="webpages">
+              <include name="**" />
+            </fileset>
+          </copy>
 
           <jar destfile="servlet.war" update="true">
             <fileset dir="build">
-              <include name="WEB-INF/**/*.class" />
-              <include name="WEB-INF/**/*.jar" />
-              <include name="WEB-INF/web.xml" />
+              <include name="WEB-INF/**" />
             </fileset>
           </jar>
         </target>
@@ -172,5 +175,11 @@
             <webApp war="servlet.war" contextPath="/"/>
           </jetty.run>
         </target>
+
+        <copy todir="build/WEB-INF/lib" overwrite="true">
+          <fileset dir="lib">
+            <include name="*.jar" />
+          </fileset>
+        </copy>
 
 </project>
