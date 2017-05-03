@@ -133,4 +133,33 @@
           </jar>
         </target>
 
+        <target name="compile-servlet" description="Compiles the servlet">
+          <mkdir dir="build/WEB-INF/classes" />
+          <javac srcdir="src/com/tinysearchengine/searchengine/servlet" destdir="build/WEB-INF/classes" debug="on" deprecation="off" optimize="on" includeAntRuntime="no">
+            <classpath>
+              <fileset dir="lib">
+                <include name="*.jar" />
+              </fileset>
+            </classpath>
+          </javac>
+        </target>
+
+        <target name="servlet-war" depends="compile-servlet" description="Makes the WAR file for the servlet">
+          <delete file="servlet.war" />
+          <copy file="servletconf/web.xml" tofile="build/WEB-INF/web.xml" overwrite="true" />
+          <copy todir="build/WEB-INF/lib" overwrite="true">
+            <fileset dir="lib">
+              <include name="*.jar" />
+            </fileset>
+          </copy>
+
+          <jar destfile="jetty/webapps/servlet.war" update="true">
+            <fileset dir="build">
+              <include name="WEB-INF/**/*.class" />
+              <include name="WEB-INF/**/*.jar" />
+              <include name="WEB-INF/web.xml" />
+            </fileset>
+          </jar>
+        </target>
+
 </project>
