@@ -15,8 +15,8 @@ public class PageRankFinalizeMapper extends Mapper<LongWritable,Text,Text,Text> 
 			return;
 		} else {
 			String curURL = urls[0];
-			String finalPageRankScore = urls[1].split(" ")[0]; //|Score0.555
-			double myScore = Double.parseDouble(finalPageRankScore.substring(6));//0.555
+			String[] scoresandlinks =  urls[1].split(" ");
+			double myScore = Double.parseDouble(scoresandlinks[0].split("\\|")[1]);//0.555
 			context.write(new Text(curURL), new Text(String.valueOf(myScore)));
 		}
 	}

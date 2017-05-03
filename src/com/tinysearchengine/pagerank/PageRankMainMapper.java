@@ -15,16 +15,19 @@ public class PageRankMainMapper extends Mapper<LongWritable,Text,Text,Text> {
 	@Override 
 	public void map(LongWritable key, Text values, Context context) throws IOException, InterruptedException {
 		String[] urls = values.toString().split("\t", 2); //based on the tab sign I stored
-		if(urls.length != 2) { return; }
+		if(urls.length != 2) { return; } 
 		//urls[0] curURL
 		//urls[1] Score|1.0 outURL1 outURL2 outURL3
 		//in order to get all the ourURLs in our reducer, we need to do this extra write
 		String curURL = urls[0];
+		if(urls[1].startsWith("Score|") == false) {
+			System.out.println("error here, this url:" + curURL + "The part needs to repair is: " + urls[1]);
+		}
 		context.write(new Text(curURL), new Text(urls[1]));	
 		
 		String scoreAndLinks[]= urls[1].split(" ", 2);  
 		double averageScore = 0.0;
-		double curPageRankScore = Double.parseDouble(scoreAndLinks[0].substring(6)); //should eliminate "Score|" 
+		double curPageRankScore = Double.parseDouble(scoreAndLinks[0].split("\\|")[1]); //should eliminate "Score|"
 		if(scoreAndLinks.length != 2) { //no outURLs, points to nobody :(
 			averageScore = curPageRankScore; //we just put it here
 			context.write(new Text(curURL), new Text(String.valueOf(averageScore))); //we emit current URL with avarageScore
