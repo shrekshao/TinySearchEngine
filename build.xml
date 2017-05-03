@@ -153,13 +153,24 @@
             </fileset>
           </copy>
 
-          <jar destfile="jetty/webapps/servlet.war" update="true">
+          <jar destfile="servlet.war" update="true">
             <fileset dir="build">
               <include name="WEB-INF/**/*.class" />
               <include name="WEB-INF/**/*.jar" />
               <include name="WEB-INF/web.xml" />
             </fileset>
           </jar>
+        </target>
+
+        <path id="jetty.plugin.classpath">
+          <fileset dir="lib/jetty-lib" includes="**/*.jar"/>
+        </path>
+        <taskdef classpathref="jetty.plugin.classpath" resource="tasks.properties" loaderref="jetty.loader" />
+
+        <target name="jetty.run" depends="servlet-war">
+          <jetty.run>
+            <webApp war="servlet.war" contextPath="/"/>
+          </jetty.run>
         </target>
 
 </project>
