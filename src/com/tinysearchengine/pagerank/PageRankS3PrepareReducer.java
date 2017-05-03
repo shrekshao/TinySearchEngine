@@ -11,7 +11,7 @@ public class PageRankS3PrepareReducer extends Reducer<Text,Text,Text,Text> {
 		String urlString = "Score|1.0";
 		for(Text v : values) {
 			String curoutlink = v.toString();
-			urlString += " " + curoutlink;
+			urlString += "\002" + curoutlink;
 		}
 		System.out.println(urlString);
 		context.write(key, new Text(urlString));

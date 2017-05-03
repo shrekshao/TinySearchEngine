@@ -15,26 +15,30 @@ import org.apache.hadoop.mapreduce.Reducer;
 public class PageRankMainReducer extends Reducer<Text,Text,Text,Text> {
 	public static final double decay = 0.85;
 	@Override 
-	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException
+	{
 		double newScore = 0.0;
 		String urlString = "";
 		//now we get two kinds of values
 		for(Text v : values) {
 			String curOperation = v.toString();
-			System.out.println(curOperation);
 			if(curOperation.startsWith("Score|")) { //make sure curOperation's length == 2
-				if(curOperation.split(" ", 2).length == 1) { //Score| then nothing follows
+				if(curOperation.split("\002", 2).length == 1) { //Score| then nothing follows
 					urlString = "";
 				} else {
-					urlString = curOperation.split(" ", 2)[1];
+					urlString = curOperation.split("\002", 2)[1].replaceAll("\\s+$", "");
 				}
 			} else {
-				newScore += decay * Double.parseDouble(v.toString());
+				try {
+					newScore += decay * Double.parseDouble(v.toString());
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
 			}
 		}	
 		newScore += 1 - decay;
-		if(urlString != "") { //has outURLs
-			context.write(key, new Text("Score|" + newScore + " " + urlString));
+		if(urlString != null && urlString != "" && urlString != " ") { //has outURLs
+			context.write(key, new Text("Score|" + newScore + "\002" + urlString));
 		} else {
 			context.write(key, new Text("Score|" + newScore));
 		}

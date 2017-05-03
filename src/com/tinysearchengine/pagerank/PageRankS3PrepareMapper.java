@@ -85,13 +85,13 @@ public class PageRankS3PrepareMapper extends Mapper<LongWritable, Text, Text, Te
 		}
 		
 		String url = parts[0]; 
-		if(url.endsWith("/")) {
-			url = url.substring(0, url.length() - 1);
-		}
-		url = url.replaceAll("\\s+$", "");
-	    if(url.contains(" ")) {
-	    	url = url.replaceAll(" ", "%20");
-	    }
+//		if(url.endsWith("/")) {
+//			url = url.substring(0, url.length() - 1);
+//		}
+//		url = url.replaceAll("\\s+$", "");
+//	    if(url.contains(" ")) {
+//	    	url = url.replaceAll(" ", "%20");
+//	    }
 		if(parts.length == 2 || parts[2] == "") { //Need to parse by myself
 			JSONObject obj = new JSONObject(parts[1]);
 			String s3key = obj.getJSONObject("s3").getString("key");			
@@ -106,13 +106,10 @@ public class PageRankS3PrepareMapper extends Mapper<LongWritable, Text, Text, Te
 				URL resolvedUrl = new URL(curUrl, link);
 				String realLink = resolvedUrl.toString(); //get away! those mailto:
 				if(realLink.startsWith("https") || realLink.startsWith("http")) {
-					realLink = realLink.replaceAll("\\s+$", "");
-				    if(realLink.contains(" ")) {
-					    realLink = realLink.replaceAll(" ", "%20");
-				    }
-				    if(realLink.endsWith("/")) {
-				    	realLink = realLink.substring(0,realLink.length()-1);
-				    }		    
+//					realLink = realLink.replaceAll("\\s+$", "");
+//				    if(realLink.contains(" ")) {
+//					    realLink = realLink.replaceAll(" ", "%20");
+//				    }	    
 				    context.write(new Text(url), new Text(realLink));
 				}		
 			}	
@@ -120,13 +117,10 @@ public class PageRankS3PrepareMapper extends Mapper<LongWritable, Text, Text, Te
 			String[] outlinks = parts[2].split("\002");
 			for(String outlink : outlinks) {
 				if(outlink.startsWith("https") || outlink.startsWith("http")) {
-					outlink = outlink.replaceAll("\\s+$", "");
-				    if(outlink.contains(" ")) {
-				    	outlink = outlink.replaceAll(" ", "%20");
-				    }
-				    if(outlink.endsWith("/")) {
-				    	outlink = outlink.substring(0,outlink.length()-1);
-				    }
+//					outlink = outlink.replaceAll("\\s+$", "");
+//				    if(outlink.contains(" ")) {
+//				    	outlink = outlink.replaceAll(" ", "%20");
+//				    }
 				    context.write(new Text(url), new Text(outlink));
 				}	
 			}
