@@ -8,13 +8,23 @@
 	<display-name>TinySearchEngine</display-name>
 
 	<servlet>
-		<servlet-name>mainpage</servlet-name>
-		<servlet-class>com.tinysearchengine.searchengine.servlet.MainPageServlet</servlet-class>
+		<servlet-name>fileservlet</servlet-name>
+		<servlet-class>com.tinysearchengine.searchengine.servlet.FileServlet</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>searchservlet</servlet-name>
+		<servlet-class>com.tinysearchengine.searchengine.servlet.SearchServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>mainpage</servlet-name>
+		<servlet-name>fileservlet</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
+	<servlet-mapping>
+		<servlet-name>searchservlet</servlet-name>
+		<url-pattern>/searchresult</url-pattern>
+	</servlet-mapping>
+	
 </web-app>

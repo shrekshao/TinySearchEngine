@@ -11,13 +11,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class MainPageServlet extends HttpServlet {
+public class FileServlet extends HttpServlet {
 	// Be careful about the directory.
 	final String dir = System.getProperty("user.dir") + "/build/webpages";
-	
+
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		File file = new File(dir + request.getRequestURI());
+		// return the requested file if the request URI is a file
 		if (file.isFile()) {
 			InputStream is = new FileInputStream(file);
 			OutputStream os = response.getOutputStream();
@@ -29,10 +30,12 @@ public class MainPageServlet extends HttpServlet {
 			}
 			os.close();
 			is.close();
-		} else {
+		}
+		// else return 404
+		else {
 			PrintWriter out = response.getWriter();
-			out.println("Tiny Search Engine!\n");
-			out.println("Request URI: " + request.getRequestURI());
+			out.println("404 Not Found\n");
+			response.sendError(404);
 			out.close();
 		}
 	}
