@@ -42,7 +42,6 @@ public class PageRankGetURLs {
 					String[] links = URLExtractor.extract(curByte);
 					for(String link: links) {
 						if(link.startsWith("https") || link.startsWith("http")) {
-							new URL(link, parsedUrlStr).toString();
 							if(link.contains(" ")) {
 								link = link.replaceAll(" ", "%20");
 							}

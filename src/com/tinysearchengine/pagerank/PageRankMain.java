@@ -4,7 +4,7 @@ import org.apache.hadoop.util.ToolRunner;
 
 public class PageRankMain {
 
-	static int iterations = 10;
+	static int iterations = 25;
 	
 	public static void main(String args[]) throws Exception {
 		int flag = 0;
@@ -15,12 +15,23 @@ public class PageRankMain {
 		//we get the correct parameters to start out program
 		String input = args[0];
 		String output = args[1];
+		
+		//Start Reading S3 file 
+		System.out.println("start reading s3 file");
+		String preput = output + "/Step0_ReadS3File";
+		String[] initParas = new String[] {input, preput};
+		flag = ToolRunner.run(new PageRankS3PrepareDriver(), initParas);
+		
+		if (flag == 1) { //fail
+			System.out.println("reading s3 file has some problems!!!");
+			System.exit(flag);
+		}
+		
 		String iterIn = "";
 		String iterOut = "";
-		
 		//Start Main PageRank Procedure
 		for (int i = 0; i < iterations; i++) {
-			iterIn = (i == 0? input : iterOut);
+			iterIn = (i == 0? preput : iterOut);
 			iterOut = output + "/Step1_PageRank" + String.valueOf(i);
 			System.out.println("Current is Round :" + i);
 			String[] paras = new String[] { iterIn, iterOut };
