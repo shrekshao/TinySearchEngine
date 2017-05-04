@@ -34,10 +34,6 @@ public class RequestToOtherSites {
 
 		Document doc = Jsoup.parse(content);
 
-		PrintWriter writer = new PrintWriter("response.html", "UTF-8");
-		writer.println(content);
-		writer.close();
-
 		int total = 0;
 		ArrayList<AmazonItemResult> itemList = new ArrayList<AmazonItemResult>();
 		while (true) {
