@@ -2,7 +2,9 @@
 <project name="ant-template" default="jar-crawler">
 
         <target name="clean">
-                <delete dir="build" />
+          <delete dir="build" />
+          <delete dir="static" />
+          <delete file="servlet.war" />
         </target>
 
         <target name="init">
@@ -117,6 +119,12 @@
           </manifestclasspath>
         </target>
 
+        <target name="compute-servlet-class-path" depends="compute-build-path">
+          <manifestclasspath property="lib.servlet.classpath" jarfile="servlet.war">
+            <classpath refid="build-classpath"/>
+          </manifestclasspath>
+        </target>
+
         <target name="jar-testsuite" depends="tests-classes,compute-test-class-path">
           <echo message="${lib.test.classpath}"/>
           <jar destfile="build/tests/testsuite.jar" update="true">
@@ -135,51 +143,86 @@
 
         <target name="compile-servlet" description="Compiles the servlet">
           <mkdir dir="build/WEB-INF/classes" />
-          <javac srcdir="src/com/tinysearchengine/searchengine/servlet" destdir="build/WEB-INF/classes" debug="on" deprecation="off" optimize="on" includeAntRuntime="no">
+          <javac srcdir="src"
+                 includes="com/tinysearchengine/searchengine/servlet/**/*.java"
+                 destdir="build/WEB-INF/classes"
+                 debug="on"
+                 deprecation="off"
+                 optimize="on"
+                 includeAntRuntime="no">
             <classpath>
               <fileset dir="lib">
                 <include name="*.jar" />
               </fileset>
             </classpath>
           </javac>
+          <copy todir="build/WEB-INF/classes">
+            <fileset dir="src">
+              <include name="**/*.html"/>
+              <include name="**/*.ftlh"/>
+            </fileset>
+          </copy>
         </target>
 
-        <target name="servlet-war" depends="compile-servlet" description="Makes the WAR file for the servlet">
-          <delete file="servlet.war" />
+        <target name="servlet-war"
+                depends="compile-servlet,compute-servlet-class-path"
+                description="Makes the WAR file for the servlet">
           <copy file="servletconf/web.xml" tofile="build/WEB-INF/web.xml" overwrite="true" />
-          <copy todir="build/WEB-INF/lib" overwrite="true">
-            <fileset dir="lib">
-              <include name="*.jar" />
-            </fileset>
-          </copy>
-          <copy todir="build/webpages" overwrite="true">
-            <fileset dir="webpages">
-              <include name="**" />
-            </fileset>
-          </copy>
 
-          <jar destfile="servlet.war" update="true">
+          <jar destfile="servlet.war"
+               update="true">
             <fileset dir="build">
               <include name="WEB-INF/**" />
             </fileset>
+            <manifest>
+              <attribute name="Class-Path" value="${lib.servlet.classpath}"/>
+            </manifest>
           </jar>
         </target>
 
         <path id="jetty.plugin.classpath">
           <fileset dir="lib/jetty-lib" includes="**/*.jar"/>
         </path>
-        <taskdef classpathref="jetty.plugin.classpath" resource="tasks.properties" loaderref="jetty.loader" />
+        <taskdef classpathref="jetty.plugin.classpath"
+                 resource="tasks.properties"
+                 loaderref="jetty.loader" />
 
-        <target name="jetty.run" depends="servlet-war">
-          <jetty.run>
-            <webApp war="servlet.war" contextPath="/"/>
-          </jetty.run>
+        <target name="mk-static">
+          <mkdir dir="static/css"/>
+          <mkdir dir="static/js"/>
         </target>
 
-        <copy todir="build/WEB-INF/lib" overwrite="true">
-          <fileset dir="lib">
-            <include name="*.jar" />
-          </fileset>
-        </copy>
+        <target name="copy-css"
+                depends="mk-static"
+                description="Copy all the css files into the css folder">
+          <copy todir="static/css" flatten="true">
+            <fileset dir="src">
+              <include name="**/*.css"/>
+            </fileset>
+          </copy>
+        </target>
 
+        <target name="copy-js"
+                depends="mk-static"
+                description="Copy all the js files into the js folder">
+          <copy todir="static/js" flatten="true">
+            <fileset dir="src">
+              <include name="**/*.js"/>
+            </fileset>
+          </copy>
+        </target>
+
+        <target name="jetty.dep" depends="servlet-war,copy-css,copy-js">
+        </target>
+
+        <target name="jetty.run" depends="jetty.dep">
+          <jetty.run>
+            <webApp war="servlet.war"
+                    contextPath="/">
+              <lib dir="lib" includes="*.jar" />
+            </webApp>
+            <webApp war="static/css/" contextPath="/css"/>
+            <webApp war="static/js/"  contextPath="/js"/>
+          </jetty.run>
+        </target>
 </project>

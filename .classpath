@@ -78,5 +78,6 @@
 	<classpathentry kind="lib" path="lib/avro-1.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/hadoop-yarn-api-2.7.1.jar"/>
 	<classpathentry kind="lib" path="lib/hadoop-yarn-common-2.7.1.jar"/>
+	<classpathentry kind="lib" path="lib/freemarker-2.3.23.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
