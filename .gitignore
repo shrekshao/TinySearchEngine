@@ -83,3 +83,6 @@ local.properties
 .cache-main
 .scala_dependencies
 .worksheet
+
+servlet.war
+static/
