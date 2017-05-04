@@ -1,7 +1,7 @@
 package com.tinysearchengine.searchengine.othersites;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -25,6 +25,7 @@ public class RequestToOtherSites {
 
 	static public ArrayList<AmazonItemResult> getAmazonResult(String keyword)
 			throws ClientProtocolException, IOException {
+		keyword = URLEncoder.encode(keyword, "UTF-8");
 		final HttpGet request = new HttpGet(
 				"https://www.amazon.com/s/ref=nb_sb_ss_c_1_3?url=search-alias%3Daps&field-keywords=" + keyword);
 		CloseableHttpClient httpClient = HttpClients.createDefault();

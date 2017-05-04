@@ -11,7 +11,7 @@ import com.tinysearchengine.searchengine.othersites.RequestToOtherSites;
 
 public class TestRequestToOtherSites {
 	public static void main(String args[]) throws ClientProtocolException, IOException {
-		ArrayList<AmazonItemResult> result = RequestToOtherSites.getAmazonResult(URLEncoder.encode("Head dryer", "UTF-8"));
+		ArrayList<AmazonItemResult> result = RequestToOtherSites.getAmazonResult("Head Dryer");
 		
 		int c = 0;
 		for (AmazonItemResult item : result) {
