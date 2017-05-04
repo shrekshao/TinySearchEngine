@@ -10,8 +10,6 @@ CREATE EXTERNAL TABLE ddb_worddoctftuple
 STORED BY 'org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler'
 TBLPROPERTIES(
     "dynamodb.table.name" = "WordDocTfTuple",
-    "dynamodb.throughput.read.percent" = "100",
-    "dynamodb.throughput.write.percent" = "100",
     "dynamodb.column.mapping"="id:id,word:word,url:url,tf:tf"
 );
 
@@ -33,7 +31,7 @@ CREATE EXTERNAL TABLE s3_worddoctftuple_fix
     tf      DOUBLE)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
 WITH SERDEPROPERTIES (
-  "input.regex" = "^([^\\t\\s]*)[\\t\\s]+([^\\t\\s]*)[\\t\\s]+([^\\t\\s]*)[\\t\\s]+([^\\t\\s]*)$"
+  "input.regex" = "^([^\\t\\s]*)\\t([^\\t\\s]*)\\s(.*)\\s([^\\t\\s]*)$"
 )
 LOCATION 's3://tinysearchengine-mapreduce/inverted-index/output';
 
@@ -54,7 +52,7 @@ CREATE EXTERNAL TABLE s3_worddoctftuple_test
     tf      DOUBLE)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
 WITH SERDEPROPERTIES (
-  "input.regex" = "^([^\\t\\s]*)\\t([^\\t\\s]*)\\s([^\\t\\s]*)\\s([^\\t\\s]*)$"
+  "input.regex" = "^([^\\t\\s]*)\\t([^\\t\\s]+)\\s(.*)\\s([^\\t\\s]*)$"
 )
 LOCATION 's3://tinysearchengine-mapreduce/inverted-index/output-test';
 
@@ -65,7 +63,7 @@ CREATE EXTERNAL TABLE s3_worddoctftuple_test_fix
     tf      DOUBLE)
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
 WITH SERDEPROPERTIES (
-  "input.regex" = "^([^\\t\\s]*)[\\t\\s]+([^\\t\\s]*)[\\t\\s]+([^\\t\\s]*)[\\t\\s]+([^\\t\\s]*)$"
+  "input.regex" = "^([^\\t\\s]*)\\t([^\\t\\s]+)\\s(.*)\\s([^\\t\\s]*)$"
 )
 LOCATION 's3://tinysearchengine-mapreduce/inverted-index/output-test';
 
@@ -108,3 +106,5 @@ add jar s3://tinysearchengine-mapreduce/program/hive-contrib-2.1.1.jar;
 CREATE FUNCTION row_idx AS 'org.apache.hadoop.hive.contrib.udf.UDFRowSequence'; 
 
 set hive.execution.engine to mr
+
+
