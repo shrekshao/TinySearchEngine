@@ -143,27 +143,34 @@
 
         <target name="compile-servlet" description="Compiles the servlet">
           <mkdir dir="build/WEB-INF/classes" />
-          <javac srcdir="src/com/tinysearchengine/searchengine/servlet" destdir="build/WEB-INF/classes" debug="on" deprecation="off" optimize="on" includeAntRuntime="no">
+          <javac srcdir="src"
+                 includes="com/tinysearchengine/searchengine/servlet/**/*.java"
+                 destdir="build/WEB-INF/classes"
+                 debug="on"
+                 deprecation="off"
+                 optimize="on"
+                 includeAntRuntime="no">
             <classpath>
               <fileset dir="lib">
                 <include name="*.jar" />
               </fileset>
             </classpath>
           </javac>
+          <copy todir="build/WEB-INF/classes">
+            <fileset dir="src">
+              <include name="**/*.html"/>
+              <include name="**/*.ftlh"/>
+            </fileset>
+          </copy>
         </target>
 
         <target name="servlet-war"
                 depends="compile-servlet,compute-servlet-class-path"
                 description="Makes the WAR file for the servlet">
-          <delete file="servlet.war" />
           <copy file="servletconf/web.xml" tofile="build/WEB-INF/web.xml" overwrite="true" />
-          <copy todir="build/webpages" overwrite="true">
-            <fileset dir="webpages">
-              <include name="**" />
-            </fileset>
-          </copy>
 
-          <jar destfile="servlet.war" update="true">
+          <jar destfile="servlet.war"
+               update="true">
             <fileset dir="build">
               <include name="WEB-INF/**" />
             </fileset>
@@ -176,7 +183,9 @@
         <path id="jetty.plugin.classpath">
           <fileset dir="lib/jetty-lib" includes="**/*.jar"/>
         </path>
-        <taskdef classpathref="jetty.plugin.classpath" resource="tasks.properties" loaderref="jetty.loader" />
+        <taskdef classpathref="jetty.plugin.classpath"
+                 resource="tasks.properties"
+                 loaderref="jetty.loader" />
 
         <target name="mk-static">
           <mkdir dir="static/css"/>
@@ -208,16 +217,12 @@
 
         <target name="jetty.run" depends="jetty.dep">
           <jetty.run>
-            <webApp war="servlet.war" contextPath="/"/>
+            <webApp war="servlet.war"
+                    contextPath="/">
+              <lib dir="lib" includes="*.jar" />
+            </webApp>
             <webApp war="static/css/" contextPath="/css"/>
             <webApp war="static/js/"  contextPath="/js"/>
           </jetty.run>
         </target>
-
-        <copy todir="build/WEB-INF/lib" overwrite="true">
-          <fileset dir="lib">
-            <include name="*.jar" />
-          </fileset>
-        </copy>
-
 </project>

@@ -5,16 +5,23 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-        <display-name>TinySearchEngine</display-name>
+<display-name>TinySearchEngine</display-name>
 
-        <servlet>
-                <servlet-name>searchservlet</servlet-name>
-                <servlet-class>com.tinysearchengine.searchengine.servlet.SearchServlet</servlet-class>
-        </servlet>
+<servlet>
+  <servlet-name>searchservlet</servlet-name>
+  <servlet-class>com.tinysearchengine.searchengine.servlet.SearchServlet</servlet-class>
+</servlet>
 
-        <servlet-mapping>
-                <servlet-name>searchservlet</servlet-name>
-                <url-pattern>/searchresult</url-pattern>
-        </servlet-mapping>
+<servlet>
+  <servlet-name>indexservlet</servlet-name>
+  <servlet-class>com.tinysearchengine.searchengine.servlet.IndexServlet</servlet-class>
+</servlet>
 
+<servlet-mapping>
+  <servlet-name>indexservlet</servlet-name>
+  <url-pattern>/</url-pattern>
+
+  <servlet-name>searchservlet</servlet-name>
+  <url-pattern>/searchresult</url-pattern>
+</servlet-mapping>
 </web-app>
