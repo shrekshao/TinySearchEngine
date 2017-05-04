@@ -3,12 +3,11 @@
 <head>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<link rel="stylesheet" href="/css/common.css" />
-	<link rel="stylesheet" href="/css/index.css" />
+	<link rel="stylesheet" href="/css/searchresult.css" />
 	<title>Tiny Search Engine</title>
 </head>
 <body class="container">
-	<div id="index-container" class="col-lg-offset-3 col-lg-6">
-		<h1 id="title" class="lead">TinySearchEngine</h1>
+	<div id="search-result-header" class="col-lg-12">
 		<div id="search-form-container">
 			<form id="search-form">
 				<div class="form-group">
@@ -17,6 +16,19 @@
 				</div>
 			</form>
 		</div>
+	</div>
+	<div id="search-result-container" class="col-lg-offset-3 col-lg-6">
+		<#list searchResults as resultItem>
+			<div class="search-result-item">
+				<h3 class="search-result-item-link">
+					<a href="${resultItem.url}">${resultItem.title}</a>
+				</h3>
+				<div class="search-result-item-body">
+					<div><cite>${resultItem.url}</cite></div>
+					<span>${resultItem.summary}</span>
+				</div>
+			</div>
+		</#list> 
 	</div>
 </body>
 </html>

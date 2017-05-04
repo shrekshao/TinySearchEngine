@@ -20,6 +20,8 @@ public class IndexServlet extends HttpServlet {
 
 	Configuration d_templateConfiguration;
 
+	Template d_indexTemplate;
+
 	public void init() throws ServletException {
 		super.init();
 
@@ -27,23 +29,28 @@ public class IndexServlet extends HttpServlet {
 		d_templateConfiguration.setDefaultEncoding("UTF-8");
 		d_templateConfiguration.setTemplateExceptionHandler(
 				TemplateExceptionHandler.RETHROW_HANDLER);
+
+		InputStream idxFileStream =
+			getClass().getResourceAsStream("index.ftlh");
+		try {
+			d_indexTemplate = new Template("index-template",
+					new InputStreamReader(idxFileStream),
+					d_templateConfiguration);
+		} catch (IOException e) {
+			throw new ServletException(e);
+		}
+
 	}
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-		InputStream idxFileStream =
-			getClass().getResourceAsStream("index.ftlh");
-		Template template = new Template("index-template",
-				new InputStreamReader(idxFileStream),
-				d_templateConfiguration);
 		HashMap<String, Object> root = new HashMap<>();
 		root.put("time", new Date().toString());
 		try {
-			template.process(root, response.getWriter());
+			d_indexTemplate.process(root, response.getWriter());
 		} catch (TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ServletException(e);
 		}
 	}
 

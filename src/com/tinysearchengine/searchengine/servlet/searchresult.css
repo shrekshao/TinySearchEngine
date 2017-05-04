@@ -1,0 +1,36 @@
+#search-result-header {
+    margin: 20px 0 0 0;
+    padding: 0;
+}
+
+#search-result-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 0;
+    padding-left: 0;
+    width: 100%;
+}
+
+.search-result-item {
+    flex: 1;
+    max-height: 250px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.search-result-item cite {
+    color: #006621;
+    font-style: normal;
+}
+
+.search-result-item .search-result-item-link {
+    margin: 0;
+    padding: 0;
+}
+
+.search-result-item .search-result-item-body {
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
