@@ -1,0 +1,8 @@
+SET dynamodb.throughput.read.percent=10;
+SET dynamodb.throughput.write.percent=10;
+
+CREATE EXTERNAL TABLE IF NOT EXISTS s3_pagerankurlscore
+(url STRING,
+ score DOUBLE)
+
+LOCATION 's3://tinysearchengine-mapreduce/inverted-index/output';
