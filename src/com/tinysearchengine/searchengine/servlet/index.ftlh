@@ -10,7 +10,7 @@
 	<div id="index-container" class="col-lg-offset-3 col-lg-6">
 		<h1 id="title" class="lead">TinySearchEngine</h1>
 		<div id="search-form-container">
-			<form id="search-form">
+			<form id="search-form" method="post" action="/search">
 				<div class="form-group">
 					<input type="text" placeholder="Search here..." required>
 					<button class="btn btn-primary" type="submit">Search</button>

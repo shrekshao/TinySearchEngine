@@ -9,7 +9,7 @@
 <body class="container">
 	<div id="search-result-header" class="col-lg-12">
 		<div id="search-form-container">
-			<form id="search-form">
+			<form id="search-form" method="post" action="/search">
 				<div class="form-group">
 					<input type="text" placeholder="Search here..." required>
 					<button class="btn btn-primary" type="submit">Search</button>
