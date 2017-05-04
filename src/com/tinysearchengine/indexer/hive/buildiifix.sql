@@ -12,6 +12,17 @@ WITH SERDEPROPERTIES (
 )
 LOCATION 's3://tinysearchengine-mapreduce/inverted-index/output';
 
+CREATE EXTERNAL TABLE s3_worddoctftuple_a
+    (word      STRING,
+    idf     DOUBLE,
+    url     STRING,
+    tf      DOUBLE)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
+WITH SERDEPROPERTIES (
+  "input.regex" = "^(.*)\\t([^\\t\\s]+)\\s(.*)\\s([^\\t\\s]+)$"
+)
+LOCATION 's3://tinysearchengine-mapreduce/inverted-index/output';
+
 CREATE EXTERNAL TABLE ddb_wordidf
     (
     word  STRING,
@@ -32,14 +43,25 @@ CREATE TABLE hive_wordidf
 ALTER TABLE hive_wordidf SET SERDEPROPERTIES ('serialization.encoding'='UTF-8');
 
 
+INSERT OVERWRITE TABLE hive_wordidf
+SELECT DISTINCT word,idf FROM s3_worddoctftuple_a WHERE word<>"";
+
 INSERT OVERWRITE TABLE ddb_wordidf
 SELECT * FROM hive_wordidf WHERE word<>'';
+
+
 
 INSERT OVERWRITE TABLE ddb_wordidf
 SELECT * FROM hive_wordidf WHERE word='qauo7upiifv90aghrapcjwmjxtj1ifmcgl';
 
 
 
+
+ALTER TABLE ddb_wordidf SET TBLPROPERTIES ('dynamodb.throughput.write.percent'='85');
+
+
+INSERT OVERWRITE TABLE ddb_wordidf
+SELECT DISTINCT word,idf FROM s3_worddoctftuple_a WHERE word<>"";
 
 #-------------------
 
@@ -52,10 +74,12 @@ CREATE TABLE hive_worddoctftuple
     (id   BIGINT,
     word  STRING,url
     url   STRING,
-    tf DOUBLE)
+    tf DOUBLE);
 
 INSERT OVERWRITE TABLE hive_worddoctftuple
 SELECT row_idx(),word,url,tf FROM s3_worddoctftuple WHERE word<>"" AND url<>"";
+
+
 
 
 CREATE EXTERNAL TABLE ddb_worddoctftuple
@@ -70,5 +94,12 @@ TBLPROPERTIES(
 );
 
 
+-- INSERT OVERWRITE TABLE ddb_worddoctftuple
+-- SELECT * FROM hive_worddoctftuple;
+
+add jar s3://tinysearchengine-mapreduce/program/hive-contrib-2.1.1.jar;
+
+CREATE FUNCTION row_idx AS 'org.apache.hadoop.hive.contrib.udf.UDFRowSequence'; 
+
 INSERT OVERWRITE TABLE ddb_worddoctftuple
-SELECT * FROM hive_worddoctftuple;
+SELECT row_idx(),word,url,tf FROM s3_worddoctftuple_a WHERE word<>"" AND url<>"";
