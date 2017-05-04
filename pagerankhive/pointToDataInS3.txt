@@ -1,20 +1,29 @@
-SET dynamodb.throughput.read.percent=10;
-SET dynamodb.throughput.write.percent=10;
+SET dynamodb.throughput.read.percent = 10;
+SET dynamodb.throughput.write.percent = 10;
 
 CREATE EXTERNAL TABLE s3_features_unformatted_pagerank
 (
-    url      STRING ,
-    pageRankScore     DOUBLE)
+    url STRING,
+    pageRankScore DOUBLE)
 
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
 WITH SERDEPROPERTIES (
   "input.regex" = "^(.*)\\t([^\\t\\s]+)$"
 )
-
 LOCATION 's3://tinysearchengine-mapreduce/pagerank-real-output/outputNOW/output';
 
+CREATE EXTERNAL TABLE hive_dynamoPageRank
+(
+    url STRING,
+    pageRankScore DOUBLE)
+STORED BY 'org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler'
+TBLPROPERTIES(
+    "dynamodb.table.name" = "PageRankScore",
+    "dynamodb.column.mapping" = "url:url,pageRankScore:pageRankScore"
+);
 
-INSERT OVERWRITE TABLE PageRankScore
-SELECT * FROM s3_features_unformatted_pagerank;
+
+INSERT OVERWRITE TABLE hive_dynamoPageRank
+SELECT * FROM s3_features_unformatted_pagerank WHERE url<>"" AND LENGTH(url) < 2048;
 
  
