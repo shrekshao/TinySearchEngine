@@ -12,7 +12,7 @@
 		<div id="search-form-container">
 			<form id="search-form" method="post" action="/search">
 				<div class="form-group">
-					<input type="text" placeholder="Search here..." required>
+					<input type="text" name="query" placeholder="Search here..." required>
 					<button class="btn btn-primary" type="submit">Search</button>
 				</div>
 			</form>

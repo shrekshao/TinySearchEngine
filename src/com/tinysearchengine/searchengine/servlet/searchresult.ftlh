@@ -11,12 +11,25 @@
 		<div id="search-form-container">
 			<form id="search-form" method="post" action="/search">
 				<div class="form-group">
-					<input type="text" placeholder="Search here..." required>
+					<input type="text" name="query" value="${(query)!}" placeholder="Search here..." required>
 					<button class="btn btn-primary" type="submit">Search</button>
 				</div>
 			</form>
 		</div>
 	</div>
+	
+	<#if thirdPartyResults?has_content >
+	<div id="thirdparty-result-container" class="col-lg-offset-3 col-lg-6">		
+		<#list thirdPartyResults as resultItem>
+			<div class="thirdparty-result-item">
+				<img src="${resultItem.imageUrl}"/>
+				<h4><a href="${resultItem.itemUrl}">${resultItem.title}</a></h4>
+				<p>${resultItem.price}</p>
+			</div>
+		</#list>
+	</div>
+	</#if>
+	
 	<div id="search-result-container" class="col-lg-offset-3 col-lg-6">
 		<#list searchResults as resultItem>
 			<div class="search-result-item">
