@@ -28,7 +28,7 @@ public class TestResolvedURL {
 		for (String s : str.split("\\|")) {
 			System.out.println("2:" + s);
 		}
-		String sss = new String("https://physics.stanford.edu/sites/default/files/TA_Responsibilities_July_2012_0.pdf	Score|0.16328125000000002");
+		String sss = new String("https://physics.stanford.edu/sites/default/f%09iles/TA_Responsibilities_July_2012_0.pdf	Score|0.16328125000000002");
 		for (String ssss : sss.split("\t", 2)) {
 			System.out.println(ssss);
 		}

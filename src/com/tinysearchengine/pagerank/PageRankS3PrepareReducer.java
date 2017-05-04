@@ -13,7 +13,6 @@ public class PageRankS3PrepareReducer extends Reducer<Text,Text,Text,Text> {
 			String curoutlink = v.toString();
 			urlString += "\002" + curoutlink;
 		}
-		System.out.println(urlString);
 		context.write(key, new Text(urlString));
 	}
 }
