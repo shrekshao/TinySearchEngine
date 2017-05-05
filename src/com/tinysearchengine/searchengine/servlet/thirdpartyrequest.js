@@ -31,10 +31,19 @@ window.onload = function() {
 					itemDiv.appendChild(h4);
 
 					// add price
+					var priceDiv = document.createElement("div");
+					
+					var logo = document.createElement("img");
+					logo.setAttribute("src", "/img/amazon-logo.jpg");
+					priceDiv.appendChild(logo);
+					
 					var price = document.createElement("p");
 					price.textContent = itemInfo.price;
-					itemDiv.appendChild(price);
-
+					priceDiv.appendChild(price);
+					
+					itemDiv.appendChild(priceDiv);
+					
+					// add all things to item div
 					resultContainer.appendChild(itemDiv);
 				}
 			}

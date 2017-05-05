@@ -1,228 +1,240 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ant-template" default="jar-crawler">
 
-        <target name="clean">
-          <delete dir="build" />
-          <delete dir="static" />
-          <delete file="servlet.war" />
-        </target>
+	<target name="clean">
+		<delete dir="build" />
+		<delete dir="static" />
+		<delete file="servlet.war" />
+	</target>
 
-        <target name="init">
-                <mkdir dir="build/classes"/>
-                <mkdir dir="build/tests/classes"/>
-        </target>
+	<target name="init">
+		<mkdir dir="build/classes"/>
+		<mkdir dir="build/tests/classes"/>
+	</target>
 
-        <target name="crawler-classes" depends="init,util-classes,db-classes">
-                <javac srcdir="src"
+	<target name="crawler-classes" depends="init,util-classes,db-classes">
+		<javac srcdir="src"
          includes="com/tinysearchengine/crawler/**/*.java"
          destdir="build/classes"
          deprecation="on"
          debug="true"
          includeantruntime="false">
-                  <classpath>
-                    <fileset dir="lib">
-                      <include name="*.jar"/>
-                    </fileset>
-                  </classpath>
-                </javac>
-        </target>
+			<classpath>
+				<fileset dir="lib">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
 
-        <target name="db-classes">
-                <javac srcdir="src"
+	<target name="db-classes">
+		<javac srcdir="src"
                        includes="com/tinysearchengine/database/**/*.java"
                        destdir="build/classes"
                        debug="true"
                        includeantruntime="false">
-                  <classpath>
-                    <fileset dir="lib">
-                      <include name="*.jar"/>
-                    </fileset>
-                  </classpath>
-                </javac>
-        </target>
+			<classpath>
+				<fileset dir="lib">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
 
-        <target name="util-classes">
-                <javac srcdir="src"
+	<target name="util-classes">
+		<javac srcdir="src"
                        includes="com/tinysearchengine/utils/**/*.java"
                        destdir="build/classes"
                        deprecation="on"
                        debug="true"
                        includeantruntime="false">
-                  <classpath>
-                    <fileset dir="lib">
-                      <include name="*.jar"/>
-                    </fileset>
-                  </classpath>
-                </javac>
-        </target>
+			<classpath>
+				<fileset dir="lib">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
 
-        <target name="jar-crawler" depends="crawler-classes,compute-crawler-class-path">
-          <echo message="${lib.crawler.classpath}"/>
-          <jar destfile="build/crawler.jar" update="true">
-            <fileset dir="build/classes">
-              <include name="**/*.class"/>
-            </fileset>
-            <manifest>
-              <attribute name="Main-Class" value="com.tinysearchengine.crawler.CrawlerDriver"/>
-              <attribute name="Class-Path" value="${lib.crawler.classpath}"/>
-            </manifest>
-          </jar>
-        </target>
+	<target name="jar-crawler" depends="crawler-classes,compute-crawler-class-path">
+		<echo message="${lib.crawler.classpath}"/>
+		<jar destfile="build/crawler.jar" update="true">
+			<fileset dir="build/classes">
+				<include name="**/*.class"/>
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class" value="com.tinysearchengine.crawler.CrawlerDriver"/>
+				<attribute name="Class-Path" value="${lib.crawler.classpath}"/>
+			</manifest>
+		</jar>
+	</target>
 
-        <target name="jar-repairer" depends="crawler-classes,compute-crawler-class-path">
-          <jar destfile="build/repairer.jar" update="true">
-            <fileset dir="build/classes">
-              <include name="**/*.class"/>
-            </fileset>
-            <manifest>
-              <attribute name="Main-Class"
+	<target name="jar-repairer" depends="crawler-classes,compute-crawler-class-path">
+		<jar destfile="build/repairer.jar" update="true">
+			<fileset dir="build/classes">
+				<include name="**/*.class"/>
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class"
                          value="com.tinysearchengine.crawler.CrawlerExtractedLinksRepairDriver"/>
-              <attribute name="Class-Path" value="${lib.crawler.classpath}"/>
-            </manifest>
-          </jar>
+				<attribute name="Class-Path" value="${lib.crawler.classpath}"/>
+			</manifest>
+		</jar>
 
-        </target>
+	</target>
 
-        <target name="tests-classes" depends="crawler-classes,util-classes">
-                <javac srcdir="tests"
+	<target name="tests-classes" depends="crawler-classes,util-classes">
+		<javac srcdir="tests"
                        includes="com/tinysearchengine/**/*.java"
                        destdir="build/tests/classes"
                        deprecation="on"
                        debug="true"
                        includeantruntime="false">
-                  <classpath>
-                    <fileset dir="lib">
-                      <include name="*.jar"/>
-                    </fileset>
-                    <pathelement path="build/classes"/>
-                  </classpath>
-                </javac>
-        </target>
+			<classpath>
+				<fileset dir="lib">
+					<include name="*.jar"/>
+				</fileset>
+				<pathelement path="build/classes"/>
+			</classpath>
+		</javac>
+	</target>
 
-        <target name="compute-build-path">
-          <path id="build-classpath">
-            <fileset dir="lib">
-              <include name="*.jar"/>
-            </fileset>
-          </path>
-        </target>
+	<target name="compute-build-path">
+		<path id="build-classpath">
+			<fileset dir="lib">
+				<include name="*.jar"/>
+			</fileset>
+		</path>
+	</target>
 
-        <target name="compute-test-class-path" depends="compute-build-path">
-          <manifestclasspath property="lib.test.classpath" jarfile="build/tests/testsuite.jar">
-            <classpath refid="build-classpath"/>
-          </manifestclasspath>
-        </target>
+	<target name="compute-test-class-path" depends="compute-build-path">
+		<manifestclasspath property="lib.test.classpath" jarfile="build/tests/testsuite.jar">
+			<classpath refid="build-classpath"/>
+		</manifestclasspath>
+	</target>
 
-        <target name="compute-crawler-class-path" depends="compute-build-path">
-          <manifestclasspath property="lib.crawler.classpath" jarfile="build/crawler.jar">
-            <classpath refid="build-classpath"/>
-          </manifestclasspath>
-        </target>
+	<target name="compute-crawler-class-path" depends="compute-build-path">
+		<manifestclasspath property="lib.crawler.classpath" jarfile="build/crawler.jar">
+			<classpath refid="build-classpath"/>
+		</manifestclasspath>
+	</target>
 
-        <target name="compute-servlet-class-path" depends="compute-build-path">
-          <manifestclasspath property="lib.servlet.classpath" jarfile="servlet.war">
-            <classpath refid="build-classpath"/>
-          </manifestclasspath>
-        </target>
+	<target name="compute-servlet-class-path" depends="compute-build-path">
+		<manifestclasspath property="lib.servlet.classpath" jarfile="servlet.war">
+			<classpath refid="build-classpath"/>
+		</manifestclasspath>
+	</target>
 
-        <target name="jar-testsuite" depends="tests-classes,compute-test-class-path">
-          <echo message="${lib.test.classpath}"/>
-          <jar destfile="build/tests/testsuite.jar" update="true">
-            <fileset dir="build/tests/classes">
-              <include name="**/*.class"/>
-            </fileset>
-            <fileset dir="build/classes">
-              <include name="**/*.class"/>
-            </fileset>
-            <manifest>
-              <attribute name="Main-Class" value="com.tinysearchengine.tests.TestDriver"/>
-              <attribute name="Class-Path" value="${lib.test.classpath}"/>
-            </manifest>
-          </jar>
-        </target>
+	<target name="jar-testsuite" depends="tests-classes,compute-test-class-path">
+		<echo message="${lib.test.classpath}"/>
+		<jar destfile="build/tests/testsuite.jar" update="true">
+			<fileset dir="build/tests/classes">
+				<include name="**/*.class"/>
+			</fileset>
+			<fileset dir="build/classes">
+				<include name="**/*.class"/>
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class" value="com.tinysearchengine.tests.TestDriver"/>
+				<attribute name="Class-Path" value="${lib.test.classpath}"/>
+			</manifest>
+		</jar>
+	</target>
 
-        <target name="compile-servlet" description="Compiles the servlet">
-          <mkdir dir="build/WEB-INF/classes" />
-          <javac srcdir="src"
+	<target name="compile-servlet" description="Compiles the servlet">
+		<mkdir dir="build/WEB-INF/classes" />
+		<javac srcdir="src"
                  includes="com/tinysearchengine/searchengine/**/*.java"
                  destdir="build/WEB-INF/classes"
                  debug="on"
                  deprecation="off"
                  optimize="on"
                  includeAntRuntime="no">
-            <classpath>
-              <fileset dir="lib">
-                <include name="*.jar" />
-              </fileset>
-            </classpath>
-          </javac>
-          <copy todir="build/WEB-INF/classes">
-            <fileset dir="src">
-              <include name="**/*.html"/>
-              <include name="**/*.ftlh"/>
-            </fileset>
-          </copy>
-        </target>
+			<classpath>
+				<fileset dir="lib">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<copy todir="build/WEB-INF/classes">
+			<fileset dir="src">
+				<include name="**/*.html"/>
+				<include name="**/*.ftlh"/>
+			</fileset>
+		</copy>
+	</target>
 
-        <target name="servlet-war"
+	<target name="servlet-war"
                 depends="compile-servlet,compute-servlet-class-path"
                 description="Makes the WAR file for the servlet">
-          <copy file="servletconf/web.xml" tofile="build/WEB-INF/web.xml" overwrite="true" />
+		<copy file="servletconf/web.xml" tofile="build/WEB-INF/web.xml" overwrite="true" />
 
-          <jar destfile="servlet.war"
+		<jar destfile="servlet.war"
                update="true">
-            <fileset dir="build">
-              <include name="WEB-INF/**" />
-            </fileset>
-            <manifest>
-              <attribute name="Class-Path" value="${lib.servlet.classpath}"/>
-            </manifest>
-          </jar>
-        </target>
+			<fileset dir="build">
+				<include name="WEB-INF/**" />
+			</fileset>
+			<manifest>
+				<attribute name="Class-Path" value="${lib.servlet.classpath}"/>
+			</manifest>
+		</jar>
+	</target>
 
-        <path id="jetty.plugin.classpath">
-          <fileset dir="lib/jetty-lib" includes="**/*.jar"/>
-        </path>
-        <taskdef classpathref="jetty.plugin.classpath"
+	<path id="jetty.plugin.classpath">
+		<fileset dir="lib/jetty-lib" includes="**/*.jar"/>
+	</path>
+	<taskdef classpathref="jetty.plugin.classpath"
                  resource="tasks.properties"
                  loaderref="jetty.loader" />
 
-        <target name="mk-static">
-          <mkdir dir="static/css"/>
-          <mkdir dir="static/js"/>
-        </target>
+	<target name="mk-static">
+		<mkdir dir="static/css"/>
+		<mkdir dir="static/js"/>
+		<mkdir dir="static/img"/>
+	</target>
 
-        <target name="copy-css"
+	<target name="copy-css"
                 depends="mk-static"
                 description="Copy all the css files into the css folder">
-          <copy todir="static/css" flatten="true">
-            <fileset dir="src">
-              <include name="**/*.css"/>
-            </fileset>
-          </copy>
-        </target>
+		<copy todir="static/css" flatten="true">
+			<fileset dir="src">
+				<include name="**/*.css"/>
+			</fileset>
+		</copy>
+	</target>
 
-        <target name="copy-js"
+	<target name="copy-js"
                 depends="mk-static"
                 description="Copy all the js files into the js folder">
-          <copy todir="static/js" flatten="true">
-            <fileset dir="src">
-              <include name="**/*.js"/>
-            </fileset>
-          </copy>
-        </target>
+		<copy todir="static/js" flatten="true">
+			<fileset dir="src">
+				<include name="**/*.js"/>
+			</fileset>
+		</copy>
+	</target>
 
-        <target name="jetty.dep" depends="servlet-war,copy-css,copy-js">
-        </target>
+	<target name="copy-img"
+            depends="mk-static"
+            description="Copy all the images into the js folder">
+		<copy todir="static/img" flatten="true">
+			<fileset dir="src">
+				<include name="**/*.jpg"/>
+			</fileset>
+		</copy>
+	</target>
 
-        <target name="jetty.run" depends="jetty.dep">
-          <jetty.run>
-            <webApp war="servlet.war"
+	<target name="jetty.dep" depends="servlet-war,copy-css,copy-js,copy-img">
+	</target>
+
+	<target name="jetty.run" depends="jetty.dep">
+		<jetty.run>
+			<webApp war="servlet.war"
                     contextPath="/">
-              <lib dir="lib" includes="*.jar" />
-            </webApp>
-            <webApp war="static/css/" contextPath="/css"/>
-            <webApp war="static/js/"  contextPath="/js"/>
-          </jetty.run>
-        </target>
+				<lib dir="lib" includes="*.jar" />
+			</webApp>
+			<webApp war="static/css/" contextPath="/css"/>
+			<webApp war="static/js/"  contextPath="/js"/>
+			<webApp war="static/img/" contextPath="/img"/>
+		</jetty.run>
+	</target>
 </project>
