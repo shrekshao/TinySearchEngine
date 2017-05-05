@@ -161,7 +161,7 @@ public class DdbConnector {
 	
 	
 	
-	// Methods used for indexer to r/w ParsedDoc table (forward index) and Keyword (inverted index)
+	// Methods used for indexer
 	/**
 	 * Store the given document into DynamoDb.
 	 * 

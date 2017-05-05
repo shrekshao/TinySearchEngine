@@ -18,20 +18,38 @@ import org.jsoup.select.Elements;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+//import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+//import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.tinysearchengine.indexer.database.DdbParsedDoc;
 
 public class ParseDocMapper extends Mapper<LongWritable, Text, Text, Text> {
 	static final String S3BUCKET_NAME = "tinysearchengine";
 	static final String INPUT_SEPARATOR = "\001";	// mapper input separator
 	static final String SEPARATOR = " ~~ ";
 	
+//	@SuppressWarnings("deprecation")
+	DefaultAWSCredentialsProviderChain credential = new DefaultAWSCredentialsProviderChain();
 	@SuppressWarnings("deprecation")
 	private AmazonS3 s3Client = 
-			new AmazonS3Client(new DefaultAWSCredentialsProviderChain());
+			new AmazonS3Client(credential);
+	
+//	@SuppressWarnings("deprecation")
+//	AmazonDynamoDB d_ddb = new AmazonDynamoDBClient();
+	AmazonDynamoDB d_ddb = AmazonDynamoDBClientBuilder.standard().build();
+//	@SuppressWarnings("deprecation")
+//	AmazonDynamoDB d_ddb = new AmazonDynamoDBClient();
+//	@SuppressWarnings("deprecation")
+	private DynamoDBMapper d_mapper = new DynamoDBMapper(d_ddb, credential);
+	
+	
 	
 //	private AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(InstanceProfileCredentialsProvider.getInstance()).build();
 	
@@ -97,10 +115,7 @@ public class ParseDocMapper extends Mapper<LongWritable, Text, Text, Text> {
 	
 	@Override
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-		
-		// TODO: use URL to read data from dynamoDB (might use batch load save ...)
-		// TODO: use S3link to get document as a string
-		
+
 		String line = value.toString();
 		String[] parts = line.split(INPUT_SEPARATOR);
 		
@@ -111,15 +126,11 @@ public class ParseDocMapper extends Mapper<LongWritable, Text, Text, Text> {
 			return;
 		}
 		
-		
-		
 		String url = parts[0]; 
-//		String s3key = parts[1];
 		
 		JSONObject obj = new JSONObject(parts[1]);
 		String s3key = obj.getJSONObject("s3").getString("key");
 		
-//		System.out.println(s3key);
 		
 		String content = getS3FileContent(s3key);
 		if (content == null)
@@ -144,13 +155,11 @@ public class ParseDocMapper extends Mapper<LongWritable, Text, Text, Text> {
 		try
 		{
 		
-		
 		// kick out explicit non-english page
 		Elements html = doc.select("html[lang]");
 		if (html != null)
 		{
 			String language = html.attr("lang");
-//			System.out.println(language);
 			if (language != "")
 			{
 				if (language != "en" && language != "en-US" && language != "en-GB")
@@ -161,8 +170,6 @@ public class ParseDocMapper extends Mapper<LongWritable, Text, Text, Text> {
 			
 		}
 		
-//		// TODO: change to parse for all text in the content
-    	
     	
     	Elements title = doc.select("title");
     	String titleStr = title.text();
@@ -186,13 +193,13 @@ public class ParseDocMapper extends Mapper<LongWritable, Text, Text, Text> {
     	}
         
     	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
+    	DdbParsedDoc parsedDoc = new DdbParsedDoc();
+      
+        parsedDoc.setDocId(url);
+        parsedDoc.setTitle(titleStr);
+        parsedDoc.setAbstract(pStr);
+
+        d_mapper.save(parsedDoc);
     	
     	
     	context.write(
