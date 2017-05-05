@@ -12,12 +12,12 @@ import com.tinysearchengine.searchengine.othersites.RequestToOtherSites;
 
 public class TestRequestToOtherSites {
 	public static void main(String args[]) throws ClientProtocolException, IOException {
-		//TestAmazon();
-		TestEbay();
+		TestAmazon();
+		//TestEbay();
 	}
 	
 	static void TestAmazon() throws ClientProtocolException, IOException {
-		ArrayList<AmazonItemResult> result = RequestToOtherSites.getAmazonResult("laptop");
+		ArrayList<AmazonItemResult> result = RequestToOtherSites.getAmazonResult("macbook pro");
 		
 		int c = 0;
 		for (AmazonItemResult item : result) {

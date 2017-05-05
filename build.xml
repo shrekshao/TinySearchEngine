@@ -144,7 +144,7 @@
         <target name="compile-servlet" description="Compiles the servlet">
           <mkdir dir="build/WEB-INF/classes" />
           <javac srcdir="src"
-                 includes="com/tinysearchengine/searchengine/servlet/**/*.java"
+                 includes="com/tinysearchengine/searchengine/**/*.java"
                  destdir="build/WEB-INF/classes"
                  debug="on"
                  deprecation="off"
