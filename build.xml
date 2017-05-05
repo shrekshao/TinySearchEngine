@@ -10,6 +10,40 @@
                 <mkdir dir="build/tests/classes"/>
         </target>
 
+        <target name="downloads3-class" depends="init">
+                <javac srcdir="src"
+         includes="com/tinysearchengine/indexer/test/GetS3Object.java"
+         destdir="build/classes"
+         deprecation="on"
+         debug="true"
+         includeantruntime="false">
+                  <classpath>
+                    <fileset dir="lib">
+                      <!--<include name="aws-java-sdk-1.11.122.jar"/>-->
+                      <include name="*.jar"/>
+                    </fileset>
+                  </classpath>
+                </javac>
+        </target>
+
+        
+
+        <target name="jar-downloads3" depends="downloads3-class,compute-indexer-class-path">
+          <echo message="${lib.indexer.classpath}"/>
+          <jar destfile="build/downloads3.jar" update="true">
+            <fileset dir="build/classes">
+              <include name="**/*.class"/>
+            </fileset>
+            <manifest>
+              <attribute name="Main-Class" value="com.tinysearchengine.indexer.test.GetS3Object"/>
+              <attribute name="Class-Path" value="${lib.indexer.classpath}"/>
+            </manifest>
+          </jar>
+        </target>
+
+
+
+
         <target name="crawler-classes" depends="init,util-classes,db-classes">
                 <javac srcdir="src"
          includes="com/tinysearchengine/crawler/**/*.java"
@@ -113,6 +147,12 @@
 
         <target name="compute-crawler-class-path" depends="compute-build-path">
           <manifestclasspath property="lib.crawler.classpath" jarfile="build/crawler.jar">
+            <classpath refid="build-classpath"/>
+          </manifestclasspath>
+        </target>
+
+        <target name="compute-indexer-class-path" depends="compute-build-path">
+          <manifestclasspath property="lib.indexer.classpath" jarfile="build/downloads3.jar">
             <classpath refid="build-classpath"/>
           </manifestclasspath>
         </target>
