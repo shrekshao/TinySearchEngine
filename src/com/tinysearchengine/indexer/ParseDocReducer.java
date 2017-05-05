@@ -1,11 +1,9 @@
 package com.tinysearchengine.indexer;
 
 import java.io.IOException;
-import java.util.HashSet;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.Reducer.Context;
 
 public class ParseDocReducer extends Reducer<Text, Text, Text, Text> {
 	@Override

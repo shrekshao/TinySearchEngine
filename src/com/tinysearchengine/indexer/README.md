@@ -98,3 +98,12 @@ Testing purpose
 com.tinysearchengine.indexer.BuildInvertedIndex
 s3n://tinysearchengine-mapreduce/inverted-index-test-input
 s3n://tinysearchengine-mapreduce/inverted-index-test-output/output-a
+
+
+com.tinysearchengine.indexer.ParseDocMain
+s3n://tinysearchengine-mapreduce/document-table
+s3n://tinysearchengine-mapreduce/parsed-doc/output
+
+com.tinysearchengine.indexer.ParseDocMain
+s3n://tinysearchengine-mapreduce/inverted-index-test-input
+s3n://tinysearchengine-mapreduce/parsed-doc-test-output/output-a

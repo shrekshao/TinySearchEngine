@@ -15,7 +15,7 @@ public class ParseDocDriver extends Configured implements Tool {
 	public int run(String[] arg0) throws Exception {
 		Job job = Job.getInstance();
 		job.setJobName("ParseDoc");
-		job.setJarByClass(BuildInvertedIndexDriver.class);
+		job.setJarByClass(ParseDocDriver.class);
 		job.getConfiguration().set("mapreduce.output.basename", "ParsedDoc");
 		job.getConfiguration().set("mapreduce.output.textoutputformat.separator", " ~~ ");
 		
