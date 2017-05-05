@@ -8,7 +8,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.ConsoleAppender;
@@ -49,7 +51,7 @@ public class DdbConnectorTests {
 		doc.setContentType("application/html");
 		doc.setCrawledTime(new Date().getTime());
 		doc.setCharset("UTF-8");
-		
+
 		Set<String> links = new HashSet<>();
 		links.add("www.barfoo.com");
 		links.add("www.barbaz.com");
@@ -130,7 +132,7 @@ public class DdbConnectorTests {
 		System.out.println(
 				"Avg latency: " + (dur / (long) totalIterations) + " ns");
 	}
-	
+
 	@Test
 	public void testGetNonRepairedDocuments() {
 		List<DdbDocument> docs = d_connector.getAllNonRepairedDocumentsLazily();
@@ -151,5 +153,58 @@ public class DdbConnectorTests {
 		System.out.println(
 				"Avg latency: " + (dur / (long) totalIterations) + " ns");
 
+	}
+
+	@Test
+	public void testGetWordDocTfTuple() {
+		List<DdbWordDocTfTuple> tuples =
+			d_connector.getWordDocTfTuplesForWord("start");
+		Iterator<DdbWordDocTfTuple> it = tuples.iterator();
+		while (it.hasNext()) {
+			DdbWordDocTfTuple tuple = it.next();
+			System.out.println(tuple.getUrl() + ", "
+					+ tuple.getWord()
+					+ ", "
+					+ tuple.getTf());
+		}
+	}
+
+	@Test
+	public void testBatchGetPgRank() {
+		List<String> urls = new LinkedList<>();
+		urls.add("https://www.nytimes.com");
+		urls.add("https://news.ycombinator.com/news");
+
+		Map<String, List<Object>> results =
+			d_connector.batchGetPageRankScore(urls);
+
+		for (Map.Entry<String, List<Object>> kv : results.entrySet()) {
+			System.out.println(kv.getKey());
+			for (Object obj : kv.getValue()) {
+				assertTrue(obj instanceof DdbPageRankScore);
+				DdbPageRankScore pgScore = (DdbPageRankScore) obj;
+				System.out.println(
+						pgScore.getUrl() + ", " + pgScore.getPageRankScore());
+			}
+		}
+	}
+
+	@Test
+	public void testBatchGetDocuments() {
+		List<String> urls = new LinkedList<>();
+		urls.add("https://www.nytimes.com");
+		urls.add("https://news.ycombinator.com/news");
+
+		Map<String, List<Object>> results = d_connector.batchGetDocuments(urls);
+
+		for (Map.Entry<String, List<Object>> kv : results.entrySet()) {
+			System.out.println(kv.getKey());
+			for (Object obj : kv.getValue()) {
+				assertTrue(obj instanceof DdbDocument);
+				DdbDocument doc = (DdbDocument) obj;
+				System.out.println(
+						doc.getUrlAsString() + ", " + doc.getFingerprint());
+			}
+		}
 	}
 }

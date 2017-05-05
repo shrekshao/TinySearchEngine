@@ -3,7 +3,9 @@ package com.tinysearchengine.database;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
@@ -14,6 +16,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.PaginationLoadingStrategy;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.KeyPair;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.s3.model.Region;
@@ -127,6 +130,53 @@ public class DdbConnector {
 		return d_mapper.scan(DdbDocument.class, expr, config);
 	}
 
+	public List<DdbWordDocTfTuple> getWordDocTfTuplesForWord(String word) {
+		HashMap<String, AttributeValue> attrs = new HashMap<>();
+		attrs.put(":wd", new AttributeValue().withS(word));
+
+		DynamoDBQueryExpression<DdbWordDocTfTuple> expr =
+			new DynamoDBQueryExpression<DdbWordDocTfTuple>()
+					.withIndexName("word-index").withConsistentRead(false)
+					.withKeyConditionExpression("word = :wd")
+					.withExpressionAttributeValues(attrs);
+
+		return d_mapper.query(DdbWordDocTfTuple.class, expr);
+	}
+
+	public DdbPageRankScore getPageRankScore(String url) {
+		return d_mapper.load(DdbPageRankScore.class, url);
+	}
+
+	public Map<String, List<Object>> batchGetPageRankScore(List<String> urls) {
+		Map<Class<?>, List<KeyPair>> loadDescriptor =
+			new HashMap<Class<?>, List<KeyPair>>();
+
+		List<KeyPair> kps = new LinkedList<KeyPair>();
+		urls.forEach((url) -> {
+			KeyPair kp = new KeyPair();
+			kp.setHashKey(url);
+			kps.add(kp);
+		});
+
+		loadDescriptor.put(DdbPageRankScore.class, kps);
+		return d_mapper.batchLoad(loadDescriptor);
+	}
+
+	public Map<String, List<Object>> batchGetDocuments(List<String> urls) {
+		Map<Class<?>, List<KeyPair>> loadDescriptor =
+				new HashMap<Class<?>, List<KeyPair>>();
+
+		List<KeyPair> kps = new LinkedList<KeyPair>();
+		urls.forEach((url) -> {
+			KeyPair kp = new KeyPair();
+			kp.setHashKey(url);
+			kps.add(kp);
+		});
+
+		loadDescriptor.put(DdbDocument.class, kps);
+		return d_mapper.batchLoad(loadDescriptor);
+	}
+
 	/**
 	 * Converts a url into a name appropriate as an S3Link key.
 	 * 
@@ -158,10 +208,9 @@ public class DdbConnector {
 	public S3Link createS3Link(String linkKey) {
 		return d_mapper.createS3Link(Region.US_East_2, k_BUCKET_NAME, linkKey);
 	}
-	
-	
-	
-	// Methods used for indexer to r/w ParsedDoc table (forward index) and Keyword (inverted index)
+
+	// Methods used for indexer to r/w ParsedDoc table (forward index) and
+	// Keyword (inverted index)
 	/**
 	 * Store the given document into DynamoDb.
 	 * 
@@ -172,5 +221,5 @@ public class DdbConnector {
 
 		d_mapper.save(parsedDoc);
 	}
-	
+
 }

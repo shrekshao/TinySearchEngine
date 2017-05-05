@@ -31,7 +31,7 @@
 	
 	<div id="search-result-container" class="col-lg-offset-3 col-lg-6">
 		<#list searchResults as resultItem>
-			<div class="search-result-item">
+			<div class="search-result-item" data-score="${resultItem.score}" data-pg-score="${resultItem.pgRankScore}">
 				<h3 class="search-result-item-link">
 					<a href="${resultItem.url}">${resultItem.title}</a>
 				</h3>
