@@ -30,7 +30,6 @@ public class RequestToOtherSites {
 
 	static public ArrayList<AmazonItemResult> getAmazonResult(String keyword)
 			throws ClientProtocolException, IOException {
-		//System.out.println("Enter***************************");
 		keyword = URLEncoder.encode(keyword, "UTF-8");
 		final HttpGet request = new HttpGet(
 				"https://www.amazon.com/s/ref=nb_sb_ss_c_1_3?url=search-alias%3Daps&field-keywords=" + keyword);
@@ -44,7 +43,6 @@ public class RequestToOtherSites {
 //		PrintWriter writer = new PrintWriter("response.html", "UTF-8");
 //		writer.println(content);
 //		writer.close();
-		//System.out.println(content);
 		int total = 0;
 		ArrayList<AmazonItemResult> itemList = new ArrayList<AmazonItemResult>();
 		while (true) {
