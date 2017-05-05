@@ -1,0 +1,39 @@
+SET dynamodb.throughput.read.percent = 10;
+SET dynamodb.throughput.write.percent = 10;
+
+CREATE EXTERNAL TABLE hive_dynamomiaomiaomiao
+(
+    url STRING)
+STORED BY 'org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler'
+TBLPROPERTIES(
+    "dynamodb.table.name" = "DocumentTable",
+    "dynamodb.column.mapping" = "url:url"
+);
+
+CREATE EXTERNAL TABLE hive_dynamoPageRank
+(
+    url STRING,
+    pageRankScore DOUBLE)
+STORED BY 'org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler'
+TBLPROPERTIES(
+    "dynamodb.table.name" = "PageRankScore",
+    "dynamodb.column.mapping" = "url:url,pageRankScore:pageRankScore"
+);
+
+CREATE EXTERNAL TABLE hive_dynamoPageRankNew
+(
+    url STRING,
+    pageRankScore DOUBLE)
+STORED BY 'org.apache.hadoop.hive.dynamodb.DynamoDBStorageHandler'
+TBLPROPERTIES(
+    "dynamodb.table.name" = "PageRankScoreNew",
+    "dynamodb.column.mapping" = "url:url,pageRankScore:pageRankScore"
+);
+
+
+INSERT OVERWRITE TABLE hive_dynamoPageRankNew
+	SELECT hive_dynamoPageRank.url, hive_dynamoPageRank.pageRankScore 
+	FROM 
+		hive_dynamoPageRank INNER JOIN hive_dynamomiaomiaomiao ON hive_dynamoPageRank.url = hive_dynamomiaomiaomiao.url;
+
+ 
