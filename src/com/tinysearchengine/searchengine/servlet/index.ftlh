@@ -15,6 +15,12 @@
 					<input type="text" name="query" placeholder="Search here..." required>
 					<button class="btn btn-primary" type="submit">Search</button>
 				</div>
+				<label id="enable-amazon-box">
+					<input type="checkbox" name="enable-amazon" value="amazon">Amazon</input>
+				</label>
+				<label id="enable-ebay-box">
+					<input type="checkbox" name="enable-ebay" value="ebay">Ebay</input>
+				</label>	
 			</form>
 		</div>
 	</div>

@@ -13,8 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import com.tinysearchengine.searchengine.othersites.AmazonItemResult;
+import com.tinysearchengine.searchengine.othersites.EbayItemResult;
 import com.tinysearchengine.searchengine.othersites.RequestToOtherSites;
 
 import freemarker.template.Configuration;
@@ -24,7 +24,7 @@ import freemarker.template.TemplateExceptionHandler;
 
 public class SearchServlet extends HttpServlet {
 
-	final int k_MAX_AMAZON_RESULTS = 15;
+	final int k_MAX_3RDPARTY_RESULTS = 15;
 
 	Configuration d_templateConfiguration;
 
@@ -72,6 +72,13 @@ public class SearchServlet extends HttpServlet {
 			setImageUrl(amzr.imgUrl);
 			setTitle(amzr.title);
 			setPrice(amzr.price);
+		}
+
+		public ThirdPartyResult(EbayItemResult ebr) {
+			setItemUrl(ebr.itemUrl);
+			setImageUrl(ebr.imgUrl);
+			setTitle(ebr.title);
+			setPrice(ebr.price);
 		}
 
 		public void setItemUrl(String url) {
@@ -152,15 +159,40 @@ public class SearchServlet extends HttpServlet {
 
 		root.put("searchResults", results);
 
-		// Put the amazon results in
+		boolean shouldQueryAmazon =
+			(request.getParameter("enable-amazon") != null);
+
 		List<ThirdPartyResult> thirdPartyResults = new ArrayList<>();
-		final List<ThirdPartyResult> collectedResults = thirdPartyResults;
-		RequestToOtherSites.getAmazonResult(queryTerm).forEach((item) -> {
-			collectedResults.add(new ThirdPartyResult(item));
-		});
-		if (thirdPartyResults.size() > k_MAX_AMAZON_RESULTS) {
-			thirdPartyResults =
-				thirdPartyResults.subList(0, k_MAX_AMAZON_RESULTS);
+
+		if (shouldQueryAmazon) {
+			// Put the amazon results in
+			final List<ThirdPartyResult> collectedResults = thirdPartyResults;
+			RequestToOtherSites.getAmazonResult(queryTerm).forEach((item) -> {
+				collectedResults.add(new ThirdPartyResult(item));
+			});
+
+			if (thirdPartyResults.size() > k_MAX_3RDPARTY_RESULTS) {
+				thirdPartyResults =
+					thirdPartyResults.subList(0, k_MAX_3RDPARTY_RESULTS);
+			}
+		}
+
+		boolean shouldQueryEbay = (request.getParameter("enable-ebay") != null);
+		if (shouldQueryEbay) {
+			System.out.println("Ebay enabled!");
+			List<ThirdPartyResult> ebayResults = new ArrayList<>();
+			final List<ThirdPartyResult> collectedResults = ebayResults;
+			ArrayList<EbayItemResult> ebayItems =
+				RequestToOtherSites.getEbayResult(queryTerm);
+			ebayItems.forEach((item) -> {
+				collectedResults.add(new ThirdPartyResult(item));
+			});
+
+			if (ebayResults.size() > k_MAX_3RDPARTY_RESULTS) {
+				ebayResults = ebayResults.subList(0, k_MAX_3RDPARTY_RESULTS);
+			}
+
+			thirdPartyResults.addAll(ebayResults);
 		}
 
 		root.put("thirdPartyResults", thirdPartyResults);

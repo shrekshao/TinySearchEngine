@@ -34,6 +34,7 @@ public class RequestToOtherSites {
 		final HttpGet request = new HttpGet(
 				"https://www.amazon.com/s/ref=nb_sb_ss_c_1_3?url=search-alias%3Daps&field-keywords=" + keyword);
 		request.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36");
+		request.setHeader("Accept", "text/html");
 		CloseableHttpResponse httpResponse = httpClient.execute(request);
 		HttpEntity entity = httpResponse.getEntity();
 		String content = EntityUtils.toString(entity);
@@ -99,15 +100,12 @@ public class RequestToOtherSites {
 		final HttpGet request = new HttpGet(
 				"http://www.ebay.com/sch/i.html?_nkw=" + keyword);
 		request.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36");
+		request.setHeader("Accept", "text/html");
 		CloseableHttpResponse httpResponse = httpClient.execute(request);
 		HttpEntity entity = httpResponse.getEntity();
 		String content = EntityUtils.toString(entity);
 
 		Document doc = Jsoup.parse(content);
-		
-//		PrintWriter writer = new PrintWriter("ebay2.html", "UTF-8");
-//		writer.println(content);
-//		writer.close();
 		
 		ArrayList<EbayItemResult> itemList = new ArrayList<EbayItemResult>();
 		Element ul = doc.getElementById("ListViewInner");
