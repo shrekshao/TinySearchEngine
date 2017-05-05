@@ -63,6 +63,16 @@ SELECT catch_string_e(word),idf FROM s3_wordidf;
 INSERT OVERWRITE TABLE ddb_wordidf
 SELECT catch_string_e(word),catch_double_e(idf) FROM s3_wordidf;
 
+INSERT OVERWRITE TABLE s3_idwordtfurl
+SELECT row_idx(),word,tf,url FROM s3_wordtfurl;
+
+CREATE EXTERNAL TABLE s3_idwordtfurl
+    (id   BIGINT,
+    word      STRING,
+    tf      DOUBLE,
+    url     STRING)
+LOCATION 's3://tinysearchengine-mapreduce/wordtfurl-id';
+
 
 ---------------------
 
