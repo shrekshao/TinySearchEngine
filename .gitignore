@@ -23,6 +23,7 @@ credentials.csv
 
 # Package Files #
 # *.jar
+lib/hive-exec-2.1.1.jar
 *.war
 *.ear
 *.zip
