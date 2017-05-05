@@ -129,7 +129,7 @@ public class RequestToOtherSites {
 					if (!imgurl1.isEmpty() && !imgurl1.endsWith(".gif"))
 						item.imgUrl = imgurl1;
 				}
-				Elements price = e.select("li[class=\"lvprice prc\"]");
+				Elements price = e.select("li[class=\"lvprice prc\"]").select("span[class=\"bold\"]");
 				if (!price.isEmpty()) {
 					item.price = price.text();
 				}

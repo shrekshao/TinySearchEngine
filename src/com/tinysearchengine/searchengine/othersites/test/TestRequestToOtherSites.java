@@ -12,8 +12,8 @@ import com.tinysearchengine.searchengine.othersites.RequestToOtherSites;
 
 public class TestRequestToOtherSites {
 	public static void main(String args[]) throws ClientProtocolException, IOException {
-		TestAmazon();
-		//TestEbay();
+		//TestAmazon();
+		TestEbay();
 	}
 	
 	static void TestAmazon() throws ClientProtocolException, IOException {
