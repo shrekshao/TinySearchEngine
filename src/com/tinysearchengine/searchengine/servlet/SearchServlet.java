@@ -122,14 +122,11 @@ public class SearchServlet extends HttpServlet {
 
 		d_templateConfiguration = new Configuration();
 		d_templateConfiguration.setDefaultEncoding("UTF-8");
-		d_templateConfiguration.setTemplateExceptionHandler(
-				TemplateExceptionHandler.RETHROW_HANDLER);
+		d_templateConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-		InputStream idxFileStream =
-			getClass().getResourceAsStream("searchresult.ftlh");
+		InputStream idxFileStream = getClass().getResourceAsStream("searchresult.ftlh");
 		try {
-			d_searchResultTemplate = new Template("searchresult-template",
-					new InputStreamReader(idxFileStream),
+			d_searchResultTemplate = new Template("searchresult-template", new InputStreamReader(idxFileStream),
 					d_templateConfiguration);
 		} catch (IOException e) {
 			throw new ServletException(e);
@@ -138,8 +135,7 @@ public class SearchServlet extends HttpServlet {
 	}
 
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		HashMap<String, Object> root = new HashMap<>();
 
 		String queryTerm = request.getParameter("query");
@@ -152,50 +148,56 @@ public class SearchServlet extends HttpServlet {
 			SearchResult r = new SearchResult();
 			r.setTitle("This is foobar" + i);
 			r.setUrl("http://www.foobar" + i + ".com");
-			r.setSummary(String.join("",
-					Collections.nCopies(20, "This is the content of foobar.")));
+			r.setSummary(String.join("", Collections.nCopies(20, "This is the content of foobar.")));
 			results.add(r);
 		}
 
 		root.put("searchResults", results);
 
-		boolean shouldQueryAmazon =
-			(request.getParameter("enable-amazon") != null);
+		boolean shouldQueryAmazon = (request.getParameter("enable-amazon") != null);
 
 		List<ThirdPartyResult> thirdPartyResults = new ArrayList<>();
 
 		if (shouldQueryAmazon) {
-			// Put the amazon results in
-			final List<ThirdPartyResult> collectedResults = thirdPartyResults;
-			RequestToOtherSites.getAmazonResult(queryTerm).forEach((item) -> {
-				collectedResults.add(new ThirdPartyResult(item));
-			});
+			// Set input checkbox checked
+			root.put("amazonChecked", "checked");
 
-			if (thirdPartyResults.size() > k_MAX_3RDPARTY_RESULTS) {
-				thirdPartyResults =
-					thirdPartyResults.subList(0, k_MAX_3RDPARTY_RESULTS);
-			}
+			// Put the amazon results in
+//			final List<ThirdPartyResult> collectedResults = thirdPartyResults;
+//			RequestToOtherSites.getAmazonResult(queryTerm).forEach((item) -> {
+//				collectedResults.add(new ThirdPartyResult(item));
+//			});
+//
+//			if (thirdPartyResults.size() > k_MAX_3RDPARTY_RESULTS) {
+//				thirdPartyResults = thirdPartyResults.subList(0, k_MAX_3RDPARTY_RESULTS);
+//			}
+		} else {
+			root.put("amazonChecked", "");
 		}
 
 		boolean shouldQueryEbay = (request.getParameter("enable-ebay") != null);
+
 		if (shouldQueryEbay) {
-			System.out.println("Ebay enabled!");
-			List<ThirdPartyResult> ebayResults = new ArrayList<>();
-			final List<ThirdPartyResult> collectedResults = ebayResults;
-			ArrayList<EbayItemResult> ebayItems =
-				RequestToOtherSites.getEbayResult(queryTerm);
-			ebayItems.forEach((item) -> {
-				collectedResults.add(new ThirdPartyResult(item));
-			});
+			// Set input checkbox checked
+			root.put("ebayChecked", "checked");
 
-			if (ebayResults.size() > k_MAX_3RDPARTY_RESULTS) {
-				ebayResults = ebayResults.subList(0, k_MAX_3RDPARTY_RESULTS);
-			}
-
-			thirdPartyResults.addAll(ebayResults);
+//			List<ThirdPartyResult> ebayResults = new ArrayList<>();
+//			final List<ThirdPartyResult> collectedResults = ebayResults;
+//			ArrayList<EbayItemResult> ebayItems = RequestToOtherSites.getEbayResult(queryTerm);
+//			ebayItems.forEach((item) -> {
+//				collectedResults.add(new ThirdPartyResult(item));
+//			});
+//
+//			if (ebayResults.size() > k_MAX_3RDPARTY_RESULTS) {
+//				ebayResults = ebayResults.subList(0, k_MAX_3RDPARTY_RESULTS);
+//			}
+//
+//			thirdPartyResults.addAll(ebayResults);
+		} else {
+			root.put("ebayChecked", "");
 		}
 
-		root.put("thirdPartyResults", thirdPartyResults);
+		//root.put("thirdPartyResults", thirdPartyResults);
 
 		try {
 			d_searchResultTemplate.process(root, response.getWriter());

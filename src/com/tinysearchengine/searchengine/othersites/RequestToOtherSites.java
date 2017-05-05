@@ -64,7 +64,7 @@ public class RequestToOtherSites {
 				if (itemUrl != null)
 					item.itemUrl = itemUrl;
 
-				Elements itemImgUrlElement = itemUrlElement.getElementsByTag("img");
+				Elements itemImgUrlElement = aElements.select("img[src]");
 				if (!itemImgUrlElement.isEmpty()) {
 					String imgUrl = itemImgUrlElement.attr("src");
 					if (imgUrl != null)
