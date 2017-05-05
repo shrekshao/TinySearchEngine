@@ -13,3 +13,15 @@
     margin-left: 5px;
     flex: 0.2;
 }
+
+#enable-amazon-box input {
+    margin-right: 5px;
+}
+
+#enable-ebay-box {
+    margin-left: 10px;
+}
+
+#enable-ebay-box input {
+    margin-right: 5px;
+}
