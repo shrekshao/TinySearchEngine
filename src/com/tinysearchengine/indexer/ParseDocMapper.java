@@ -20,16 +20,15 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 //import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+//import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 //import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+//import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+//import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
-import com.tinysearchengine.indexer.database.DdbParsedDoc;
+//import com.tinysearchengine.indexer.database.DdbParsedDoc;
 
 public class ParseDocMapper extends Mapper<LongWritable, Text, Text, Text> {
 	static final String S3BUCKET_NAME = "tinysearchengine";
@@ -43,12 +42,16 @@ public class ParseDocMapper extends Mapper<LongWritable, Text, Text, Text> {
 			new AmazonS3Client(credential);
 	
 //	@SuppressWarnings("deprecation")
-//	AmazonDynamoDB d_ddb = new AmazonDynamoDBClient();
-	AmazonDynamoDB d_ddb = AmazonDynamoDBClientBuilder.standard().build();
-//	@SuppressWarnings("deprecation")
-//	AmazonDynamoDB d_ddb = new AmazonDynamoDBClient();
-//	@SuppressWarnings("deprecation")
-	private DynamoDBMapper d_mapper = new DynamoDBMapper(d_ddb, credential);
+//	AmazonDynamoDB d_ddb = new AmazonDynamoDBClient(credential);
+//	AmazonDynamoDBClient d_ddb = new AmazonDynamoDBClient(credential);
+//	ddbClient.setRegion(Region.getRegion(Regions.US_EAST_2));
+	
+//	AmazonDynamoDB d_ddb = AmazonDynamoDBClientBuilder.standard().build();
+////	@SuppressWarnings("deprecation")
+////	AmazonDynamoDB d_ddb = new AmazonDynamoDBClient();
+////	@SuppressWarnings("deprecation")
+//	private DynamoDBMapper d_mapper = new DynamoDBMapper(d_ddb);
+//	private DynamoDBMapper d_mapper = new DynamoDBMapper(d_ddb, credential);
 	
 	
 	
@@ -194,13 +197,13 @@ public class ParseDocMapper extends Mapper<LongWritable, Text, Text, Text> {
     	}
         
     	
-    	DdbParsedDoc parsedDoc = new DdbParsedDoc();
-      
-        parsedDoc.setDocId(url);
-        parsedDoc.setTitle(titleStr);
-        parsedDoc.setAbstract(pStr);
-
-        d_mapper.save(parsedDoc);
+//    	DdbParsedDoc parsedDoc = new DdbParsedDoc();
+//      
+//        parsedDoc.setDocId(url);
+//        parsedDoc.setTitle(titleStr);
+//        parsedDoc.setAbstract(pStr);
+//
+//        d_mapper.save(parsedDoc);
     	
     	
     	context.write(
