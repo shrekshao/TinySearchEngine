@@ -101,6 +101,7 @@ public class RequestToOtherSites {
 		keyword = URLEncoder.encode(keyword, "UTF-8");
 		final HttpGet request = new HttpGet(
 				"http://www.ebay.com/sch/i.html?_nkw=" + keyword);
+		// pay attention to this Safari User-Agent header
 		request.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A");
 		request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
 		CloseableHttpResponse httpResponse = httpClient.execute(request);
@@ -110,7 +111,7 @@ public class RequestToOtherSites {
 //		writer.println(content);
 //		writer.close();
 		//System.out.println(content);
-		content = FileUtils.readFileToString(new File("ebay-non.html"), "utf-8");
+		//content = FileUtils.readFileToString(new File("ebay-non.html"), "utf-8");
 
 		Document doc = Jsoup.parse(content);
 		
@@ -158,7 +159,7 @@ public class RequestToOtherSites {
 						item.imgUrl = imgurl0;
 					if (!imgurl1.isEmpty() && !imgurl1.endsWith(".gif"))
 						item.imgUrl = imgurl1;
-					//System.out.println(item.imgUrl);
+//					System.out.println(item.imgUrl);
 				}
 				Elements title = e.select("h3[class=\"s-item__title\"]");
 				//System.out.println(title);
@@ -176,7 +177,7 @@ public class RequestToOtherSites {
 				}
 				itemList.add(item);
 			}
-			//System.out.println("Branch1");
+//			System.out.println("Branch1");
 //			PrintWriter writere = new PrintWriter("ebay-non.html", "UTF-8");
 //			writere.println(content);
 //			writere.close();
