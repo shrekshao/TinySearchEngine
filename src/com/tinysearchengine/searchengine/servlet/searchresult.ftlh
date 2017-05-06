@@ -19,9 +19,14 @@
 				<label id="enable-amazon-box">
 					<input id="amazon-checkbox" type="checkbox" name="enable-amazon" value="amazon" ${amazonChecked}>Amazon</input>
 				</label>
+				
 				<label id="enable-ebay-box">
 					<input id="ebay-checkbox" type="checkbox" name="enable-ebay" value="ebay" ${ebayChecked}>Ebay</input>
 				</label>
+				
+				<label id="enable-youtube-box">
+					<input id="youtube-checkbox" type="checkbox" name="enable-youtube" value="youtube" ${youtubeChecked}>Youtube</input>
+				</label>	
 			</form>
 		</div>
 	</div>
@@ -44,19 +49,9 @@
 		</#list> 
 	</div>
 </div>	
+
 <div id="youtube-container" class="col-lg-2">
-	<div class="youtube-item">
-		<h4>
-		<a href="https://www.youtube.com/embed/XGSy3_Czz8k">Video1</a>
-		</h4>
-		<iframe src="https://www.youtube.com/embed/XGSy3_Czz8k">
-		</iframe>
-	</div>
-	
-	<div class="youtube-item">
-		<iframe class="youtube-item" src="https://www.youtube.com/embed/XGSy3_Czz8k"／>
-		</iframe>
-	</div>
+
 </div>
 
 </body>

@@ -20,7 +20,10 @@
 				</label>
 				<label id="enable-ebay-box">
 					<input type="checkbox" name="enable-ebay" value="ebay">Ebay</input>
-				</label>	
+				</label>
+				<label id="enable-youtube-box">
+					<input type="checkbox" name="enable-youtube" value="youtube">Youtube</input>
+				</label>
 			</form>
 		</div>
 	</div>

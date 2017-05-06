@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tinysearchengine.searchengine.othersites.AmazonItemResult;
 import com.tinysearchengine.searchengine.othersites.EbayItemResult;
 import com.tinysearchengine.searchengine.othersites.RequestToOtherSites;
+import com.tinysearchengine.searchengine.othersites.YoutubeItemResult;
 
 public class ThirdPartyForwardServlet extends HttpServlet {
 	@Override
@@ -29,6 +30,15 @@ public class ThirdPartyForwardServlet extends HttpServlet {
 			writer.close();
 		} else if (name.equals("ebay")) {
 			ArrayList<EbayItemResult> result = RequestToOtherSites.getEbayResult(query);
+//			System.out.println(result.size());
+			PrintWriter writer = response.getWriter();
+			
+			ObjectMapper mapper = new ObjectMapper();
+			String jsonContent = mapper.writeValueAsString(result);
+			writer.write(jsonContent);
+			writer.close();
+		} else if (name.equals("youtube")) {
+			ArrayList<YoutubeItemResult> result = RequestToOtherSites.getYoutubeResult(query);
 //			System.out.println(result.size());
 			PrintWriter writer = response.getWriter();
 			

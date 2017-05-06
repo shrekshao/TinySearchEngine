@@ -187,4 +187,48 @@ public class RequestToOtherSites {
 		}
 		return itemList;
 	}
+	
+	static public ArrayList<YoutubeItemResult> getYoutubeResult(String[] keywords) throws ClientProtocolException, IOException {
+		return getYoutubeResult(Arrays.toString(keywords));
+	}
+	
+	static public ArrayList<YoutubeItemResult> getYoutubeResult(String keyword) throws ClientProtocolException, IOException {
+		ArrayList<YoutubeItemResult> itemList = new ArrayList<YoutubeItemResult>();
+		
+		keyword = URLEncoder.encode(keyword, "UTF-8");
+		final HttpGet request = new HttpGet(
+				"https://www.youtube.com/results?search_query=" + keyword);
+		request.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36");
+		request.setHeader("Accept", "text/html");
+		CloseableHttpResponse httpResponse = httpClient.execute(request);
+		HttpEntity entity = httpResponse.getEntity();
+		String content = EntityUtils.toString(entity);
+//		PrintWriter writere = new PrintWriter("miaoTestHtml/youtube.html", "UTF-8");
+//		writere.println(content);
+//		writere.close();
+		Document doc = Jsoup.parse(content);
+//		System.out.println(content);
+		Elements lis = doc.select("ol[class=\"item-section\"]");
+//		System.out.println(lis.toString());
+		lis = lis.select("h3[class=\"yt-lockup-title\"]");
+		
+		for (Element li : lis) {
+			YoutubeItemResult item = new YoutubeItemResult();
+			Elements a = li.select("a[title]");
+			if (!a.isEmpty()) {
+				String url = a.attr("href");
+				if (url != null) {
+					item.url = "https://www.youtube.com" + url;
+					item.embedUrl = "https://www.youtube.com/embed/" + url.replace("/watch?v=", "");
+				}
+				String title = a.attr("title");
+				if (title != null) {
+					item.title = title;
+				}
+			}
+			itemList.add(item);
+//			System.out.println(item.url + " : " + item.title);
+		}
+		return itemList;
+	}
 }

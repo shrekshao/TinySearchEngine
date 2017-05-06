@@ -106,5 +106,43 @@ window.onload = function() {
 		xhr.open('GET', url, true);
 		xhr.send();
 	}
+	
+	if (document.getElementById("youtube-checkbox").getAttribute("checked") != null) {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var itemInfos = JSON.parse(this.responseText);
+				var resultContainer = document
+						.getElementById("youtube-container");
 
+				for (var i = 0; i < itemInfos.length; i++) {
+					var itemInfo = itemInfos[i];
+					console.log(itemInfo);
+					var itemDiv = document.createElement("div");
+					itemDiv.setAttribute("class", "youtube-item");
+
+					// add title and url
+					var h4 = document.createElement("h4");
+					var url = document.createElement("a");
+					url.setAttribute("href", itemInfo.url);
+					url.textContent = itemInfo.title;
+					h4.appendChild(url);
+					itemDiv.appendChild(h4);
+
+					// add video
+					var iframe = document.createElement("iframe");
+					iframe.setAttribute("src", itemInfo.embedUrl);
+					itemDiv.appendChild(iframe);
+					
+					// add all things to item div
+					resultContainer.appendChild(itemDiv);
+				}
+			}
+		}
+		var url = location.protocol + '//' + location.host
+				+ "/thirdparty?name=youtube&&query=" + query;
+		console.log(url);
+		xhr.open('GET', url, true);
+		xhr.send();
+	}
 }

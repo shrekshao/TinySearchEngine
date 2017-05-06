@@ -9,11 +9,13 @@ import org.apache.http.client.ClientProtocolException;
 import com.tinysearchengine.searchengine.othersites.AmazonItemResult;
 import com.tinysearchengine.searchengine.othersites.EbayItemResult;
 import com.tinysearchengine.searchengine.othersites.RequestToOtherSites;
+import com.tinysearchengine.searchengine.othersites.YoutubeItemResult;
 
 public class TestRequestToOtherSites {
 	public static void main(String args[]) throws ClientProtocolException, IOException {
 		//TestAmazon();
 		//TestEbay();
+		TestYoutube();
 	}
 	
 	static void TestAmazon() throws ClientProtocolException, IOException {
@@ -31,6 +33,16 @@ public class TestRequestToOtherSites {
 		
 		int c = 0;
 		for (EbayItemResult item : result) {
+			System.out.println("Item " + (c++) + ":");
+			item.print();
+		}
+	}
+	
+	static void TestYoutube() throws ClientProtocolException, IOException { 
+		ArrayList<YoutubeItemResult> result = RequestToOtherSites.getYoutubeResult("computer");
+		
+		int c = 0;
+		for (YoutubeItemResult item : result) {
 			System.out.println("Item " + (c++) + ":");
 			item.print();
 		}
