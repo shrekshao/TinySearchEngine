@@ -5,7 +5,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName = "WordDocTfTuple")
+@DynamoDBTable(tableName = "WordDocTfTupleNew")
 public class DdbWordDocTfTuple {
 	int d_id;
 	double d_tf;
