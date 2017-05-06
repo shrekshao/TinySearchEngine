@@ -8,6 +8,7 @@
 	<title>Tiny Search Engine</title>
 </head>
 <body class="container">
+<div class="col-lg-10">
 	<div id="search-result-header" class="col-lg-12">
 		<div id="search-form-container">
 			<form id="search-form" method="post" action="/search">
@@ -42,5 +43,21 @@
 			</div>
 		</#list> 
 	</div>
+</div>	
+<div id="youtube-container" class="col-lg-2">
+	<div class="youtube-item">
+		<h4>
+		<a href="https://www.youtube.com/embed/XGSy3_Czz8k">Video1</a>
+		</h4>
+		<iframe src="https://www.youtube.com/embed/XGSy3_Czz8k">
+		</iframe>
+	</div>
+	
+	<div class="youtube-item">
+		<iframe class="youtube-item" src="https://www.youtube.com/embed/XGSy3_Czz8k"／>
+		</iframe>
+	</div>
+</div>
+
 </body>
 </html>
