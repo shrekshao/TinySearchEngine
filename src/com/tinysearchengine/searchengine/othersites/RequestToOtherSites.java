@@ -22,6 +22,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class RequestToOtherSites {
+	static final int nMaxAmazonItem = 8;
+	static final int nMaxEbayItem = 8;
+	static final int nMaxYoutubeItem = 8;
 	
 	static CloseableHttpClient httpClient = HttpClients.createDefault();
 	
@@ -87,8 +90,9 @@ public class RequestToOtherSites {
 
 			itemList.add(item);
 			total++;
+			if (total >= nMaxAmazonItem)
+				break;
 		}
-
 		return itemList;
 	}
 	
@@ -111,12 +115,13 @@ public class RequestToOtherSites {
 //		writer.println(content);
 //		writer.close();
 		//System.out.println(content);
-		content = FileUtils.readFileToString(new File("miaoTestHtml/ebay-non.html"), "utf-8");
+		//content = FileUtils.readFileToString(new File("miaoTestHtml/ebay-non.html"), "utf-8");
 
 		Document doc = Jsoup.parse(content);
 		
 		ArrayList<EbayItemResult> itemList = new ArrayList<EbayItemResult>();
 		Element ul = doc.getElementById("ListViewInner");
+		int total = 0;
 		if (ul != null) {
 			//System.out.println(ul.toString());
 			Elements lis = ul.select("li[id]").select("[_sp]").select("[class]").select("[listingid]").select("[r]");
@@ -143,6 +148,9 @@ public class RequestToOtherSites {
 					item.price = price.text();
 				}
 				itemList.add(item);
+				total++;
+				if (total >= nMaxEbayItem)
+					break;
 			}
 			//System.out.println("Branch0");
 		} else {
@@ -179,6 +187,9 @@ public class RequestToOtherSites {
 					item.itemUrl = itemUrl.attr("href");
 				}
 				itemList.add(item);
+				total++;
+				if (total >= nMaxEbayItem)
+					break;
 			}
 //			System.out.println("Branch1");
 //			PrintWriter writere = new PrintWriter("ebay-non.html", "UTF-8");
@@ -211,7 +222,7 @@ public class RequestToOtherSites {
 		Elements lis = doc.select("ol[class=\"item-section\"]");
 //		System.out.println(lis.toString());
 		lis = lis.select("h3[class=\"yt-lockup-title\"]");
-		
+		int total = 0;
 		for (Element li : lis) {
 			YoutubeItemResult item = new YoutubeItemResult();
 			Elements a = li.select("a[title]");
@@ -227,8 +238,12 @@ public class RequestToOtherSites {
 				}
 			}
 			itemList.add(item);
+			total++;
+			if (total >= nMaxYoutubeItem)
+				break;
 //			System.out.println(item.url + " : " + item.title);
 		}
+		
 		return itemList;
 	}
 }
