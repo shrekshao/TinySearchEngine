@@ -12,7 +12,7 @@
 		<div id="search-form-container">
 			<form id="search-form" method="post" action="/search">
 				<div class="form-group">
-					<input id="search-bar" type="text" name="query" value="${(query)!}" placeholder="Search here..." required>
+					<input id="search-bar" type="text" name="query" value="${(query)!}" data-stemmed-terms="${stemmedTerms}" placeholder="Search here..." required>
 					<button class="btn btn-primary" type="submit">Search</button>
 				</div>
 				<label id="enable-amazon-box">
