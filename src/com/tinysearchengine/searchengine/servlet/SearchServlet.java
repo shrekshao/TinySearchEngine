@@ -416,7 +416,7 @@ public class SearchServlet extends HttpServlet {
 		}
 
 		root.put("searchResults", results);
-
+		
 		boolean shouldQueryAmazon =
 			(request.getParameter("enable-amazon") != null);
 
@@ -474,11 +474,22 @@ public class SearchServlet extends HttpServlet {
         	root.put("youtubeChecked", "");
         }
         
+		// google-style spell check
+		root.put("doYouWantToSearch", "Do you want to search: ");
+		
+		String correctedQuery = new String();
+		
+		// TODO: 
+		// 1. check if each words in query exist in the keyword list
+		// 2. if exist, simply append to correctedQuery and continue
+		// 3. if not, find the most similar keyword and append it to correctedQuery
+		
+		root.put("correctedQuery", correctedQuery);
+		
 		try {
 			d_searchResultTemplate.process(root, response.getWriter());
 		} catch (TemplateException e) {
 			throw new ServletException(e);
 		}
-
 	}
 }

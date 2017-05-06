@@ -31,6 +31,16 @@
 		</div>
 	</div>
 	
+	<div class="col-lg-12">
+		<h5>
+			<p style="display:inline">${doYouWantToSearch}</p>
+			<form id="spell-search-form" method="post" action="/search">
+    			<a href="javascript:;" onclick="document.getElementById('spell-search-form').submit();">${correctedQuery}</a>
+    			<input type="hidden" name="query" value="${correctedQuery}"/>
+			</form>
+		</h5>
+	</div>
+	
 	<div id="thirdparty-result-container" class="col-lg-offset-3 col-lg-6">		
 
 	</div>
