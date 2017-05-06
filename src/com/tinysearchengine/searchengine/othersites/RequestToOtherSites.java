@@ -111,7 +111,7 @@ public class RequestToOtherSites {
 //		writer.println(content);
 //		writer.close();
 		//System.out.println(content);
-		//content = FileUtils.readFileToString(new File("ebay-non.html"), "utf-8");
+		content = FileUtils.readFileToString(new File("miaoTestHtml/ebay-non.html"), "utf-8");
 
 		Document doc = Jsoup.parse(content);
 		
@@ -147,7 +147,7 @@ public class RequestToOtherSites {
 			//System.out.println("Branch0");
 		} else {
 			Elements lis = doc.select("li[class=\"s-item\"]");
-			
+//			boolean f = false;
 			for (Element e : lis) {
 				EbayItemResult item = new EbayItemResult();
 				Elements img = e.select("img");
@@ -165,15 +165,18 @@ public class RequestToOtherSites {
 				//System.out.println(title);
 				if (!title.isEmpty()) {
 					item.title = title.text();
-			
 				}
 				Elements price = e.select("span[class=\"s-item__price\"]");
 				if (!price.isEmpty()) {
 					item.price = price.text();
 				}
-				Elements itemUrl = e.select("a[class=\"__link s-item__link--visited-color\"]");
+				Elements itemUrl = e.select("a[class=\"s-item__link s-item__link--visited-color\"]");
+//				if (!f) {
+//				System.out.println(e.toString());
+//				f= true;
+//				}
 				if (!itemUrl.isEmpty()) {
-					item.itemUrl = itemUrl.text();
+					item.itemUrl = itemUrl.attr("href");
 				}
 				itemList.add(item);
 			}
