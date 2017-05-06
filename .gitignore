@@ -4,6 +4,7 @@ build/
 credentials.csv
 .metadata/
 # filesForTest/invertedIndexer/output/
+miaoTestHtml/
 
 .classpath
 

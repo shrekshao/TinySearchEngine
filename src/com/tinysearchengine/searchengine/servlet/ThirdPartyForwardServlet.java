@@ -29,6 +29,7 @@ public class ThirdPartyForwardServlet extends HttpServlet {
 			writer.close();
 		} else if (name.equals("ebay")) {
 			ArrayList<EbayItemResult> result = RequestToOtherSites.getEbayResult(query);
+//			System.out.println(result.size());
 			PrintWriter writer = response.getWriter();
 			
 			ObjectMapper mapper = new ObjectMapper();

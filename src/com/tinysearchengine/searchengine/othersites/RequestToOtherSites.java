@@ -1,5 +1,6 @@
 package com.tinysearchengine.searchengine.othersites;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -7,6 +8,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -99,17 +101,23 @@ public class RequestToOtherSites {
 		keyword = URLEncoder.encode(keyword, "UTF-8");
 		final HttpGet request = new HttpGet(
 				"http://www.ebay.com/sch/i.html?_nkw=" + keyword);
-		request.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36");
+		request.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A");
 		request.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
 		CloseableHttpResponse httpResponse = httpClient.execute(request);
 		HttpEntity entity = httpResponse.getEntity();
 		String content = EntityUtils.toString(entity);
+//		PrintWriter writer = new PrintWriter("ebay.html", "UTF-8");
+//		writer.println(content);
+//		writer.close();
+		//System.out.println(content);
+		content = FileUtils.readFileToString(new File("ebay-non.html"), "utf-8");
 
 		Document doc = Jsoup.parse(content);
 		
 		ArrayList<EbayItemResult> itemList = new ArrayList<EbayItemResult>();
 		Element ul = doc.getElementById("ListViewInner");
 		if (ul != null) {
+			//System.out.println(ul.toString());
 			Elements lis = ul.select("li[id]").select("[_sp]").select("[class]").select("[listingid]").select("[r]");
 			for (Element e : lis) {
 				EbayItemResult item = new EbayItemResult();
@@ -135,6 +143,43 @@ public class RequestToOtherSites {
 				}
 				itemList.add(item);
 			}
+			//System.out.println("Branch0");
+		} else {
+			Elements lis = doc.select("li[class=\"s-item\"]");
+			
+			for (Element e : lis) {
+				EbayItemResult item = new EbayItemResult();
+				Elements img = e.select("img");
+				//System.out.println(img.toString());
+				if (!img.isEmpty()) {
+					String imgurl0 = img.attr("src");
+					String imgurl1 = img.attr("data-src");
+					if (!imgurl0.isEmpty() && !imgurl0.endsWith(".gif"))
+						item.imgUrl = imgurl0;
+					if (!imgurl1.isEmpty() && !imgurl1.endsWith(".gif"))
+						item.imgUrl = imgurl1;
+					//System.out.println(item.imgUrl);
+				}
+				Elements title = e.select("h3[class=\"s-item__title\"]");
+				//System.out.println(title);
+				if (!title.isEmpty()) {
+					item.title = title.text();
+			
+				}
+				Elements price = e.select("span[class=\"s-item__price\"]");
+				if (!price.isEmpty()) {
+					item.price = price.text();
+				}
+				Elements itemUrl = e.select("a[class=\"__link s-item__link--visited-color\"]");
+				if (!itemUrl.isEmpty()) {
+					item.itemUrl = itemUrl.text();
+				}
+				itemList.add(item);
+			}
+			//System.out.println("Branch1");
+//			PrintWriter writere = new PrintWriter("ebay-non.html", "UTF-8");
+//			writere.println(content);
+//			writere.close();
 		}
 		return itemList;
 	}
