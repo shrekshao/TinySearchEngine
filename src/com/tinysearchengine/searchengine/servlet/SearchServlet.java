@@ -1,5 +1,8 @@
 package com.tinysearchengine.searchengine.servlet;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -8,10 +11,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Scanner;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -56,6 +61,8 @@ public class SearchServlet extends HttpServlet {
 	DdbConnector d_connector = new DdbConnector();
 
 	XPathFactory d_xpathFactory = XPathFactory.newInstance();
+	
+	HashMap<String, Double> d_keywordsandidf = new HashMap<String, Double>();
 
 	public class UrlWordPair {
 		String url;
@@ -178,6 +185,29 @@ public class SearchServlet extends HttpServlet {
 			return d_price;
 		}
 	}
+	
+    public int wordEditDistance(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+        
+        int[][] distance = new int[m + 1][n + 1];
+        for(int i = 0; i <= m; i++) { distance[i][0] = i; }
+        for(int i = 1; i <= n; i++) { distance[0][i] = i; }
+        
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                if(word1.charAt(i) == word2.charAt(j)) { distance[i + 1][j + 1] = distance[i][j]; }
+                else {
+                    int distanceIJ = distance[i][j];
+                    int distanceJplus1 = distance[i][j + 1];
+                    int distanceIplus1 = distance[i + 1][j];
+                    distance[i + 1][j + 1] = distanceIJ < distanceJplus1 ? (distanceIJ < distanceIplus1 ? distanceIJ : distanceIplus1) : (distanceJplus1 < distanceIplus1 ? distanceJplus1 : distanceIplus1);
+                    distance[i + 1][j + 1]++;
+                }
+            }
+        }
+        return distance[m][n];
+    }
 
 	public void init() throws ServletException {
 		super.init();
@@ -187,8 +217,26 @@ public class SearchServlet extends HttpServlet {
 		d_templateConfiguration.setTemplateExceptionHandler(
 				TemplateExceptionHandler.RETHROW_HANDLER);
 
-		InputStream idxFileStream =
-			getClass().getResourceAsStream("searchresult.ftlh");
+		InputStream idxFileStream = getClass().getResourceAsStream("searchresult.ftlh");
+		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader("/Users/owner/TinySearchEngine/pagerankinput/keywordlist.txt"));
+		    System.out.println("***file read***");
+			String line;
+//			int counter = 0;
+		    while ((line = br.readLine()) != null) {
+//		    	counter ++;
+		    	String[] parts = line.split("\t");
+		    	d_keywordsandidf.put(parts[0], Double.parseDouble(parts[1]));
+//		    	if(counter == 1000) {
+//		    		System.out.println(parts[0]);
+//		    		System.out.println(parts[1]);
+//		    	}
+		    }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		try {
 			d_searchResultTemplate = new Template("searchresult-template",
 					new InputStreamReader(idxFileStream),
@@ -474,11 +522,70 @@ public class SearchServlet extends HttpServlet {
         	root.put("youtubeChecked", "");
         }
         
-		// google-style spell check
-		root.put("doYouWantToSearch", "Do you want to search: ");
-		
+		// google-style spell check		
 		String correctedQuery = new String();
-		
+		String tempwords = "";
+	//	System.out.println("DEBUG: QUERYTERM!" + queryTerm);
+	//	System.out.println("DEBUG: MapSize!" + d_keywordsandidf.size());
+		String[] terms = queryTerm.split("\\s+"); //get each term in the query string
+		HashMap<String, String> queryAndStem = new HashMap<String, String>(); //query and stem hashset
+		List<String> stemmedTerms = new LinkedList<String>();
+		for (String term : terms) { //traverse through whole terms
+			if (StopWordList.stopwords.contains(term)) {
+				queryAndStem.put(term, term);
+				continue;
+			} 
+			d_stemmer.setCurrent(term);
+			System.out.println("Cur Term is:" + term);
+			d_stemmer.stem();
+			queryAndStem.put(d_stemmer.getCurrent(), term);
+			stemmedTerms.add(d_stemmer.getCurrent());
+			System.out.println("Debug: Print stemmer" + d_stemmer.getCurrent());
+		} //make a map: <term, term>
+		//check distance
+		int distance = Integer.MAX_VALUE;
+		String realresult = ""; 
+		String tempresult = "";
+		for(String curStemmedTerm : stemmedTerms) {
+		    if(d_keywordsandidf.containsKey(curStemmedTerm)) {
+		    	realresult += queryAndStem.get(curStemmedTerm);
+		    } else {
+		    	for(String key: d_keywordsandidf.keySet()) {
+		    		int curdistance = wordEditDistance(curStemmedTerm, key);
+		    		if(curdistance > distance) {
+		    			continue;
+		    		} else if (curdistance < distance) {
+		    			distance = curdistance;
+		    			tempresult = key;
+		    			continue;
+		    		} else {
+		    			if(d_keywordsandidf.get(key) >= d_keywordsandidf.get(tempresult)) {
+		    				continue;
+		    			} else {
+		    				distance = curdistance;
+		    				tempresult = key;
+		    				continue;
+		    			}
+		    		}
+		    	}   
+		    	System.out.println("TEMPRESULT!!!" + tempresult);
+		    	realresult += queryAndStem.get(tempresult);
+		    }  
+		}
+		//System.out.println(correctedQuery + " ######### ");
+		if(realresult.equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
+			//System.out.println("HERE: ******* ");
+			correctedQuery = "";
+			root.put("doYouWantToSearch", "");		
+		} else {
+			String[] all = realresult.split("\\s+");
+			for(int i = 0 ; i < all.length ; i++) {
+				System.out.println(all[i]);
+				correctedQuery += all[i];					
+			}
+			System.out.println(correctedQuery + " ********* ");
+			root.put("doYouWantToSearch", "Do you want to search: ");
+		}		
 		// TODO: 
 		// 1. check if each words in query exist in the keyword list
 		// 2. if exist, simply append to correctedQuery and continue

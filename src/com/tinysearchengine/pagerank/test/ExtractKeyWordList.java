@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,8 +28,10 @@ public class ExtractKeyWordList {
 			Writer w = new BufferedWriter(osw);
 			while (docIt.hasNext()) {
 				WordIdfDdbDocument doc = docIt.next();
-				w.write(doc.getWord());
-				w.write("\r\n");
+				if(doc.getIdf() < 6) {
+					w.write(doc.getWord() + "\t" + doc.getIdf());
+					w.write("\r\n");
+				}
 				//counter--;
 				sum++;
 				if (sum % 500 == 0) {
