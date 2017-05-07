@@ -31,6 +31,12 @@
 		</div>
 	</div>
 	
+	<div class="col-lg-12">
+		<h6>
+			<p style="color:#708090">Search time: ${time}s</p>
+		</h6>
+	</div>
+	
 	<div id="thirdparty-result-container" class="col-lg-offset-3 col-lg-6">		
 
 	</div>
