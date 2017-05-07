@@ -462,6 +462,8 @@ public class SearchServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
+		long startTime   = System.currentTimeMillis();
+
 		HashMap<String, Object> root = new HashMap<>();
 
 		String queryTerm = request.getParameter("query");
@@ -527,6 +529,9 @@ public class SearchServlet extends HttpServlet {
 			root.put("youtubeChecked", "");
 		}
 
+		long endTime   = System.currentTimeMillis();
+		long totalTime = endTime - startTime;
+		root.put("time", String.valueOf(totalTime / 1000.0));
 		try {
 			d_searchResultTemplate.process(root, response.getWriter());
 		} catch (TemplateException e) {
