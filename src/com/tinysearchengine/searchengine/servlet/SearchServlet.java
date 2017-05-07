@@ -242,7 +242,7 @@ public class SearchServlet extends HttpServlet {
 			getClass().getResourceAsStream("searchresult.ftlh");
 		try {
 			BufferedReader br = new BufferedReader(
-					new FileReader("pagerankinput/keywordlist.txt"));
+					new FileReader("pagerankinput/sortbyidf.txt")); // boost the speed
 			String line;
 			while ((line = br.readLine()) != null) {
 				String[] parts = line.split("\t");
@@ -633,6 +633,7 @@ public class SearchServlet extends HttpServlet {
 			    		if (curdistance < 3 && idf < minResult.getRight()) {
 			    			//distance = curdistance;
 			    			minResult = pair;
+			    			break; // boost the speed
 			    		} 
 //			    		else if (curdistance == distance){ //equal
 //			    			if(idf < minResult.getRight()) {
