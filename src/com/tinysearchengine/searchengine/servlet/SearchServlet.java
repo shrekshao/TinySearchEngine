@@ -566,6 +566,7 @@ public class SearchServlet extends HttpServlet {
 		} else {
 			root.put("ebayChecked", "");
 		}
+
 		// root.put("thirdPartyResults", thirdPartyResults);
         boolean shouldQueryYoutube = (request.getParameter("enable-youtube") != null);
         
