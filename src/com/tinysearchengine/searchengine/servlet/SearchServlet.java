@@ -536,19 +536,17 @@ public class SearchServlet extends HttpServlet {
 				}
 			});
 
-		/*
 		double maxScore = 0;
 		for (Map.Entry<String, DdbPageRankScore> kv : pgScores.entrySet()) {
 			if (kv.getValue().getPageRankScore() > maxScore) {
 				maxScore = kv.getValue().getPageRankScore();
 			}
 		}
-		*/
 
 		for (UrlScorePair p : ps) {
 			DdbPageRankScore pgScore = pgScores.get(p.url);
 			if (pgScore != null) {
-				p.pgRankScore = pgScore.getPageRankScore();
+				p.pgRankScore = pgScore.getPageRankScore() / maxScore;
 				p.totalScore = computeTotalScore(p);
 			}
 
