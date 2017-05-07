@@ -5,19 +5,19 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName = "WordDocTfTupleNew")
+@DynamoDBTable(tableName = "WordDocTfTupleUUID")
 public class DdbWordDocTfTuple {
-	int d_id;
+	String d_id;
 	double d_tf;
 	String d_url;
 	String d_word;
 
 	@DynamoDBHashKey(attributeName = "id")
-	public int getId() {
+	public String getId() {
 		return d_id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		d_id = id;
 	}
 
