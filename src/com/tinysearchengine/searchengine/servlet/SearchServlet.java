@@ -616,10 +616,12 @@ public class SearchServlet extends HttpServlet {
 //			    			}
 //			    		}
 			    	}   
-			    	realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
+			    	if (minResult.getLeft().isEmpty())
+			    		realresult += term.getRight() + " ";
+			    	else
+			    		realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
 			    }  
 			}
-			
 			if(realresult.replaceAll("\\s+", "").equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
 				correctedQuery = "";
 				root.put("doYouWantToSearch", "");		
