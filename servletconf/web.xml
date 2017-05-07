@@ -10,6 +10,7 @@
 	<servlet>
 		<servlet-name>searchservlet</servlet-name>
 		<servlet-class>com.tinysearchengine.searchengine.servlet.SearchServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet>

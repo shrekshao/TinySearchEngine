@@ -1,7 +1,6 @@
 package com.tinysearchengine.searchengine.servlet;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,12 +10,10 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Scanner;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -48,24 +45,6 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 
 public class SearchServlet extends HttpServlet {
-
-	public SearchServlet() {
-		try {
-			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist.txt"));
-			String line;
-		    while ((line = br.readLine()) != null) {
-		    	String[] parts = line.split("\t");
-		    	Pair<String, Double> pair = new ImmutablePair<String, Double>(parts[0], Double.parseDouble(parts[1]));
-		    	
-		    	d_keywordsandidf.add(pair);
-		    	d_keywordSet.add(parts[0]);
-		    }
-		    br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println("Initiate");
-	}
 	
 	final int k_MAX_3RDPARTY_RESULTS = 15;
 	final int k_MAX_SEARCH_RESULTS = 50;
@@ -250,7 +229,20 @@ public class SearchServlet extends HttpServlet {
 				TemplateExceptionHandler.RETHROW_HANDLER);
 
 		InputStream idxFileStream = getClass().getResourceAsStream("searchresult.ftlh");
-		
+//		try {
+//			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist.txt"));
+//			String line;
+//		    while ((line = br.readLine()) != null) {
+//		    	String[] parts = line.split("\t");
+//		    	Pair<String, Double> pair = new ImmutablePair<String, Double>(parts[0], Double.parseDouble(parts[1]));
+//		    	
+//		    	d_keywordsandidf.add(pair);
+//		    	d_keywordSet.add(parts[0]);
+//		    }
+//		    br.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		try {
 			d_searchResultTemplate = new Template("searchresult-template",
 					new InputStreamReader(idxFileStream),
@@ -518,7 +510,7 @@ public class SearchServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-		//long startTime = System.currentTimeMillis();
+		long startTime = System.currentTimeMillis();
 
 		HashMap<String, Object> root = new HashMap<>();
 
@@ -641,9 +633,9 @@ public class SearchServlet extends HttpServlet {
 		
 		root.put("doYouWantToSearch", "");	
 		root.put("correctedQuery", "");
-		//long endTime   = System.currentTimeMillis();
-		//long totalTime = endTime - startTime;
-		root.put("time", String.valueOf(1 / 1000.0));
+		long endTime   = System.currentTimeMillis();
+		long totalTime = endTime - startTime;
+		root.put("time", String.valueOf(totalTime / 1000.0));
 		
 		try {
 			d_searchResultTemplate.process(root, response.getWriter());
