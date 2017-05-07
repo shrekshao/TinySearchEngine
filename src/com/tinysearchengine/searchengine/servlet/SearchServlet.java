@@ -390,7 +390,12 @@ public class SearchServlet extends HttpServlet {
 			queue.offer(p);
 		}
 
-		return queue.toArray(new UrlScorePair[0]);
+		
+		ArrayList<UrlScorePair> results = new ArrayList<>();
+		for (UrlScorePair p : queue) {
+			results.add(p);
+		}
+		return results.toArray(new UrlScorePair[0]);
 	}
 
 	private String extractMainBody(StringBuilder title, byte[] document)
@@ -525,7 +530,11 @@ public class SearchServlet extends HttpServlet {
 			sortedPs.add(p);
 		}
 
-		return sortedPs.toArray(new UrlScorePair[0]);
+		ArrayList<UrlScorePair> results = new ArrayList<>();
+		for (UrlScorePair p : sortedPs) {
+			results.add(p);
+		}
+		return results.toArray(new UrlScorePair[0]);
 	}
 
 	@Override
