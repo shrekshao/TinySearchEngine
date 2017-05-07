@@ -26,6 +26,10 @@
 				
 				<label id="enable-youtube-box">
 					<input id="youtube-checkbox" type="checkbox" name="enable-youtube" value="youtube" ${youtubeChecked}>Youtube</input>
+				</label>
+				
+				<label id="enable-spellcheck-box">
+					<input id="spellcheck-checkbox" type="checkbox" name="enable-spellcheck" value="spellcheck" ${spellCheckChecked}>Spell Check</input>
 				</label>	
 			</form>
 		</div>

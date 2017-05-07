@@ -24,6 +24,9 @@
 				<label id="enable-youtube-box">
 					<input type="checkbox" name="enable-youtube" value="youtube">Youtube</input>
 				</label>
+				<label id="enable-spellcheck-box">
+					<input type="checkbox" name="enable-spellcheck" value="spellcheck">Spell Check</input>
+				</label>	
 			</form>
 		</div>
 	</div>
