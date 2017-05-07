@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -528,62 +529,81 @@ public class SearchServlet extends HttpServlet {
 	//	System.out.println("DEBUG: QUERYTERM!" + queryTerm);
 	//	System.out.println("DEBUG: MapSize!" + d_keywordsandidf.size());
 		String[] terms = queryTerm.split("\\s+"); //get each term in the query string
-		HashMap<String, String> queryAndStem = new HashMap<String, String>(); //query and stem hashset
-		List<String> stemmedTerms = new LinkedList<String>();
+		LinkedHashMap<String, String> queryAndStem = new LinkedHashMap<String, String>(); //query and stem hashset
+	//	List<String> stemmedTerms = new LinkedList<String>();
 		for (String term : terms) { //traverse through whole terms
 			if (StopWordList.stopwords.contains(term)) {
 				queryAndStem.put(term, term);
 				continue;
 			} 
 			d_stemmer.setCurrent(term);
-			System.out.println("Cur Term is:" + term);
+		//	System.out.println("Cur Term is:" + term);
 			d_stemmer.stem();
+//			stemmedTerms.add(ddd);
+		//	System.out.println("DEBUG ++ " + d_stemmer.getCurrent());
+		//	queryAndStem.put(term, d_stemmer.getCurrent());
 			queryAndStem.put(d_stemmer.getCurrent(), term);
-			stemmedTerms.add(d_stemmer.getCurrent());
-			System.out.println("Debug: Print stemmer" + d_stemmer.getCurrent());
-		} //make a map: <term, term>
+		//	System.out.println("Debug: Print stemmer 88w7e87w897e9");
+		//	System.out.println("Debug: Print stemmer" + d_stemmer.getCurrent());
+		}
+		
+//		for (String term : terms) { //traverse through whole terms
+//			if (StopWordList.stopwords.contains(term)) {
+//				queryAndStem.put(term, term);
+//				continue;
+//			} 
+//			d_stemmer.setCurrent(term);
+//		//	System.out.println("Cur Term is:" + term);
+//			d_stemmer.stem();
+////			queryAndStem.put(d_stemmer.getCurrent(), term);
+//			System.out.println(d_stemmer.getCurrent());
+//		//	stemmedTerms.add(d_stemmer.getCurrent());
+//		//	System.out.println("Debug: Print stemmer" + d_stemmer.getCurrent());
+//		} //make a map: <term, term>
 		//check distance
 		int distance = Integer.MAX_VALUE;
 		String realresult = ""; 
 		String tempresult = "";
-		for(String curStemmedTerm : stemmedTerms) {
+		for(String curStemmedTerm : queryAndStem.keySet()) { //here is APPLLL
+			System.out.println("KEYEKYEKKEYKYE + " + curStemmedTerm);
 		    if(d_keywordsandidf.containsKey(curStemmedTerm)) {
-		    	realresult += queryAndStem.get(curStemmedTerm);
+//		    	System.out.println(curStemmedTerm);
+		    	realresult += queryAndStem.get(curStemmedTerm) + " ";
+		 //   	System.out.println("IF IT IS RIGHT ! " + queryAndStem.get(curStemmedTerm));
 		    } else {
 		    	for(String key: d_keywordsandidf.keySet()) {
-		    		int curdistance = wordEditDistance(curStemmedTerm, key);
-		    		if(curdistance > distance) {
-		    			continue;
+		    		int curdistance = wordEditDistance(curStemmedTerm, key); //APPLLL VS KEY
+		    		if(curdistance > distance) { //skip, does not need to do anything
 		    		} else if (curdistance < distance) {
 		    			distance = curdistance;
 		    			tempresult = key;
-		    			continue;
-		    		} else {
+		    		} else { //equal
 		    			if(d_keywordsandidf.get(key) >= d_keywordsandidf.get(tempresult)) {
-		    				continue;
 		    			} else {
 		    				distance = curdistance;
 		    				tempresult = key;
-		    				continue;
 		    			}
 		    		}
 		    	}   
 		    	System.out.println("TEMPRESULT!!!" + tempresult);
-		    	realresult += queryAndStem.get(tempresult);
+		    	realresult += tempresult + " "; //queryAndStem.get(tempresult) + " ";
+		    //	System.out.println("Is it here??? : " + queryAndStem.get(tempresult));
 		    }  
 		}
+		System.out.println("DEBUG!!! REALRESULT" + realresult);
 		//System.out.println(correctedQuery + " ######### ");
-		if(realresult.equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
+		if(realresult.replaceAll("\\s+", "").equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
 			//System.out.println("HERE: ******* ");
 			correctedQuery = "";
 			root.put("doYouWantToSearch", "");		
 		} else {
 			String[] all = realresult.split("\\s+");
-			for(int i = 0 ; i < all.length ; i++) {
-				System.out.println(all[i]);
-				correctedQuery += all[i];					
+			for(int i = 0 ; i < all.length ; i++) { 
+				//System.out.println(all[i]);
+				correctedQuery += all[i] + " ";		
+				System.out.println("DEBUGGG:" + correctedQuery);
 			}
-			System.out.println(correctedQuery + " ********* ");
+			correctedQuery = correctedQuery.substring(0, correctedQuery.length() - 1);
 			root.put("doYouWantToSearch", "Do you want to search: ");
 		}		
 		// TODO: 

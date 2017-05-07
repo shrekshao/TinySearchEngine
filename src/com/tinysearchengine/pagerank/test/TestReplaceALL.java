@@ -31,23 +31,6 @@ public class TestReplaceALL {
 		d_stemmer.setCurrent("chocolate");
 		d_stemmer.stem();
 		System.out.println(d_stemmer.getCurrent());
-		
-
-//		String queryTerm = "Chocolate Milk";
-//		String[] terms = queryTerm.split("\\s+"); //get each term in the query string
-//		HashMap<String, String> queryAndStem = new HashMap<String, String>(); //query and stem hashset
-//		List<String> stemmedTerms = new LinkedList<String>();
-//		for (String term : terms) { //traverse through whole terms
-//			if (StopWordList.stopwords.contains(term)) {
-//				queryAndStem.put(term, term);
-//				continue;
-//			} 
-//			d_stemmer.setCurrent(term);
-//			System.out.println("Cur Term is:" + term);
-//			d_stemmer.stem();
-//			queryAndStem.put(d_stemmer.getCurrent(), term);
-//			stemmedTerms.add(d_stemmer.getCurrent());
-//			System.out.println("Debug: Print stemmer" + d_stemmer.getCurrent());
-//		}
+	
 	}
 }
