@@ -41,7 +41,6 @@
 		</h6>
 	</div>
 	
-<<<<<<< HEAD
 	<div class="col-lg-12">
 		<h5>
 			<p style="display:inline">${doYouWantToSearch}</p>
@@ -51,9 +50,7 @@
 			</form>
 		</h5>
 	</div>
-	
-=======
->>>>>>> master
+
 	<div id="thirdparty-result-container" class="col-lg-offset-3 col-lg-6">		
 
 	</div>
