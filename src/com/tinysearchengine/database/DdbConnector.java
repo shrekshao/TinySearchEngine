@@ -164,7 +164,7 @@ public class DdbConnector {
 
 	public Map<String, List<Object>> batchGetDocuments(List<String> urls) {
 		Map<Class<?>, List<KeyPair>> loadDescriptor =
-				new HashMap<Class<?>, List<KeyPair>>();
+			new HashMap<Class<?>, List<KeyPair>>();
 
 		List<KeyPair> kps = new LinkedList<KeyPair>();
 		urls.forEach((url) -> {
@@ -174,6 +174,21 @@ public class DdbConnector {
 		});
 
 		loadDescriptor.put(DdbDocument.class, kps);
+		return d_mapper.batchLoad(loadDescriptor);
+	}
+
+	public Map<String, List<Object>> batchGetWordIdfScores(List<String> words) {
+		Map<Class<?>, List<KeyPair>> loadDescriptor =
+			new HashMap<Class<?>, List<KeyPair>>();
+		
+		List<KeyPair> kps = new LinkedList<>();
+		words.forEach((w) -> {
+			KeyPair kp = new KeyPair();
+			kp.setHashKey(w);
+			kps.add(kp);
+		});
+		
+		loadDescriptor.put(DdbIdfScore.class, kps);
 		return d_mapper.batchLoad(loadDescriptor);
 	}
 

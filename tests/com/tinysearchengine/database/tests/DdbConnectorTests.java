@@ -207,4 +207,23 @@ public class DdbConnectorTests {
 			}
 		}
 	}
+
+	@Test
+	public void testBatchGetWordIdfs() {
+		List<String> words = new LinkedList<>();
+		words.add("comput");
+		words.add("answer");
+
+		Map<String, List<Object>> results =
+			d_connector.batchGetWordIdfScores(words);
+		
+		for (Map.Entry<String, List<Object>> kv : results.entrySet()) {
+			System.out.println(kv.getKey());
+			for (Object obj : kv.getValue()) {
+				assertTrue(obj instanceof DdbIdfScore);
+				DdbIdfScore score = (DdbIdfScore) obj;
+				System.out.println(score.getWord() + ": " + score.getIdf());
+			}
+		}
+	}
 }
