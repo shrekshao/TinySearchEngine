@@ -419,7 +419,9 @@ public class SearchServlet extends HttpServlet {
 		r.setTitle(titleText);
 
 		if (titleText.contains("404")
-				|| titleText.toLowerCase().contains("not found")) {
+				|| titleText.toLowerCase().contains("not found")
+				|| titleText.toLowerCase().contains("access denied")
+				|| titleText.toLowerCase().contains("too many requests")) {
 			return null;
 		}
 
