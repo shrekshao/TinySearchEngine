@@ -230,7 +230,7 @@ public class SearchServlet extends HttpServlet {
 		InputStream idxFileStream = getClass().getResourceAsStream("searchresult.ftlh");
 		
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("/Users/owner/TinySearchEngine/pagerankinput/keywordlist.txt"));
+			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist.txt"));
 		    System.out.println("***file read***");
 			String line;
 //			int counter = 0;
