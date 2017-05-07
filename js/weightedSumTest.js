@@ -14,6 +14,7 @@ var weightedSum = (function() {
 })();
 
 var printAttributes = function(l) {
+    console.log("\n\n\n");
     for (var i = 0; i < l.length; i++) {
         console.log(l[i].title + "\n  " + l[i].iiScore + "    " + l[i].pgScore + "\n  " + weightedSum(l[i].iiScore, l[i].pgScore) + "    " + l[i].scoreBackEnd);
     }
