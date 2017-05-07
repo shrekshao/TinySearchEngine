@@ -158,7 +158,7 @@ public class DdbConnectorTests {
 	@Test
 	public void testGetWordDocTfTuple() {
 		List<DdbWordDocTfTuple> tuples =
-			d_connector.getWordDocTfTuplesForWord("start");
+			d_connector.getWordDocTfTuplesForWord("storm");
 		Iterator<DdbWordDocTfTuple> it = tuples.iterator();
 		while (it.hasNext()) {
 			DdbWordDocTfTuple tuple = it.next();
