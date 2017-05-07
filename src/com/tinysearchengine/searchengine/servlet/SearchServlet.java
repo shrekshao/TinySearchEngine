@@ -370,6 +370,12 @@ public class SearchServlet extends HttpServlet {
 			titleText = titleText.substring(0, k_MAX_TITLE_LENGTH - 3) + "...";
 		}
 		r.setTitle(titleText);
+
+		if (titleText.contains("404")
+				|| titleText.toLowerCase().contains("not found")) {
+			return null;
+		}
+
 		r.setPgRankScore(Double.toString(p.pgRankScore));
 		r.setTotalScore(Double.toString(p.totalScore));
 
