@@ -652,9 +652,11 @@ public class SearchServlet extends HttpServlet {
                         }
                         String realresult = "";
                         Pair<String, Double> minResult = new ImmutablePair<String, Double>("", Double.MAX_VALUE);
-                        int distance = Integer.MAX_VALUE;
+//                        int distance = Integer.MAX_VALUE;
                         for (Pair<String, String> term : queryAndStem) { // here is APPLLL
                                 String stemmed = term.getLeft();
+                                double minScore = Double.MAX_VALUE;
+
                             if(d_keywordSet.contains(stemmed)) {
                                 realresult += term.getRight() + " ";
                             } else {
@@ -662,16 +664,21 @@ public class SearchServlet extends HttpServlet {
                                 		String keyword = pair.getLeft();
                                 		Double idf = pair.getRight();
                                         int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
-                                        if (curdistance < distance) {
-                                                distance = curdistance;
-                                                minResult = pair;
-                                       }
-                                      else if (curdistance == distance){ //equal
-                                              if(idf < minResult.getRight()) {
-                                                      distance = curdistance;
-                                                      minResult = pair;
-                                              }
-                                      }
+                                        double score = idf + curdistance;
+                                        if (score < minScore) {
+                                        	minResult = pair;
+                                        	minScore = score;
+                                        }
+//                                        if (curdistance < distance) {
+//                                                distance = curdistance;
+//                                                minResult = pair;
+//                                       }
+//                                      else if (curdistance == distance){ //equal
+//                                              if(idf < minResult.getRight()) {
+//                                                      distance = curdistance;
+//                                                      minResult = pair;
+//                                              }
+//                                      }
                                 }
                                 if (minResult.getLeft().isEmpty())
                                         realresult += term.getRight() + " ";
