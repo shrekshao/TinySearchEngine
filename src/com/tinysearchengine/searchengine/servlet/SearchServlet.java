@@ -230,7 +230,7 @@ public class SearchServlet extends HttpServlet {
 
 		InputStream idxFileStream = getClass().getResourceAsStream("searchresult.ftlh");
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist.txt"));
+			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist-complete.txt"));
 			String line;
 		    while ((line = br.readLine()) != null) {
 		    	String[] parts = line.split("\t");
@@ -578,7 +578,6 @@ public class SearchServlet extends HttpServlet {
         
 		// google-style spell check		
 		String correctedQuery = new String();
-		String tempwords = "";
 		String[] terms = queryTerm.split("\\s+"); //get each term in the query string
 		ArrayList<Pair<String, String>> queryAndStem = new ArrayList<Pair<String, String>>(); //query and stem hashset
 		for (String term : terms) { //traverse through whole terms

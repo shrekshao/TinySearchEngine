@@ -16,13 +16,15 @@
 	<servlet>
 		<servlet-name>indexservlet</servlet-name>
 		<servlet-class>com.tinysearchengine.searchengine.servlet.IndexServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
 	</servlet>
-	
+
 	<servlet>
 		<servlet-name>thirdpartyforwardservlet</servlet-name>
 		<servlet-class>com.tinysearchengine.searchengine.servlet.ThirdPartyForwardServlet</servlet-class>
+		<load-on-startup>3</load-on-startup>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>indexservlet</servlet-name>
 		<url-pattern>/</url-pattern>
