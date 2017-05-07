@@ -13,7 +13,7 @@
 		<div id="search-form-container">
 			<form id="search-form" method="post" action="/search">
 				<div class="form-group">
-					<input id="search-bar" type="text" name="query" value="${(query)!}" data-stemmed-terms="${stemmedTerms}" placeholder="Search here..." required>
+					<input id="search-bar" type="text" name="query" value="${(query)!}" data-stemmed-terms="${stemmedTerms}" data-query-score="${queryTermScores}" placeholder="Search here..." required>
 					<button class="btn btn-primary" type="submit">Search</button>
 				</div>
 				<label id="enable-amazon-box">
@@ -47,7 +47,7 @@
 	
 	<div id="search-result-container" class="col-lg-offset-3 col-lg-6">
 		<#list searchResults as resultItem>
-			<div class="search-result-item" data-score="${resultItem.score}" data-pg-score="${resultItem.pgRankScore}">
+			<div class="search-result-item" data-score="${resultItem.score}" data-pg-score="${resultItem.pgRankScore}" data-total-score="${resultItem.totalScore}">
 				<h3 class="search-result-item-link">
 					<a href="${resultItem.url}">${resultItem.title}</a>
 				</h3>

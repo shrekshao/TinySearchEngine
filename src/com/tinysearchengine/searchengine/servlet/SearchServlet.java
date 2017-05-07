@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,8 +22,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,12 +31,12 @@ import org.tartarus.snowball.ext.englishStemmer;
 
 import com.tinysearchengine.database.DdbConnector;
 import com.tinysearchengine.database.DdbDocument;
+import com.tinysearchengine.database.DdbIdfScore;
 import com.tinysearchengine.database.DdbPageRankScore;
 import com.tinysearchengine.database.DdbWordDocTfTuple;
 import com.tinysearchengine.indexer.StopWordList;
 import com.tinysearchengine.searchengine.othersites.AmazonItemResult;
 import com.tinysearchengine.searchengine.othersites.EbayItemResult;
-import com.tinysearchengine.searchengine.othersites.RequestToOtherSites;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -52,6 +49,7 @@ public class SearchServlet extends HttpServlet {
 	final int k_MAX_SEARCH_RESULTS = 50;
 	final int k_MAX_TITLE_LENGTH = 60;
 	final int k_MAX_SUMMARY_LENGTH = 300;
+	final double k_TF_WEIGHT = 0.7;
 
 	Configuration d_templateConfiguration;
 
@@ -80,6 +78,7 @@ public class SearchServlet extends HttpServlet {
 		String url;
 		double score;
 		double pgRankScore;
+		double totalScore;
 	}
 
 	public class SearchResult {
@@ -88,6 +87,7 @@ public class SearchServlet extends HttpServlet {
 		private String d_summary;
 		private String d_score;
 		private String d_pgRankScore;
+		private String d_totalScore;
 
 		public void setTitle(String title) {
 			d_title = title;
@@ -127,6 +127,14 @@ public class SearchServlet extends HttpServlet {
 
 		public void setPgRankScore(String pgRankScore) {
 			d_pgRankScore = pgRankScore;
+		}
+
+		public String getTotalScore() {
+			return d_totalScore;
+		}
+
+		public void setTotalScore(String totalScore) {
+			d_totalScore = totalScore;
 		}
 
 	}
@@ -248,6 +256,54 @@ public class SearchServlet extends HttpServlet {
 
 	}
 
+	private Map<String, Double>
+			computeQueryTermTfScores(List<String> stemmedTerms) {
+		int maxFreq = 0;
+
+		Map<String, Integer> queryTermCounts = new HashMap<>();
+		for (String stemmedTerm : stemmedTerms) {
+			if (queryTermCounts.containsKey(stemmedTerm)) {
+				int c = queryTermCounts.get(stemmedTerm);
+				queryTermCounts.put(stemmedTerm, c + 1);
+				if (c + 1 > maxFreq) {
+					maxFreq = c + 1;
+				}
+			} else {
+				queryTermCounts.put(stemmedTerm, 1);
+				if (1 > maxFreq) {
+					maxFreq = 1;
+				}
+			}
+		}
+
+		Map<String, Double> queryTermTfs = new HashMap<>();
+		for (Map.Entry<String, Integer> kv : queryTermCounts.entrySet()) {
+			queryTermTfs.put(kv.getKey(), (1.0 * kv.getValue()) / maxFreq);
+		}
+
+		return queryTermTfs;
+	}
+
+	private Map<String, Double>
+			computeQueryTermScores(List<String> stemmedTerms) {
+		Map<String, Double> queryTermTfs =
+			computeQueryTermTfScores(stemmedTerms);
+
+		Map<String, DdbIdfScore> queryTermIdfs = cleanupDdbIdfQueryResult(
+				d_connector.batchGetWordIdfScores(stemmedTerms));
+
+		Map<String, Double> queryTermScores = new HashMap<>();
+		for (Map.Entry<String, Double> kv : queryTermTfs.entrySet()) {
+			double idfScore = 0;
+			if (queryTermIdfs.containsKey(kv.getKey())) {
+				idfScore = queryTermIdfs.get(kv.getKey()).getIdf();
+			}
+			queryTermScores.put(kv.getKey(), idfScore * kv.getValue());
+		}
+
+		return queryTermScores;
+	}
+
 	private UrlScorePair[] performSearch(Map<String, Object> dataModel,
 			String queryTerm) {
 		String[] terms = queryTerm.split("\\s+");
@@ -262,18 +318,13 @@ public class SearchServlet extends HttpServlet {
 			d_stemmer.stem();
 			stemmedTerms.add(d_stemmer.getCurrent());
 		}
-		
+
 		dataModel.put("stemmedTerms", stemmedTerms.toString());
 
-		Map<String, Integer> queryTermCounts = new HashMap<>();
-		for (String stemmedTerm : stemmedTerms) {
-			if (queryTermCounts.containsKey(stemmedTerm)) {
-				int c = queryTermCounts.get(stemmedTerm);
-				queryTermCounts.put(stemmedTerm, c + 1);
-			} else {
-				queryTermCounts.put(stemmedTerm, 1);
-			}
-		}
+		Map<String, Double> queryTermScores =
+			computeQueryTermScores(stemmedTerms);
+
+		dataModel.put("queryTermScores", queryTermScores.toString());
 
 		Map<UrlWordPair, Double> docWordTable = new HashMap<>();
 		for (String stemmedTerm : stemmedTerms) {
@@ -297,12 +348,12 @@ public class SearchServlet extends HttpServlet {
 		Map<String, Double> docScoreTable = new HashMap<>();
 		for (UrlWordPair p : docWordTable.keySet()) {
 			p.tf = docWordTable.get(p);
-			int wordCountInQuery = queryTermCounts.get(p.word);
+			double wordScore = queryTermScores.get(p.word);
 			if (docScoreTable.containsKey(p.url)) {
 				double score = docScoreTable.get(p.url);
-				docScoreTable.put(p.url, score + p.tf * wordCountInQuery);
+				docScoreTable.put(p.url, score + p.tf * wordScore);
 			} else {
-				docScoreTable.put(p.url, p.tf * wordCountInQuery);
+				docScoreTable.put(p.url, p.tf * wordScore);
 			}
 		}
 
@@ -311,10 +362,17 @@ public class SearchServlet extends HttpServlet {
 				return lhs.score > rhs.score ? -1 : 1;
 			});
 
+		double maxDocScore = 0;
+		for (Map.Entry<String, Double> kv : docScoreTable.entrySet()) {
+			if (kv.getValue() > maxDocScore) {
+				maxDocScore = kv.getValue();
+			}
+		}
+
 		for (String url : docScoreTable.keySet()) {
 			UrlScorePair p = new UrlScorePair();
 			p.url = url;
-			p.score = docScoreTable.get(url);
+			p.score = docScoreTable.get(url) / maxDocScore;
 			queue.offer(p);
 		}
 
@@ -322,7 +380,7 @@ public class SearchServlet extends HttpServlet {
 	}
 
 	private String extractMainBody(StringBuilder title, byte[] document)
-			throws XPathExpressionException, UnsupportedEncodingException {
+			throws UnsupportedEncodingException {
 		Document d = Jsoup.parse(new String(document, "UTF-8"));
 		Elements elmts = d.getElementsMatchingOwnText(".{20,}");
 		StringBuilder result = new StringBuilder();
@@ -340,8 +398,8 @@ public class SearchServlet extends HttpServlet {
 	}
 
 	private SearchResult makeSearchResultFrom(UrlScorePair p,
-			Map<String, DdbDocument> batchDocs) throws MalformedURLException,
-			UnsupportedEncodingException, XPathExpressionException {
+			Map<String, DdbDocument> batchDocs)
+			throws MalformedURLException, UnsupportedEncodingException {
 		SearchResult r = new SearchResult();
 		r.setUrl(p.url);
 		r.setScore(Double.toString(p.score));
@@ -363,7 +421,14 @@ public class SearchServlet extends HttpServlet {
 			titleText = titleText.substring(0, k_MAX_TITLE_LENGTH - 3) + "...";
 		}
 		r.setTitle(titleText);
+
+		if (titleText.contains("404")
+				|| titleText.toLowerCase().contains("not found")) {
+			return null;
+		}
+
 		r.setPgRankScore(Double.toString(p.pgRankScore));
+		r.setTotalScore(Double.toString(p.totalScore));
 
 		return r;
 	}
@@ -396,21 +461,47 @@ public class SearchServlet extends HttpServlet {
 		return r;
 	}
 
+	private Map<String, DdbIdfScore>
+			cleanupDdbIdfQueryResult(Map<String, List<Object>> results) {
+		Map<String, DdbIdfScore> r = new HashMap<>();
+		for (Map.Entry<String, List<Object>> kv : results.entrySet()) {
+			for (Object obj : kv.getValue()) {
+				if (obj instanceof DdbIdfScore) {
+					DdbIdfScore score = (DdbIdfScore) obj;
+					r.put(score.getWord(), score);
+				}
+			}
+		}
+		return r;
+	}
+
+	private double computeTotalScore(UrlScorePair p) {
+		return k_TF_WEIGHT * p.score + (1 - k_TF_WEIGHT) * p.pgRankScore;
+	}
+
 	private UrlScorePair[] mergeWithPGRankAndSort(UrlScorePair[] ps,
 			Map<String, DdbPageRankScore> pgScores) {
 		PriorityQueue<UrlScorePair> sortedPs =
 			new PriorityQueue<>(10, (lhs, rhs) -> {
-				if (lhs.score * lhs.pgRankScore > rhs.score * rhs.pgRankScore) {
+				if (computeTotalScore(lhs) > computeTotalScore(rhs)) {
 					return -1;
 				} else {
 					return 1;
 				}
 			});
 
+		double maxScore = 0;
+		for (Map.Entry<String, DdbPageRankScore> kv : pgScores.entrySet()) {
+			if (kv.getValue().getPageRankScore() > maxScore) {
+				maxScore = kv.getValue().getPageRankScore();
+			}
+		}
+
 		for (UrlScorePair p : ps) {
 			DdbPageRankScore pgScore = pgScores.get(p.url);
 			if (pgScore != null) {
-				p.pgRankScore = pgScore.getPageRankScore();
+				p.pgRankScore = pgScore.getPageRankScore() / maxScore;
+				p.totalScore = computeTotalScore(p);
 			}
 
 			sortedPs.add(p);
@@ -451,16 +542,9 @@ public class SearchServlet extends HttpServlet {
 		ArrayList<SearchResult> results = new ArrayList<>();
 
 		for (UrlScorePair p : urlScorePairs) {
-			SearchResult r;
-			try {
-				r = makeSearchResultFrom(p, batchDocs);
-				if (r != null) {
-					results.add(r);
-				}
-			} catch (XPathExpressionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.exit(1);
+			SearchResult r = makeSearchResultFrom(p, batchDocs);
+			if (r != null) {
+				results.add(r);
 			}
 		}
 
@@ -469,24 +553,9 @@ public class SearchServlet extends HttpServlet {
 		boolean shouldQueryAmazon =
 			(request.getParameter("enable-amazon") != null);
 
-		List<ThirdPartyResult> thirdPartyResults = new ArrayList<>();
-
 		if (shouldQueryAmazon) {
 			// Set input checkbox checked
 			root.put("amazonChecked", "checked");
-
-			// Put the amazon results in
-			// final List<ThirdPartyResult> collectedResults =
-			// thirdPartyResults;
-			// RequestToOtherSites.getAmazonResult(queryTerm).forEach((item) ->
-			// {
-			// collectedResults.add(new ThirdPartyResult(item));
-			// });
-			//
-			// if (thirdPartyResults.size() > k_MAX_3RDPARTY_RESULTS) {
-			// thirdPartyResults = thirdPartyResults.subList(0,
-			// k_MAX_3RDPARTY_RESULTS);
-			// }
 		} else {
 			root.put("amazonChecked", "");
 		}
@@ -496,24 +565,9 @@ public class SearchServlet extends HttpServlet {
 		if (shouldQueryEbay) {
 			// Set input checkbox checked
 			root.put("ebayChecked", "checked");
-
-			// List<ThirdPartyResult> ebayResults = new ArrayList<>();
-			// final List<ThirdPartyResult> collectedResults = ebayResults;
-			// ArrayList<EbayItemResult> ebayItems =
-			// RequestToOtherSites.getEbayResult(queryTerm);
-			// ebayItems.forEach((item) -> {
-			// collectedResults.add(new ThirdPartyResult(item));
-			// });
-			//
-			// if (ebayResults.size() > k_MAX_3RDPARTY_RESULTS) {
-			// ebayResults = ebayResults.subList(0, k_MAX_3RDPARTY_RESULTS);
-			// }
-			//
-			// thirdPartyResults.addAll(ebayResults);
 		} else {
 			root.put("ebayChecked", "");
 		}
-
 		// root.put("thirdPartyResults", thirdPartyResults);
         boolean shouldQueryYoutube = (request.getParameter("enable-youtube") != null);
         
@@ -565,7 +619,7 @@ public class SearchServlet extends HttpServlet {
 		String realresult = ""; 
 		String tempresult = "";
 		for(String curStemmedTerm : queryAndStem.keySet()) { //here is APPLLL
-			System.out.println("KEYEKYEKKEYKYE + " + curStemmedTerm);
+//			System.out.println("KEYEKYEKKEYKYE + " + curStemmedTerm);
 		    if(d_keywordsandidf.containsKey(curStemmedTerm)) {
 //		    	System.out.println(curStemmedTerm);
 		    	realresult += queryAndStem.get(curStemmedTerm) + " ";
@@ -585,12 +639,12 @@ public class SearchServlet extends HttpServlet {
 		    			}
 		    		}
 		    	}   
-		    	System.out.println("TEMPRESULT!!!" + tempresult);
+//		    	System.out.println("TEMPRESULT!!!" + tempresult);
 		    	realresult += tempresult + " "; //queryAndStem.get(tempresult) + " ";
 		    //	System.out.println("Is it here??? : " + queryAndStem.get(tempresult));
 		    }  
 		}
-		System.out.println("DEBUG!!! REALRESULT" + realresult);
+//		System.out.println("DEBUG!!! REALRESULT" + realresult);
 		//System.out.println(correctedQuery + " ######### ");
 		if(realresult.replaceAll("\\s+", "").equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
 			//System.out.println("HERE: ******* ");
@@ -601,7 +655,7 @@ public class SearchServlet extends HttpServlet {
 			for(int i = 0 ; i < all.length ; i++) { 
 				//System.out.println(all[i]);
 				correctedQuery += all[i] + " ";		
-				System.out.println("DEBUGGG:" + correctedQuery);
+//				System.out.println("DEBUGGG:" + correctedQuery);
 			}
 			correctedQuery = correctedQuery.substring(0, correctedQuery.length() - 1);
 			root.put("doYouWantToSearch", "Do you want to search: ");
@@ -612,7 +666,6 @@ public class SearchServlet extends HttpServlet {
 		// 3. if not, find the most similar keyword and append it to correctedQuery
 		
 		root.put("correctedQuery", correctedQuery);
-		
 		try {
 			d_searchResultTemplate.process(root, response.getWriter());
 		} catch (TemplateException e) {

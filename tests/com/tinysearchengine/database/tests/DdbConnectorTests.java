@@ -158,7 +158,7 @@ public class DdbConnectorTests {
 	@Test
 	public void testGetWordDocTfTuple() {
 		List<DdbWordDocTfTuple> tuples =
-			d_connector.getWordDocTfTuplesForWord("start");
+			d_connector.getWordDocTfTuplesForWord("storm");
 		Iterator<DdbWordDocTfTuple> it = tuples.iterator();
 		while (it.hasNext()) {
 			DdbWordDocTfTuple tuple = it.next();
@@ -204,6 +204,25 @@ public class DdbConnectorTests {
 				DdbDocument doc = (DdbDocument) obj;
 				System.out.println(
 						doc.getUrlAsString() + ", " + doc.getFingerprint());
+			}
+		}
+	}
+
+	@Test
+	public void testBatchGetWordIdfs() {
+		List<String> words = new LinkedList<>();
+		words.add("comput");
+		words.add("answer");
+
+		Map<String, List<Object>> results =
+			d_connector.batchGetWordIdfScores(words);
+		
+		for (Map.Entry<String, List<Object>> kv : results.entrySet()) {
+			System.out.println(kv.getKey());
+			for (Object obj : kv.getValue()) {
+				assertTrue(obj instanceof DdbIdfScore);
+				DdbIdfScore score = (DdbIdfScore) obj;
+				System.out.println(score.getWord() + ": " + score.getIdf());
 			}
 		}
 	}
