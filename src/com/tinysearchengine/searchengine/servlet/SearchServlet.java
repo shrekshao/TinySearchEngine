@@ -230,7 +230,7 @@ public class SearchServlet extends HttpServlet {
 
 		InputStream idxFileStream = getClass().getResourceAsStream("searchresult.ftlh");
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist-complete.txt"));
+			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist.txt"));
 			String line;
 		    while ((line = br.readLine()) != null) {
 		    	String[] parts = line.split("\t");
@@ -250,7 +250,6 @@ public class SearchServlet extends HttpServlet {
 		} catch (IOException e) {
 			throw new ServletException(e);
 		}
-		System.out.println("INIT");
 	}
 
 	private Map<String, Double>
