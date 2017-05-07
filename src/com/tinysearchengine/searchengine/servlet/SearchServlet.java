@@ -62,8 +62,7 @@ public class SearchServlet extends HttpServlet {
 
 	XPathFactory d_xpathFactory = XPathFactory.newInstance();
 
-	ArrayList<Pair<String, Double>> d_keywordsandidf =
-		new ArrayList<Pair<String, Double>>();
+	ArrayList<String> d_keywordsandidf = new ArrayList<String>();
 	Set<String> d_keywordSet = new HashSet<String>();
 
 	public class UrlWordPair {
@@ -246,10 +245,8 @@ public class SearchServlet extends HttpServlet {
 			String line;
 			while ((line = br.readLine()) != null) {
 				String[] parts = line.split("\t");
-				Pair<String, Double> pair = new ImmutablePair<String, Double>(
-						parts[0], Double.parseDouble(parts[1]));
 
-				d_keywordsandidf.add(pair);
+				d_keywordsandidf.add(parts[0]);
 				d_keywordSet.add(parts[0]);
 			}
 			br.close();
@@ -655,20 +652,17 @@ public class SearchServlet extends HttpServlet {
 			}
 			// int distance = Integer.MAX_VALUE;
 			String realresult = "";
-			Pair<String, Double> minResult =
-				new ImmutablePair<String, Double>("", Double.MAX_VALUE);
+			String minResult = new String();
 			for (Pair<String, String> term : queryAndStem) { // here is APPLLL
 				String stemmed = term.getLeft();
 			    if(d_keywordSet.contains(stemmed)) {
 			    	realresult += term.getRight() + " ";
 			    } else {
-			    	for(Pair<String, Double> pair : d_keywordsandidf) {
-			    		String keyword = pair.getLeft();
-			    		Double idf = pair.getRight();
+			    	for(String keyword : d_keywordsandidf) {
 			    		int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
-			    		if (curdistance < 3 && idf < minResult.getRight()) {
+			    		if (curdistance < 3) {
 			    			//distance = curdistance;
-			    			minResult = pair;
+			    			minResult = keyword;
 			    			break; // boost the speed
 			    		} 
 //			    		else if (curdistance == distance){ //equal
@@ -678,10 +672,10 @@ public class SearchServlet extends HttpServlet {
 //			    			}
 //			    		}
 			    	}   
-			    	if (minResult.getLeft().isEmpty())
+			    	if (minResult.isEmpty())
 			    		realresult += term.getRight() + " ";
 			    	else
-			    		realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
+			    		realresult += minResult + " "; //queryAndStem.get(tempresult) + " ";
 			    }  
 			}
 			if(realresult.replaceAll("\\s+", "").equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
