@@ -392,8 +392,8 @@ public class SearchServlet extends HttpServlet {
 
 		
 		ArrayList<UrlScorePair> results = new ArrayList<>();
-		for (UrlScorePair p : queue) {
-			results.add(p);
+		while (!queue.isEmpty()) {
+			results.add(queue.poll());
 		}
 		return results.toArray(new UrlScorePair[0]);
 	}
@@ -531,8 +531,8 @@ public class SearchServlet extends HttpServlet {
 		}
 
 		ArrayList<UrlScorePair> results = new ArrayList<>();
-		for (UrlScorePair p : sortedPs) {
-			results.add(p);
+		while (!sortedPs.isEmpty()) {
+			results.add(sortedPs.poll());
 		}
 		return results.toArray(new UrlScorePair[0]);
 	}
