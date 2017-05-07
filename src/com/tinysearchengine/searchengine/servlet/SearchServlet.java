@@ -593,9 +593,9 @@ public class SearchServlet extends HttpServlet {
 				d_stemmer.stem();
 				queryAndStem.add(new ImmutablePair<String, String>(d_stemmer.getCurrent(), term));
 			}
-			int distance = Integer.MAX_VALUE;
+			//int distance = Integer.MAX_VALUE;
 			String realresult = ""; 
-			Pair<String, Double> minResult = null;
+			Pair<String, Double> minResult = new ImmutablePair<String, Double>("", Double.MAX_VALUE);
 			for(Pair<String, String> term : queryAndStem) { //here is APPLLL
 				String stemmed = term.getLeft();
 			    if(d_keywordSet.contains(stemmed)) {
@@ -605,15 +605,16 @@ public class SearchServlet extends HttpServlet {
 			    		String keyword = pair.getLeft();
 			    		Double idf = pair.getRight();
 			    		int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
-			    		if (curdistance < distance) {
-			    			distance = curdistance;
+			    		if (curdistance < 3 && idf < minResult.getRight()) {
+			    			//distance = curdistance;
 			    			minResult = pair;
-			    		} else if (curdistance == distance){ //equal
-			    			if(idf < minResult.getRight()) {
-			    				distance = curdistance;
-			    				minResult = pair;
-			    			}
-			    		}
+			    		} 
+//			    		else if (curdistance == distance){ //equal
+//			    			if(idf < minResult.getRight()) {
+//			    				distance = curdistance;
+//			    				minResult = pair;
+//			    			}
+//			    		}
 			    	}   
 			    	realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
 			    }  

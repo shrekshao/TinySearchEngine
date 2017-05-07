@@ -28,7 +28,7 @@ public class TestReplaceALL {
 		System.out.println(tml1);
 		
 		SnowballStemmer d_stemmer = new englishStemmer();
-		d_stemmer.setCurrent("admissio");
+		d_stemmer.setCurrent("niccs");
 		d_stemmer.stem();
 		System.out.println(d_stemmer.getCurrent());
 	
