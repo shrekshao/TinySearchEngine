@@ -295,6 +295,8 @@ public class SearchServlet extends HttpServlet {
 
 	private Map<String, Double>
 			computeQueryTermScores(List<String> stemmedTerms) {
+		double l2Norm = 0;
+		
 		Map<String, Double> queryTermTfs =
 			computeQueryTermTfScores(stemmedTerms);
 
@@ -307,9 +309,18 @@ public class SearchServlet extends HttpServlet {
 			if (queryTermIdfs.containsKey(kv.getKey())) {
 				idfScore = queryTermIdfs.get(kv.getKey()).getIdf();
 			}
-			queryTermScores.put(kv.getKey(), idfScore * kv.getValue());
+			double score = idfScore * kv.getValue(); 
+			queryTermScores.put(kv.getKey(), score);
+			l2Norm += score * score;
 		}
 
+		l2Norm = Math.sqrt(l2Norm);
+		
+		for (String k : queryTermScores.keySet()) {
+			double score = queryTermScores.get(k);
+			queryTermScores.put(k, score / l2Norm);
+		}
+		
 		return queryTermScores;
 	}
 
@@ -338,6 +349,7 @@ public class SearchServlet extends HttpServlet {
 
 		dataModel.put("queryTermScores", queryTermScores.toString());
 
+		Map<String, Double> urlL2Norm = new HashMap<>();
 		Map<UrlWordPair, Double> docWordTable = new HashMap<>();
 		for (String stemmedTerm : stemmedTerms) {
 			List<DdbWordDocTfTuple> tuples =
@@ -356,16 +368,29 @@ public class SearchServlet extends HttpServlet {
 				}
 			}
 		}
+		
+		for (UrlWordPair p : docWordTable.keySet()) {
+			String url = p.url;
+			double part = docWordTable.get(p);
+
+			if (urlL2Norm.containsKey(url)) {
+				double oldValue = urlL2Norm.get(url);
+				urlL2Norm.put(url, oldValue + part * part);
+			} else {
+				urlL2Norm.put(url, part * part);
+			}
+		}
 
 		Map<String, Double> docScoreTable = new HashMap<>();
 		for (UrlWordPair p : docWordTable.keySet()) {
 			p.tf = docWordTable.get(p);
 			double wordScore = queryTermScores.get(p.word);
+			double norm = Math.sqrt(urlL2Norm.get(p.url));
 			if (docScoreTable.containsKey(p.url)) {
 				double score = docScoreTable.get(p.url);
-				docScoreTable.put(p.url, score + p.tf * wordScore);
+				docScoreTable.put(p.url, score + p.tf * wordScore / norm);
 			} else {
-				docScoreTable.put(p.url, p.tf * wordScore);
+				docScoreTable.put(p.url, p.tf * wordScore / norm);
 			}
 		}
 
