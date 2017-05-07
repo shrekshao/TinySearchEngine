@@ -45,7 +45,7 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 
 public class SearchServlet extends HttpServlet {
-	
+
 	final int k_MAX_3RDPARTY_RESULTS = 15;
 	final int k_MAX_SEARCH_RESULTS = 50;
 	final int k_MAX_TITLE_LENGTH = 60;
@@ -61,10 +61,11 @@ public class SearchServlet extends HttpServlet {
 	DdbConnector d_connector = new DdbConnector();
 
 	XPathFactory d_xpathFactory = XPathFactory.newInstance();
-	
-	ArrayList<Pair<String, Double>> d_keywordsandidf = new ArrayList<Pair<String, Double>>();
+
+	ArrayList<Pair<String, Double>> d_keywordsandidf =
+		new ArrayList<Pair<String, Double>>();
 	Set<String> d_keywordSet = new HashSet<String>();
-	
+
 	public class UrlWordPair {
 		String url;
 		String word;
@@ -196,29 +197,38 @@ public class SearchServlet extends HttpServlet {
 			return d_price;
 		}
 	}
-	
-    public int wordEditDistance(String word1, String word2) {
-        int m = word1.length();
-        int n = word2.length();
-        
-        int[][] distance = new int[m + 1][n + 1];
-        for(int i = 0; i <= m; i++) { distance[i][0] = i; }
-        for(int i = 1; i <= n; i++) { distance[0][i] = i; }
-        
-        for(int i = 0; i < m; i++) {
-            for(int j = 0; j < n; j++) {
-                if(word1.charAt(i) == word2.charAt(j)) { distance[i + 1][j + 1] = distance[i][j]; }
-                else {
-                    int distanceIJ = distance[i][j];
-                    int distanceJplus1 = distance[i][j + 1];
-                    int distanceIplus1 = distance[i + 1][j];
-                    distance[i + 1][j + 1] = distanceIJ < distanceJplus1 ? (distanceIJ < distanceIplus1 ? distanceIJ : distanceIplus1) : (distanceJplus1 < distanceIplus1 ? distanceJplus1 : distanceIplus1);
-                    distance[i + 1][j + 1]++;
-                }
-            }
-        }
-        return distance[m][n];
-    }
+
+	public int wordEditDistance(String word1, String word2) {
+		int m = word1.length();
+		int n = word2.length();
+
+		int[][] distance = new int[m + 1][n + 1];
+		for (int i = 0; i <= m; i++) {
+			distance[i][0] = i;
+		}
+		for (int i = 1; i <= n; i++) {
+			distance[0][i] = i;
+		}
+
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+				if (word1.charAt(i) == word2.charAt(j)) {
+					distance[i + 1][j + 1] = distance[i][j];
+				} else {
+					int distanceIJ = distance[i][j];
+					int distanceJplus1 = distance[i][j + 1];
+					int distanceIplus1 = distance[i + 1][j];
+					distance[i + 1][j + 1] = distanceIJ < distanceJplus1
+							? (distanceIJ < distanceIplus1 ? distanceIJ
+									: distanceIplus1)
+							: (distanceJplus1 < distanceIplus1 ? distanceJplus1
+									: distanceIplus1);
+					distance[i + 1][j + 1]++;
+				}
+			}
+		}
+		return distance[m][n];
+	}
 
 	public void init() throws ServletException {
 		super.init();
@@ -228,18 +238,21 @@ public class SearchServlet extends HttpServlet {
 		d_templateConfiguration.setTemplateExceptionHandler(
 				TemplateExceptionHandler.RETHROW_HANDLER);
 
-		InputStream idxFileStream = getClass().getResourceAsStream("searchresult.ftlh");
+		InputStream idxFileStream =
+			getClass().getResourceAsStream("searchresult.ftlh");
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist.txt"));
+			BufferedReader br = new BufferedReader(
+					new FileReader("pagerankinput/keywordlist.txt"));
 			String line;
-		    while ((line = br.readLine()) != null) {
-		    	String[] parts = line.split("\t");
-		    	Pair<String, Double> pair = new ImmutablePair<String, Double>(parts[0], Double.parseDouble(parts[1]));
-		    	
-		    	d_keywordsandidf.add(pair);
-		    	d_keywordSet.add(parts[0]);
-		    }
-		    br.close();
+			while ((line = br.readLine()) != null) {
+				String[] parts = line.split("\t");
+				Pair<String, Double> pair = new ImmutablePair<String, Double>(
+						parts[0], Double.parseDouble(parts[1]));
+
+				d_keywordsandidf.add(pair);
+				d_keywordSet.add(parts[0]);
+			}
+			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -312,7 +325,10 @@ public class SearchServlet extends HttpServlet {
 
 			d_stemmer.setCurrent(term);
 			d_stemmer.stem();
-			stemmedTerms.add(d_stemmer.getCurrent());
+			String stemmedWord = d_stemmer.getCurrent();
+			if (!stemmedTerms.contains(stemmedWord)) {
+				stemmedTerms.add(stemmedWord);
+			}
 		}
 
 		dataModel.put("stemmedTerms", stemmedTerms.toString());
@@ -549,7 +565,7 @@ public class SearchServlet extends HttpServlet {
 		}
 
 		root.put("searchResults", results);
-		
+
 		boolean shouldQueryAmazon =
 			(request.getParameter("enable-amazon") != null);
 
@@ -570,82 +586,94 @@ public class SearchServlet extends HttpServlet {
 		}
 
 		// root.put("thirdPartyResults", thirdPartyResults);
-        boolean shouldQueryYoutube = (request.getParameter("enable-youtube") != null);
-        
-        if (shouldQueryYoutube) {
-        	root.put("youtubeChecked", "checked");
-        } else {
-        	root.put("youtubeChecked", "");
-        }
-        
-        boolean shouldSpellCheck = (request.getParameter("enable-spellcheck") != null);
-        
-        if (shouldSpellCheck) {
-			// google-style spell check		
+		boolean shouldQueryYoutube =
+			(request.getParameter("enable-youtube") != null);
+
+		if (shouldQueryYoutube) {
+			root.put("youtubeChecked", "checked");
+		} else {
+			root.put("youtubeChecked", "");
+		}
+
+		boolean shouldSpellCheck =
+			(request.getParameter("enable-spellcheck") != null);
+
+		if (shouldSpellCheck) {
+			// google-style spell check
 			String correctedQuery = new String();
-			String[] terms = queryTerm.split("\\s+"); //get each term in the query string
-			ArrayList<Pair<String, String>> queryAndStem = new ArrayList<Pair<String, String>>(); //query and stem hashset
-			for (String term : terms) { //traverse through whole terms
-				
+			String[] terms = queryTerm.split("\\s+"); // get each term in the
+														// query string
+			ArrayList<Pair<String, String>> queryAndStem =
+				new ArrayList<Pair<String, String>>(); // query and stem hashset
+			for (String term : terms) { // traverse through whole terms
+
 				if (StopWordList.stopwords.contains(term)) {
-					queryAndStem.add(new ImmutablePair<String, String>(term, term));
+					queryAndStem
+							.add(new ImmutablePair<String, String>(term, term));
 					continue;
-				} 
+				}
 				d_stemmer.setCurrent(term);
 				d_stemmer.stem();
-				queryAndStem.add(new ImmutablePair<String, String>(d_stemmer.getCurrent(), term));
+				queryAndStem.add(new ImmutablePair<String, String>(
+						d_stemmer.getCurrent(), term));
 			}
-			//int distance = Integer.MAX_VALUE;
-			String realresult = ""; 
-			Pair<String, Double> minResult = new ImmutablePair<String, Double>("", Double.MAX_VALUE);
-			for(Pair<String, String> term : queryAndStem) { //here is APPLLL
+			// int distance = Integer.MAX_VALUE;
+			String realresult = "";
+			Pair<String, Double> minResult =
+				new ImmutablePair<String, Double>("", Double.MAX_VALUE);
+			for (Pair<String, String> term : queryAndStem) { // here is APPLLL
 				String stemmed = term.getLeft();
-			    if(d_keywordSet.contains(stemmed)) {
-			    	realresult += term.getRight() + " ";
-			    } else {
-			    	for(Pair<String, Double> pair : d_keywordsandidf) {
-			    		String keyword = pair.getLeft();
-			    		Double idf = pair.getRight();
-			    		int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
-			    		if (curdistance < 3 && idf < minResult.getRight()) {
-			    			//distance = curdistance;
-			    			minResult = pair;
-			    		} 
-//			    		else if (curdistance == distance){ //equal
-//			    			if(idf < minResult.getRight()) {
-//			    				distance = curdistance;
-//			    				minResult = pair;
-//			    			}
-//			    		}
-			    	}   
-			    	realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
-			    }  
+				if (d_keywordSet.contains(stemmed)) {
+					realresult += term.getRight() + " ";
+				} else {
+					for (Pair<String, Double> pair : d_keywordsandidf) {
+						String keyword = pair.getLeft();
+						Double idf = pair.getRight();
+						int curdistance = wordEditDistance(stemmed, keyword); // APPLLL
+																				// VS
+																				// KEY
+						if (curdistance < 3 && idf < minResult.getRight()) {
+							// distance = curdistance;
+							minResult = pair;
+						}
+						// else if (curdistance == distance){ //equal
+						// if(idf < minResult.getRight()) {
+						// distance = curdistance;
+						// minResult = pair;
+						// }
+						// }
+					}
+					realresult += minResult.getLeft() + " "; // queryAndStem.get(tempresult)
+																// + " ";
+				}
 			}
-			
-			if(realresult.replaceAll("\\s+", "").equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
+
+			if (realresult.replaceAll("\\s+", "")
+					.equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
 				correctedQuery = "";
-				root.put("doYouWantToSearch", "");		
+				root.put("doYouWantToSearch", "");
 			} else {
 				String[] all = realresult.split("\\s+");
-				for(int i = 0 ; i < all.length ; i++) { 
-					correctedQuery += all[i] + " ";		
+				for (int i = 0; i < all.length; i++) {
+					correctedQuery += all[i] + " ";
 				}
-				correctedQuery = correctedQuery.substring(0, correctedQuery.length() - 1);
+				correctedQuery =
+					correctedQuery.substring(0, correctedQuery.length() - 1);
 				root.put("doYouWantToSearch", "Do you want to search:");
-			}		
-			
+			}
+
 			root.put("correctedQuery", correctedQuery);
 			root.put("spellCheckChecked", "checked");
-        } else {
-    		root.put("doYouWantToSearch", "");	
-    		root.put("correctedQuery", "");
-    		root.put("spellCheckChecked", "");
-        }
-		
-		long endTime   = System.currentTimeMillis();
+		} else {
+			root.put("doYouWantToSearch", "");
+			root.put("correctedQuery", "");
+			root.put("spellCheckChecked", "");
+		}
+
+		long endTime = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		root.put("time", String.valueOf(totalTime / 1000.0));
-		
+
 		try {
 			d_searchResultTemplate.process(root, response.getWriter());
 		} catch (TemplateException e) {
