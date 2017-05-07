@@ -374,17 +374,19 @@ public class SearchServlet extends HttpServlet {
 				return lhs.score > rhs.score ? -1 : 1;
 			});
 
+		/*
 		double maxDocScore = 0;
 		for (Map.Entry<String, Double> kv : docScoreTable.entrySet()) {
 			if (kv.getValue() > maxDocScore) {
 				maxDocScore = kv.getValue();
 			}
 		}
+		*/
 
 		for (String url : docScoreTable.keySet()) {
 			UrlScorePair p = new UrlScorePair();
 			p.url = url;
-			p.score = docScoreTable.get(url) / maxDocScore;
+			p.score = docScoreTable.get(url);
 			queue.offer(p);
 		}
 
@@ -504,17 +506,19 @@ public class SearchServlet extends HttpServlet {
 				}
 			});
 
+		/*
 		double maxScore = 0;
 		for (Map.Entry<String, DdbPageRankScore> kv : pgScores.entrySet()) {
 			if (kv.getValue().getPageRankScore() > maxScore) {
 				maxScore = kv.getValue().getPageRankScore();
 			}
 		}
+		*/
 
 		for (UrlScorePair p : ps) {
 			DdbPageRankScore pgScore = pgScores.get(p.url);
 			if (pgScore != null) {
-				p.pgRankScore = pgScore.getPageRankScore() / maxScore;
+				p.pgRankScore = pgScore.getPageRankScore();
 				p.totalScore = computeTotalScore(p);
 			}
 
