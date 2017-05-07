@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -46,6 +49,24 @@ import freemarker.template.TemplateExceptionHandler;
 
 public class SearchServlet extends HttpServlet {
 
+	public SearchServlet() {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist.txt"));
+			String line;
+		    while ((line = br.readLine()) != null) {
+		    	String[] parts = line.split("\t");
+		    	Pair<String, Double> pair = new ImmutablePair<String, Double>(parts[0], Double.parseDouble(parts[1]));
+		    	
+		    	d_keywordsandidf.add(pair);
+		    	d_keywordSet.add(parts[0]);
+		    }
+		    br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Initiate");
+	}
+	
 	final int k_MAX_3RDPARTY_RESULTS = 15;
 	final int k_MAX_SEARCH_RESULTS = 50;
 	final int k_MAX_TITLE_LENGTH = 60;
@@ -62,8 +83,9 @@ public class SearchServlet extends HttpServlet {
 
 	XPathFactory d_xpathFactory = XPathFactory.newInstance();
 	
-	HashMap<String, Double> d_keywordsandidf = new HashMap<String, Double>();
-
+	ArrayList<Pair<String, Double>> d_keywordsandidf = new ArrayList<Pair<String, Double>>();
+	Set<String> d_keywordSet = new HashSet<String>();
+	
 	public class UrlWordPair {
 		String url;
 		String word;
@@ -230,31 +252,13 @@ public class SearchServlet extends HttpServlet {
 		InputStream idxFileStream = getClass().getResourceAsStream("searchresult.ftlh");
 		
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("pagerankinput/keywordlist.txt"));
-		    System.out.println("***file read***");
-			String line;
-//			int counter = 0;
-		    while ((line = br.readLine()) != null) {
-//		    	counter ++;
-		    	String[] parts = line.split("\t");
-		    	d_keywordsandidf.put(parts[0], Double.parseDouble(parts[1]));
-//		    	if(counter == 1000) {
-//		    		System.out.println(parts[0]);
-//		    		System.out.println(parts[1]);
-//		    	}
-		    }
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		try {
 			d_searchResultTemplate = new Template("searchresult-template",
 					new InputStreamReader(idxFileStream),
 					d_templateConfiguration);
 		} catch (IOException e) {
 			throw new ServletException(e);
 		}
-
+		System.out.println("INIT");
 	}
 
 	private Map<String, Double>
@@ -514,6 +518,8 @@ public class SearchServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
+		//long startTime = System.currentTimeMillis();
+
 		HashMap<String, Object> root = new HashMap<>();
 
 		String queryTerm = request.getParameter("query");
@@ -579,94 +585,66 @@ public class SearchServlet extends HttpServlet {
         }
         
 		// google-style spell check		
-		String correctedQuery = new String();
-		String tempwords = "";
-	//	System.out.println("DEBUG: QUERYTERM!" + queryTerm);
-	//	System.out.println("DEBUG: MapSize!" + d_keywordsandidf.size());
-		String[] terms = queryTerm.split("\\s+"); //get each term in the query string
-		LinkedHashMap<String, String> queryAndStem = new LinkedHashMap<String, String>(); //query and stem hashset
-	//	List<String> stemmedTerms = new LinkedList<String>();
-		for (String term : terms) { //traverse through whole terms
-			if (StopWordList.stopwords.contains(term)) {
-				queryAndStem.put(term, term);
-				continue;
-			} 
-			d_stemmer.setCurrent(term);
-		//	System.out.println("Cur Term is:" + term);
-			d_stemmer.stem();
-//			stemmedTerms.add(ddd);
-		//	System.out.println("DEBUG ++ " + d_stemmer.getCurrent());
-		//	queryAndStem.put(term, d_stemmer.getCurrent());
-			queryAndStem.put(d_stemmer.getCurrent(), term);
-		//	System.out.println("Debug: Print stemmer 88w7e87w897e9");
-		//	System.out.println("Debug: Print stemmer" + d_stemmer.getCurrent());
-		}
-		
+//		String correctedQuery = new String();
+//		String tempwords = "";
+//		String[] terms = queryTerm.split("\\s+"); //get each term in the query string
+//		ArrayList<Pair<String, String>> queryAndStem = new ArrayList<Pair<String, String>>(); //query and stem hashset
 //		for (String term : terms) { //traverse through whole terms
+//			
 //			if (StopWordList.stopwords.contains(term)) {
-//				queryAndStem.put(term, term);
+//				queryAndStem.add(new ImmutablePair<String, String>(term, term));
 //				continue;
 //			} 
 //			d_stemmer.setCurrent(term);
-//		//	System.out.println("Cur Term is:" + term);
 //			d_stemmer.stem();
-////			queryAndStem.put(d_stemmer.getCurrent(), term);
-//			System.out.println(d_stemmer.getCurrent());
-//		//	stemmedTerms.add(d_stemmer.getCurrent());
-//		//	System.out.println("Debug: Print stemmer" + d_stemmer.getCurrent());
-//		} //make a map: <term, term>
-		//check distance
-		int distance = Integer.MAX_VALUE;
-		String realresult = ""; 
-		String tempresult = "";
-		for(String curStemmedTerm : queryAndStem.keySet()) { //here is APPLLL
-//			System.out.println("KEYEKYEKKEYKYE + " + curStemmedTerm);
-		    if(d_keywordsandidf.containsKey(curStemmedTerm)) {
-//		    	System.out.println(curStemmedTerm);
-		    	realresult += queryAndStem.get(curStemmedTerm) + " ";
-		 //   	System.out.println("IF IT IS RIGHT ! " + queryAndStem.get(curStemmedTerm));
-		    } else {
-		    	for(String key: d_keywordsandidf.keySet()) {
-		    		int curdistance = wordEditDistance(curStemmedTerm, key); //APPLLL VS KEY
-		    		if(curdistance > distance) { //skip, does not need to do anything
-		    		} else if (curdistance < distance) {
-		    			distance = curdistance;
-		    			tempresult = key;
-		    		} else { //equal
-		    			if(d_keywordsandidf.get(key) >= d_keywordsandidf.get(tempresult)) {
-		    			} else {
-		    				distance = curdistance;
-		    				tempresult = key;
-		    			}
-		    		}
-		    	}   
-//		    	System.out.println("TEMPRESULT!!!" + tempresult);
-		    	realresult += tempresult + " "; //queryAndStem.get(tempresult) + " ";
-		    //	System.out.println("Is it here??? : " + queryAndStem.get(tempresult));
-		    }  
-		}
-//		System.out.println("DEBUG!!! REALRESULT" + realresult);
-		//System.out.println(correctedQuery + " ######### ");
-		if(realresult.replaceAll("\\s+", "").equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
-			//System.out.println("HERE: ******* ");
-			correctedQuery = "";
-			root.put("doYouWantToSearch", "");		
-		} else {
-			String[] all = realresult.split("\\s+");
-			for(int i = 0 ; i < all.length ; i++) { 
-				//System.out.println(all[i]);
-				correctedQuery += all[i] + " ";		
-//				System.out.println("DEBUGGG:" + correctedQuery);
-			}
-			correctedQuery = correctedQuery.substring(0, correctedQuery.length() - 1);
-			root.put("doYouWantToSearch", "Do you want to search: ");
-		}		
-		// TODO: 
-		// 1. check if each words in query exist in the keyword list
-		// 2. if exist, simply append to correctedQuery and continue
-		// 3. if not, find the most similar keyword and append it to correctedQuery
+//			queryAndStem.add(new ImmutablePair<String, String>(d_stemmer.getCurrent(), term));
+//		}
+//		int distance = Integer.MAX_VALUE;
+//		String realresult = ""; 
+//		Pair<String, Double> minResult = null;
+//		for(Pair<String, String> term : queryAndStem) { //here is APPLLL
+//			String stemmed = term.getLeft();
+//		    if(d_keywordSet.contains(stemmed)) {
+//		    	realresult += term.getRight() + " ";
+//		    } else {
+//		    	for(Pair<String, Double> pair : d_keywordsandidf) {
+//		    		String keyword = pair.getLeft();
+//		    		Double idf = pair.getRight();
+//		    		int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
+//		    		if (curdistance < distance) {
+//		    			distance = curdistance;
+//		    			minResult = pair;
+//		    		} else if (curdistance == distance){ //equal
+//		    			if(idf < minResult.getRight()) {
+//		    				distance = curdistance;
+//		    				minResult = pair;
+//		    			}
+//		    		}
+//		    	}   
+//		    	realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
+//		    }  
+//		}
+//		
+//		if(realresult.replaceAll("\\s+", "").equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
+//			correctedQuery = "";
+//			root.put("doYouWantToSearch", "");		
+//		} else {
+//			String[] all = realresult.split("\\s+");
+//			for(int i = 0 ; i < all.length ; i++) { 
+//				correctedQuery += all[i] + " ";		
+//			}
+//			correctedQuery = correctedQuery.substring(0, correctedQuery.length() - 1);
+//			root.put("doYouWantToSearch", "Do you want to search:");
+//		}		
+//		
+//		root.put("correctedQuery", correctedQuery);
 		
-		root.put("correctedQuery", correctedQuery);
+		root.put("doYouWantToSearch", "");	
+		root.put("correctedQuery", "");
+		//long endTime   = System.currentTimeMillis();
+		//long totalTime = endTime - startTime;
+		root.put("time", String.valueOf(1 / 1000.0));
+		
 		try {
 			d_searchResultTemplate.process(root, response.getWriter());
 		} catch (TemplateException e) {
