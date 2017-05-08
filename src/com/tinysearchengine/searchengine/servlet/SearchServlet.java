@@ -254,6 +254,14 @@ public class SearchServlet extends HttpServlet {
 //				d_keywordSet.add(parts[0]);
 			}
 			br.close();
+			
+			BufferedReader brbr = new BufferedReader(
+					new FileReader("pagerankinput/frequentwords.txt"));
+			String newline;
+			while ((newline = brbr.readLine()) != null) {
+				d_keywordSet.add(newline);
+			}
+			brbr.close();			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -698,6 +706,7 @@ public class SearchServlet extends HttpServlet {
                     }
                     d_stemmer.setCurrent(term);
                     d_stemmer.stem();
+  //                 System.out.println(d_stemmer.getCurrent());
                     queryAndStem.add(new ImmutablePair<String, String>(
                                     d_stemmer.getCurrent(), term)); //UNIVERSITY, UNIVERSITYY
                     												//APPL, APPLL
@@ -707,15 +716,19 @@ public class SearchServlet extends HttpServlet {
 //            int distance = Integer.MAX_VALUE;
             for (Pair<String, String> term : queryAndStem) { 
                     String stemmed = term.getLeft(); //UNIVERSITY
+                    String realword = term.getRight();
                     double minScore = Double.MAX_VALUE;
 
-                if(d_keywordSet.contains(stemmed)) { // UNIVERSITYY +  OF +  
-                    realresult += term.getRight() + " ";
+                if(d_keywordSet.contains(realword)) { // UNIVERSITYY +  OF +  
+                	System.out.println("No correction!!!:::" + realword + ":::Contained on keyword list");
+                    realresult += realword + " ";
                 } else {
-                    for(Pair<String, Double> pair : d_keywordsandidf) {
-                    		String keyword = pair.getLeft();
+                    for(Pair<String, Double> pair : d_keywordsandidf) { //these ensure that we do not have a null score
+                    		String keyword = pair.getLeft(); //what is inside the keyword list 
                     		Double idf = pair.getRight();
-                            int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
+                    		//***where i found the bug!!!***
+                    		//key word list vs real word
+                            int curdistance = wordEditDistance(realword, keyword); //APPLLL VS KEY
                             double score = 0.2 * idf + 0.8 * curdistance; //+ Math.abs(stemmed.length() - keyword.length());
                             if (score < minScore) {
                             	minResult = pair; 
@@ -732,8 +745,8 @@ public class SearchServlet extends HttpServlet {
 //                                  }
 //                          }
                     }
-                    if (minResult.getLeft().isEmpty())
-                            realresult += term.getRight() + " ";
+                    if (minResult.getLeft().isEmpty()) //seems like no keyword contained
+                            realresult += term.getRight() + " "; //here we put the original one
                     else
                             realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
                 }
