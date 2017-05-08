@@ -44,6 +44,7 @@ public class ThirdPartyForwardServlet extends HttpServlet {
 			
 			ObjectMapper mapper = new ObjectMapper();
 			String jsonContent = mapper.writeValueAsString(result);
+			System.out.println(result);
 			writer.write(jsonContent);
 			writer.close();
 		}
