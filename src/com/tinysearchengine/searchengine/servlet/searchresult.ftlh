@@ -5,6 +5,7 @@
 	<link rel="stylesheet" href="/css/common.css" />
 	<link rel="stylesheet" href="/css/searchresult.css" />
 	<script src="/js/thirdpartyrequest.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Tiny Search Engine</title>
 </head>
 <body class="container">

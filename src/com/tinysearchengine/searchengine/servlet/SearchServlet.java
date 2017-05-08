@@ -453,7 +453,8 @@ public class SearchServlet extends HttpServlet {
 		if (titleText.contains("404")
 				|| titleText.toLowerCase().contains("not found")
 				|| titleText.toLowerCase().contains("access denied")
-				|| titleText.toLowerCase().contains("too many requests")) {
+				|| titleText.toLowerCase().contains("too many requests")
+				|| titleText.toLowerCase().contains("redirect")) {
 			return null;
 		}
 
@@ -779,6 +780,8 @@ public class SearchServlet extends HttpServlet {
 
 		try {
 			response.setCharacterEncoding("UTF-8");
+			d_searchResultTemplate.setEncoding("UTF-8");
+			d_searchResultTemplate.setOutputEncoding("UTF-8");
 			d_searchResultTemplate.process(root, response.getWriter());
 		} catch (TemplateException e) {
 			throw new ServletException(e);
