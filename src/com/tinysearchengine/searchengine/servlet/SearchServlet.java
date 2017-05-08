@@ -246,11 +246,12 @@ public class SearchServlet extends HttpServlet {
 			String line;
 			while ((line = br.readLine()) != null) {
 				String[] parts = line.split("\t");
-				Pair<String, Double> pair = new ImmutablePair<String, Double>(
-						parts[0], Double.parseDouble(parts[1]));
-
-				d_keywordsandidf.add(pair);
-				d_keywordSet.add(parts[0]);
+//				Pair<String, Double> pair = new ImmutablePair<String, Double>(
+//						parts[0], Double.parseDouble(parts[1]));
+				d_keywordsandidf.add(new ImmutablePair<String, Double>(parts[0], Double.parseDouble(parts[1])));
+                d_keywordSet.add(parts[0]);
+//				d_keywordsandidf.add(pair);
+//				d_keywordSet.add(parts[0]);
 			}
 			br.close();
 		} catch (IOException e) {
@@ -615,69 +616,143 @@ public class SearchServlet extends HttpServlet {
                 (request.getParameter("enable-spellcheck") != null);
 
         if (shouldSpellCheck) {
-                // google-style spell check
-                String correctedQuery = new String();
-                String[] terms = queryTerm.split("\\s+"); // get each term in the
-                                                                                                        // query string
-                ArrayList<Pair<String, String>> queryAndStem =
-                        new ArrayList<Pair<String, String>>(); // query and stem hashset
-                for (String term : terms) { // traverse through whole terms
+//                // google-style spell check
+//                String correctedQuery = new String();
+//                String[] terms = queryTerm.split("\\s+"); // get each term in the
+//                                                                                                        // query string
+//                ArrayList<Pair<String, String>> queryAndStem =
+//                        new ArrayList<Pair<String, String>>(); // query and stem hashset
+//                for (String term : terms) { // traverse through whole terms
+//
+//                        if (StopWordList.stopwords.contains(term)) {
+//                                queryAndStem
+//                                                .add(new ImmutablePair<String, String>(term, term));
+//                                continue;
+//                        }
+//                        d_stemmer.setCurrent(term);
+//                        d_stemmer.stem();
+//                        queryAndStem.add(new ImmutablePair<String, String>(
+//                                        d_stemmer.getCurrent(), term));
+//                }
+//                String realresult = "";
+//                Pair<String, Double> minResult = new ImmutablePair<String, Double>("", Double.MAX_VALUE);
+//                int distance = Integer.MAX_VALUE;
+//                for (Pair<String, String> term : queryAndStem) { // here is APPLLL
+//                        String stemmed = term.getLeft();
+//                    if(d_keywordSet.contains(stemmed)) {
+//                        realresult += term.getRight() + " ";
+//                    } else {
+//                        for(Pair<String, Double> pair : d_keywordsandidf) {
+//                        		String keyword = pair.getLeft();
+//                        		Double idf = pair.getRight();
+//                                int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
+//                                if (curdistance < distance) {
+//                                        distance = curdistance;
+//                                        minResult = pair;
+//                               }
+//                              else if (curdistance == distance){ //equal
+//                                      if(idf < minResult.getRight()) {
+//                                              distance = curdistance;
+//                                              minResult = pair;
+//                                      }
+//                              }
+//                        }
+//                        if (minResult.getLeft().isEmpty())
+//                                realresult += term.getRight() + " ";
+//                        else
+//                                realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
+//                    }
+//                }
+//                if (realresult.replaceAll("\\s+", "")
+//                                .equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
+//                        correctedQuery = "";
+//                        root.put("doYouWantToSearch", "");
+//                } else {
+//                        String[] all = realresult.split("\\s+");
+//                        for (int i = 0; i < all.length; i++) {
+//                                correctedQuery += all[i] + " ";
+//                        }
+//                        correctedQuery =
+//                                correctedQuery.substring(0, correctedQuery.length() - 1);
+//                        root.put("doYouWantToSearch", "Do you want to search:");
+//                }
+//
+//                root.put("correctedQuery", correctedQuery);
+//                root.put("spellCheckChecked", "checked");
+            // google-style spell check
+            String correctedQuery = new String();
+            String[] terms = queryTerm.split("\\s+"); // get each term in the
+                                  //UNIVERSITYY
+            					  //OF
+            				      //APPLL
+            // query string
+            ArrayList<Pair<String, String>> queryAndStem =
+                    new ArrayList<Pair<String, String>>(); // query and stem hashset
+            for (String term : terms) { // traverse through whole terms
 
-                        if (StopWordList.stopwords.contains(term)) {
-                                queryAndStem
-                                                .add(new ImmutablePair<String, String>(term, term));
-                                continue;
-                        }
-                        d_stemmer.setCurrent(term);
-                        d_stemmer.stem();
-                        queryAndStem.add(new ImmutablePair<String, String>(
-                                        d_stemmer.getCurrent(), term));
-                }
-                String realresult = "";
-                Pair<String, Double> minResult = new ImmutablePair<String, Double>("", Double.MAX_VALUE);
-                int distance = Integer.MAX_VALUE;
-                for (Pair<String, String> term : queryAndStem) { // here is APPLLL
-                        String stemmed = term.getLeft();
-                    if(d_keywordSet.contains(stemmed)) {
-                        realresult += term.getRight() + " ";
-                    } else {
-                        for(Pair<String, Double> pair : d_keywordsandidf) {
-                        		String keyword = pair.getLeft();
-                        		Double idf = pair.getRight();
-                                int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
-                                if (curdistance < distance) {
-                                        distance = curdistance;
-                                        minResult = pair;
-                               }
-                              else if (curdistance == distance){ //equal
-                                      if(idf < minResult.getRight()) {
-                                              distance = curdistance;
-                                              minResult = pair;
-                                      }
-                              }
-                        }
-                        if (minResult.getLeft().isEmpty())
-                                realresult += term.getRight() + " ";
-                        else
-                                realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
+                    if (StopWordList.stopwords.contains(term)) {
+                            queryAndStem
+                                            .add(new ImmutablePair<String, String>(term, term));
+                            continue; //OF, OF
                     }
-                }
-                if (realresult.replaceAll("\\s+", "")
-                                .equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
-                        correctedQuery = "";
-                        root.put("doYouWantToSearch", "");
-                } else {
-                        String[] all = realresult.split("\\s+");
-                        for (int i = 0; i < all.length; i++) {
-                                correctedQuery += all[i] + " ";
-                        }
-                        correctedQuery =
-                                correctedQuery.substring(0, correctedQuery.length() - 1);
-                        root.put("doYouWantToSearch", "Do you want to search:");
-                }
+                    d_stemmer.setCurrent(term);
+                    d_stemmer.stem();
+                    queryAndStem.add(new ImmutablePair<String, String>(
+                                    d_stemmer.getCurrent(), term)); //UNIVERSITY, UNIVERSITYY
+                    												//APPL, APPLL
+            }
+            String realresult = "";
+            Pair<String, Double> minResult = new ImmutablePair<String, Double>("", Double.MAX_VALUE);
+//            int distance = Integer.MAX_VALUE;
+            for (Pair<String, String> term : queryAndStem) { 
+                    String stemmed = term.getLeft(); //UNIVERSITY
+                    double minScore = Double.MAX_VALUE;
 
-                root.put("correctedQuery", correctedQuery);
-                root.put("spellCheckChecked", "checked");
+                if(d_keywordSet.contains(stemmed)) { // UNIVERSITYY +  OF +  
+                    realresult += term.getRight() + " ";
+                } else {
+                    for(Pair<String, Double> pair : d_keywordsandidf) {
+                    		String keyword = pair.getLeft();
+                    		Double idf = pair.getRight();
+                            int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
+                            double score = 0.2 * idf + 0.8 * curdistance; //+ Math.abs(stemmed.length() - keyword.length());
+                            if (score < minScore) {
+                            	minResult = pair; 
+                            	minScore = score;
+                            }
+//                            if (curdistance < distance) {
+//                                    distance = curdistance;
+//                                    minResult = pair;
+//                           }
+//                          else if (curdistance == distance){ //equal
+//                                  if(idf < minResult.getRight()) {
+//                                          distance = curdistance;
+//                                          minResult = pair;
+//                                  }
+//                          }
+                    }
+                    if (minResult.getLeft().isEmpty())
+                            realresult += term.getRight() + " ";
+                    else
+                            realresult += minResult.getLeft() + " "; //queryAndStem.get(tempresult) + " ";
+                }
+            }
+            if (realresult.replaceAll("\\s+", "")
+                            .equalsIgnoreCase(queryTerm.replaceAll("\\s+", ""))) {
+                    correctedQuery = "";
+                    root.put("doYouWantToSearch", "");
+            } else {
+                    String[] all = realresult.split("\\s+");
+                    for (int i = 0; i < all.length; i++) {
+                            correctedQuery += all[i] + " ";
+                    }
+                    correctedQuery =
+                            correctedQuery.substring(0, correctedQuery.length() - 1);
+                    root.put("doYouWantToSearch", "Do you want to search:");
+            }
+
+            root.put("correctedQuery", correctedQuery);
+            root.put("spellCheckChecked", "checked");
         } else {
                 root.put("doYouWantToSearch", "");
                 root.put("correctedQuery", "");
