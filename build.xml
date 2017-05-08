@@ -225,9 +225,13 @@
 
 	<target name="jetty.dep" depends="servlet-war,copy-css,copy-js,copy-img">
 	</target>
-
+	  <typedef name="connector" classname="org.eclipse.jetty.ant.types.Connector"
+	           classpathref="jetty.plugin.classpath" loaderref="jetty.loader" />
 	<target name="jetty.run" depends="jetty.dep">
 		<jetty.run>
+		    <connectors>
+		    	<connector port="8090"/>
+		    </connectors>
 			<webApp war="servlet.war"
                     contextPath="/">
 				<lib dir="lib" includes="*.jar" />
