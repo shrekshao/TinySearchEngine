@@ -2,6 +2,7 @@ package com.tinysearchengine.searchengine.servlet;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -434,7 +435,6 @@ public class SearchServlet extends HttpServlet {
                 if (titleElmts.size() > 0) {
                         title.append(titleElmts.get(0).text());
                 }
-
                 return result.toString();
         }
 
@@ -458,6 +458,7 @@ public class SearchServlet extends HttpServlet {
                 r.setSummary(content);
 
                 String titleText = title.toString();
+                
                 if (titleText.length() > k_MAX_TITLE_LENGTH) {
                         titleText = titleText.substring(0, k_MAX_TITLE_LENGTH - 3) + "...";
                 }
@@ -592,13 +593,17 @@ public class SearchServlet extends HttpServlet {
 
                 for (UrlScorePair p : urlScorePairs) {
                         SearchResult r = makeSearchResultFrom(p, batchDocs);
-                        if (r != null) {
+                        if (r != null && !r.getTitle().isEmpty()) {
+                        	//System.out.println(r.getTitle());
                                 results.add(r);
                         }
                 }
 
                 root.put("searchResults", results);
-
+//                ArrayList<SearchResult> ss =  (ArrayList<SearchResult>)root.get("searchResults");
+//                for (SearchResult k : ss) {
+//                	System.out.println(k.getTitle());
+//                }
                 boolean shouldQueryAmazon =
                         (request.getParameter("enable-amazon") != null);
 
@@ -711,9 +716,11 @@ public class SearchServlet extends HttpServlet {
                 long endTime = System.currentTimeMillis();
                 long totalTime = endTime - startTime;
                 root.put("time", String.valueOf(totalTime / 1000.0));
-
                 try {
-                        d_searchResultTemplate.process(root, response.getWriter());
+                	System.out.println(d_searchResultTemplate.getEncoding());
+                	System.out.println(d_searchResultTemplate.getOutputEncoding());
+                	response.setCharacterEncoding("UTF-8");
+                    d_searchResultTemplate.process(root, response.getWriter());
                 } catch (TemplateException e) {
                         throw new ServletException(e);
                 }

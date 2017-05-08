@@ -1,12 +1,15 @@
 <!DOCTYPE html>
+
 <html>
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<link rel="stylesheet" href="/css/common.css" />
 	<link rel="stylesheet" href="/css/searchresult.css" />
 	<script src="/js/thirdpartyrequest.js"></script>
 	<title>Tiny Search Engine</title>
 </head>
+
 <body class="container">
 <div class="col-lg-10">
 	<div id="search-result-header" class="col-lg-12">
@@ -54,7 +57,7 @@
 	<div id="thirdparty-result-container" class="col-lg-offset-3 col-lg-6">		
 
 	</div>
-	
+
 	<div id="search-result-container" class="col-lg-offset-3 col-lg-6">
 		<#list searchResults as resultItem>
 			<div class="search-result-item" data-score="${resultItem.score}" data-pg-score="${resultItem.pgRankScore}" data-total-score="${resultItem.totalScore}">
@@ -68,11 +71,12 @@
 			</div>
 		</#list> 
 	</div>
+
 </div>	
 
 <div id="youtube-container" class="col-lg-2">
-
 </div>
+
 
 </body>
 </html>

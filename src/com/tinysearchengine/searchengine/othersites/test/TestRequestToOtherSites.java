@@ -39,7 +39,7 @@ public class TestRequestToOtherSites {
 	}
 	
 	static void TestYoutube() throws ClientProtocolException, IOException { 
-		ArrayList<YoutubeItemResult> result = RequestToOtherSites.getYoutubeResult("computer");
+		ArrayList<YoutubeItemResult> result = RequestToOtherSites.getYoutubeResult("apple");
 		
 		int c = 0;
 		for (YoutubeItemResult item : result) {

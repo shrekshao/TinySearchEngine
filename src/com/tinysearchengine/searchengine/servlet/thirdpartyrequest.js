@@ -112,6 +112,7 @@ window.onload = function() {
 		xhr.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				var itemInfos = JSON.parse(this.responseText);
+				console.log(itemInfos);
 				var resultContainer = document
 						.getElementById("youtube-container");
 
