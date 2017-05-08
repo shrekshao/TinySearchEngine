@@ -576,7 +576,8 @@ public class SearchServlet extends HttpServlet {
 			if (r != null && !r.getTitle().isEmpty()
 					&& !r.getTitle().contains("403")
 					&& !r.getTitle().contains("404")
-					&& !r.getTitle().contains("523")) {
+					&& !r.getTitle().contains("523")
+					&& !r.getTitle().contains("400")) {
 				results.add(r);
 			}
 		}
