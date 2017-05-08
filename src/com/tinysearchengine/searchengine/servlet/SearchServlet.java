@@ -246,7 +246,7 @@ public class SearchServlet extends HttpServlet {
                         String line;
                         while ((line = br.readLine()) != null) {
                                 String[] parts = line.split("\t");
-
+             
                                 d_keywordsandidf.add(new ImmutablePair<String, Double>(parts[0], Double.parseDouble(parts[1])));
                                 d_keywordSet.add(parts[0]);
                         }
@@ -717,8 +717,6 @@ public class SearchServlet extends HttpServlet {
                 long totalTime = endTime - startTime;
                 root.put("time", String.valueOf(totalTime / 1000.0));
                 try {
-                	System.out.println(d_searchResultTemplate.getEncoding());
-                	System.out.println(d_searchResultTemplate.getOutputEncoding());
                 	response.setCharacterEncoding("UTF-8");
                     d_searchResultTemplate.process(root, response.getWriter());
                 } catch (TemplateException e) {
