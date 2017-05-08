@@ -1,4 +1,4 @@
-package com.tinysearchengine.indexer.test;
+package com.tinysearchengine.indexer;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -8,27 +8,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.tinysearchengine.database.DdbConnector;
 
-public class GetS3Object {
+public class WriteWordUrlTfDdb {
 	private static String bucketName = "tinysearchengine-mapreduce"; 
 //	private static String key        = "10years.firstround.com";
 	
-	private static String s3folder = "inverted-index/output/";
+//	private static String s3folder = "wordtfurl/";
+	private static String s3folder = "wordtfurl-test/";
 	
-	private static String localfolder = "s3/"; 
+	private static String localfolder = "../s3/";
+	
+	
+	private static String curWord = "@Null";
+	private static HashMap <String, Double> curUrl2tf = new HashMap <String, Double>();
+	
+	private static DdbConnector ddb = new DdbConnector();
+	
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -47,19 +53,21 @@ public class GetS3Object {
 		
 		for (String filename : args)
 		{
+			curUrl2tf.clear();
+			
 			String key = s3folder + filename;
 			
 			
 	        try {
-	            System.out.println("Downloading: " + key);
+	            System.out.println("Reading: " + key);
 	            S3Object s3object = s3Client.getObject(new GetObjectRequest(
 	            		bucketName, key));
 //	            System.out.println("Content-Type: "  + 
 //	            		s3object.getObjectMetadata().getContentType());
 	            
 	            
-//	            displayTextInputStream(s3object.getObjectContent());
-	            writeFileInputStream(s3object.getObjectContent(), filename);
+//	            writeFileInputStream(s3object.getObjectContent(), filename);
+	            writeDdbInputStream(s3object.getObjectContent());
 	            
 	            s3object.close();
 	            
@@ -89,21 +97,6 @@ public class GetS3Object {
         
         System.out.println("Done");
     }
-
-    private static void displayTextInputStream(InputStream input)
-    throws IOException {
-    	// Read one text line at a time and display.
-        BufferedReader reader = new BufferedReader(new 
-        		InputStreamReader(input));
-        while (true) {
-            String line = reader.readLine();
-            if (line == null) break;
-
-            System.out.println("    " + line);
-        }
-        System.out.println();
-    }
-    
     
     private static void writeFileInputStream(InputStream reader, String filename) throws IOException
     {
@@ -118,5 +111,58 @@ public class GetS3Object {
 
     	writer.flush();
     	writer.close();
+    }
+    
+    
+    private static void writeDdbInputStream(InputStream input) throws IOException
+    {
+    	BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+    	String line = null;
+    	
+    	while((line = reader.readLine()) != null) {
+//    		System.out.println(line);
+    		try
+    		{
+    			String[] parts = line.split("\001");
+    			
+    			if (parts.length < 3)
+    			{
+    				continue;
+    			}
+    			
+    			String word = parts[0];
+    			
+    			if (word.equals("") || word.length() > 2000)
+    			{
+    				continue;
+    			}
+    			
+    			double tf = Double.parseDouble(parts[1]);
+				String url = parts[2];
+    			
+    			
+    			if (!word.equals(curWord))
+    			{
+    				// write item to db
+    				if (curUrl2tf.size() > )
+    				
+    				
+    				
+    				// record cur line
+    				curWord = word;
+    				curUrl2tf.clear();
+    			}
+    			
+    			
+				
+				curUrl2tf.put(url, tf);
+    			
+    		}catch(Exception e)
+    		{
+    			e.printStackTrace();
+    		}
+    		
+        }
+    	
     }
 }

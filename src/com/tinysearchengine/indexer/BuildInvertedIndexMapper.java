@@ -1,35 +1,35 @@
 package com.tinysearchengine.indexer;
 
 import java.io.BufferedReader;
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
 
+//import org.json.*;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSCredentialsProvider;
+//import com.amazonaws.auth.AWSCredentials;
+//import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+//import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.AmazonS3Client;
+//import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
-import com.tinysearchengine.database.DdbConnector;
-import com.tinysearchengine.indexer.database.DdbParsedDoc;
 
 //class BuildInvertedIndexMapperOutValue implements Writable {
 //    private String docid;	//url
@@ -134,18 +134,27 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 	static final String S3BUCKET_NAME = "tinysearchengine";
 	
 //	static final Text GLOBAL_TOTAL_COUNT_KEY = new Text("@totalCount@");
+	
+	
+	static final String INPUT_SEPARATOR = "\001";	// mapper input separator
 	static final String SEPARATOR = " ";
 	
 	
-	private DdbConnector d_ddbConnector = new DdbConnector();
 	
+//	private AWSCredentialsProvider s3CredentialProvider =
+//			DefaultAWSCredentialsProviderChain.getInstance();
+//	private AmazonS3 s3Client = 
+//			AmazonS3ClientBuilder.standard().withCredentials(s3CredentialProvider).build();
 	
-	private AWSCredentialsProvider s3CredentialProvider =
-			DefaultAWSCredentialsProviderChain.getInstance();
+//	private AWSCredentials credentials = EnvironmentVariableCredentialsProvider.getCredential();
+//	@SuppressWarnings("deprecation")
+//	private AmazonS3 s3Client = 
+//			new AmazonS3Client(new InstanceProfileCredentialsProvider(false));
+	@SuppressWarnings("deprecation")
 	private AmazonS3 s3Client = 
-			AmazonS3ClientBuilder.standard().withCredentials(s3CredentialProvider).build();
+			new AmazonS3Client(new DefaultAWSCredentialsProviderChain());
 	
-	
+//	private AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(InstanceProfileCredentialsProvider.getInstance()).build();
 	
     private String getStringFromInputStream(InputStream input)
     		throws IOException 
@@ -214,33 +223,81 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		// TODO: use S3link to get document as a string
 		
 		String line = value.toString();
-		String[] parts = line.split("\\s");
+		String[] parts = line.split(INPUT_SEPARATOR);
+		
+		
+		if (parts.length < 2)
+		{
+			System.out.println(line);
+			return;
+		}
 		
 		
 		
 		String url = parts[0]; 
-		String s3key = parts[1];
+//		String s3key = parts[1];
+		
+		JSONObject obj = new JSONObject(parts[1]);
+		String s3key = obj.getJSONObject("s3").getString("key");
+		
+//		System.out.println(s3key);
+		
 		String content = getS3FileContent(s3key);
 		if (content == null)
 		{
-			// exception, no file from s3 acquired
+			System.out.println(s3key + " content null");
 			return;
 		}
 		// -----------------------
 		
-		Document doc = Jsoup.parse(content);
+		Document doc;
+		try
+		{
+			doc = Jsoup.parse(content);
+		}
+		catch(IllegalArgumentException e)
+		{
+			System.out.println(s3key + " content empty string");
+			return;
+		}
+		
+		
+		try
+		{
+		
+		
+		// kick out explicit non-english page
+		Elements html = doc.select("html[lang]");
+		if (html != null)
+		{
+			String language = html.attr("lang");
+//			System.out.println(language);
+			if (language != "")
+			{
+				if (language != "en" && language != "en-US" && language != "en-GB")
+				{
+					return;
+				}
+			}
+			
+		}
 		
 //		// TODO: change to parse for all text in the content
 //    	Elements p = doc.select("p");
 //    	Elements title = doc.select("title");
 //    	
 //    	String text = title.text() +"\n" + p.text();
+		
+		
+		// parse english words only
+		
 		String text = doc.text();
     	
         String[] words = (text).split("[^a-zA-Z0-9']+");
         
         HashMap<String, Integer> keyword2count = new HashMap<String, Integer>();
-        int totalCount = 0;		// total num of words abstracted from this doc
+        int totalCount = words.length;		// total num of words abstracted from this doc
+        
         
         
         SnowballStemmer stemmer = new englishStemmer();
@@ -260,7 +317,6 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
         	stemmer.stem();
         	String stemmed = stemmer.getCurrent();
         	
-        	totalCount++;
         	
         	if (keyword2count.containsKey(stemmed))
         	{
@@ -277,27 +333,38 @@ public class BuildInvertedIndexMapper extends Mapper<LongWritable, Text, Text, T
 		
         
         // for this docuemnt (key)
-        HashMap<String, Float> keyword2tf = new HashMap<String, Float>();
+//        HashMap<String, Double> keyword2tf = new HashMap<String, Double>();
+        
         
         for(Map.Entry<String, Integer> entry : keyword2count.entrySet())
         {
         	String w = entry.getKey();
         	int count = entry.getValue();
         	
-        	float tf = (float) count / totalCount;
-        	keyword2tf.put(w, tf);
+        	double tf = (double) count / totalCount;
+//        	keyword2tf.put(w, tf);
         	
         	context.write(
         			new Text(w), 
         			new Text(
         					url
         					+ SEPARATOR
-        					+ Float.toString(tf)
+        					+ Double.toString(tf)
         					)
         			);
         	
         	
         }
+        
+		} catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+        
+//        // Test output
+//        System.out.println(s3key);
+//        System.out.println(totalCount);
+//        System.out.println(keyword2count.size());
         
         
 //        // TODO: write dynamoDB table ParsedDoc with dynamodbmapper

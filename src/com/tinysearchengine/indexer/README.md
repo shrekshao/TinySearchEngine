@@ -1,39 +1,29 @@
 # Indexer DynamoDB Design
 
 * Tables
-    + ParsedDoc
+    + ParsedDoc Table ( for result display on search engine result page )
         - docid (url)
-        - doc pointer to S3 (manual node hash) / url (if stored in db)
-        - total word count
-        - page rank score
-        - Map < wordid, tf >
-    + KeyWord
-        - wordid ( still needed, cuz string for primiary key cost more space) 
-        - word (text, probably after Porterstemmer)
-        - global count
-        - idf (log(N/n)) log (Total number of documents / documents containing this word) 
-        - Set ( docid )
+        - title:string
+        - abstract:string
 
 
-
-
-
-------------
-
-> (Since it's NoSQL DB so probably don't need this)        
->    + KeyWord Document relation
->        - wordid
->        - docid
->        - count
->        - tf (freq(i,j) = raw occurance of w_i in d_j)
+* Keyword Table redesign (if Keyword Table limited by entry size 400kb)
+    + WordDocTfTuple
+        - columns
+            - `id:int` (ddb default primary key)
+            - word:string (After stemmed)
+            - docid:string (url)
+            - tf:double
+        - global secondary index
+            - word (inverted index)
+            - docid (forward index) (no usage for basic requirement)
+    + Idf
+        - columns
+            - `word:string` (After stemmed)
+            - idf:double
 
 
 --------------
-
-# Got it wrong..
-
-idf = log (Total number of documents / documents containing this word) 
-
 
 # Hadoop batch task for calculating indexer (static)
 
@@ -44,7 +34,6 @@ idf = log (Total number of documents / documents containing this word)
         - [x] Select elements (e.g. < p >)
         - [x] Split to keywords
         - [x] porterstemmer
-        - [ ] store to dynamoDB table ParsedDoc (or, emit with a special key to label as document tuple)
     - emit: < `wordid`, docid, count >
     - emit: < `@totalCount@`, Null, localTotalCount >  (For calculate global word counts used by idf)  (This is not needed..., instead, totalCount of document is needed (can directly get from how many tuples are there in the dynamodb table documenttable) )
 * reducer
@@ -55,30 +44,10 @@ idf = log (Total number of documents / documents containing this word)
             - store without doc hashset
         - else
             - [x] sum up total count of document this wordid is in
-            - [ ] store to dynamoDB table Keyword
+            - [x] emit to hdfs (then store in S3)
 
 
 Another round of simple map reduce to fill in idf for each keyword (if found better for performance)
-
-
-## Alternative design (to make sure all write to db happens after output from reducer)
-
-* pass 1 (write forward index)
-    * input DdbDocument from dynamoDB, crawled doc from S3
-    * mapper emit < word, docid(url), count( freq(word, this doc)  ) > 
-    * reducer emit as is
-* pass 2 (write forward index)
-    * input (intermediate text files from pass 1 output)
-        * < word, `docid`, count > (group by docid)
-    * mapper emit as is (docid is aggregation key)
-    * reducer emit as is ( batch write output to dynamoDB table: Parsed Doc (forward index)  )
-* pass3 (write inverted index)
-    * input (intermediate text files from pass 1 output)
-        * < `word`, docid, count > (group by docid)
-    * mapper emit as is
-    * reducer emit as is
-
-(Such many emitting as is, is it really efficient or necessary?)
 
 
 ----------
@@ -90,12 +59,12 @@ Incoming query
 {k_x0, k_x1, ..., k_xn}
 for each keyword k_xi
 tf = normalized freq = a + (1-a) * freq(i,j)/max_i(freq(l,j))  (a=0.5)
-idf = log(N/n)
+idf ( by look up the ddb table )
 
 
 * query DB:
     - Query Q = {k_x0, k_x1, ..., k_xn}
-        - HashMap < keyword, idf>
+        - HashMap < keyword, idf >
     - Related Doc Set D = {}
     - for each k in Q
         - get idf(k)
@@ -114,3 +83,27 @@ idf = log(N/n)
 
 
 * score for each doc: dot( v_q, v_d ) * PageRankScore
+
+--------
+
+EMR custom jar arguments
+
+com.tinysearchengine.indexer.BuildInvertedIndex
+s3n://tinysearchengine-mapreduce/document-table
+s3n://tinysearchengine-mapreduce/inverted-index/output
+
+
+Testing purpose
+
+com.tinysearchengine.indexer.BuildInvertedIndex
+s3n://tinysearchengine-mapreduce/inverted-index-test-input
+s3n://tinysearchengine-mapreduce/inverted-index-test-output/output-a
+
+
+com.tinysearchengine.indexer.ParseDocMain
+s3n://tinysearchengine-mapreduce/document-table
+s3n://tinysearchengine-mapreduce/parsed-doc/output
+
+com.tinysearchengine.indexer.ParseDocMain
+s3n://tinysearchengine-mapreduce/inverted-index-test-input
+s3n://tinysearchengine-mapreduce/parsed-doc-test-output/output-a

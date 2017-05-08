@@ -1,0 +1,1717 @@
+Status: Running (Executing on YARN cluster with App id application_1493779389658_0007)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED  
+----------------------------------------------------------------------------------------------
+Map 1 .......... container     SUCCEEDED     60         60        0        0       0       0  
+Reducer 2        container        FAILED     47          0        0       47       5       0  
+----------------------------------------------------------------------------------------------
+VERTICES: 01/02  [==============>>------------] 56%   ELAPSED TIME: 135.59 s   
+----------------------------------------------------------------------------------------------
+Status: Failed
+Vertex failed, vertexName=Reducer 2, vertexId=vertex_1493779389658_0007_1_01, diagnostics=[Task failed, taskId=task_1493779389658_0007_1_01_000019, diagnostics=[TaskAttempt 0 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0007_1_01_000019_0:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 8OJIOIOFTLVPD61FFHD7G5AJMRVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 8OJIOIOFTLVPD61FFHD7G5AJMRVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 8OJIOIOFTLVPD61FFHD7G5AJMRVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 1 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0007_1_01_000019_1:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 2GCKSBJ2CGRTGSRA2S3F8A915FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 2GCKSBJ2CGRTGSRA2S3F8A915FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 2GCKSBJ2CGRTGSRA2S3F8A915FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 2 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0007_1_01_000019_2:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 4CHLI3DSAGAFNKAK3UATGEDUHBVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 4CHLI3DSAGAFNKAK3UATGEDUHBVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 4CHLI3DSAGAFNKAK3UATGEDUHBVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 3 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0007_1_01_000019_3:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: VH6HT82VQLT6HQACDIMFS8DQP7VV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: VH6HT82VQLT6HQACDIMFS8DQP7VV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: VH6HT82VQLT6HQACDIMFS8DQP7VV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+]], Vertex did not succeed due to OWN_TASK_FAILURE, failedTasks:1 killedTasks:46, Vertex vertex_1493779389658_0007_1_01 [Reducer 2] killed/failed due to:OWN_TASK_FAILURE]
+DAG did not succeed due to VERTEX_FAILURE. failedVertices:1 killedVertices:0
+FAILED: Execution Error, return code 2 from org.apache.hadoop.hive.ql.exec.tez.TezTask. Vertex failed, vertexName=Reducer 2, vertexId=vertex_1493779389658_0007_1_01, diagnostics=[Task failed, taskId=task_1493779389658_0007_1_01_000019, diagnostics=[TaskAttempt 0 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0007_1_01_000019_0:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 8OJIOIOFTLVPD61FFHD7G5AJMRVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 8OJIOIOFTLVPD61FFHD7G5AJMRVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 8OJIOIOFTLVPD61FFHD7G5AJMRVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 1 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0007_1_01_000019_1:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 2GCKSBJ2CGRTGSRA2S3F8A915FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 2GCKSBJ2CGRTGSRA2S3F8A915FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 2GCKSBJ2CGRTGSRA2S3F8A915FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 2 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0007_1_01_000019_2:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 4CHLI3DSAGAFNKAK3UATGEDUHBVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 4CHLI3DSAGAFNKAK3UATGEDUHBVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 4CHLI3DSAGAFNKAK3UATGEDUHBVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 3 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0007_1_01_000019_3:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"00000000000000e","_col1":5.796387324322044},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: VH6HT82VQLT6HQACDIMFS8DQP7VV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: VH6HT82VQLT6HQACDIMFS8DQP7VV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: An AttributeValue may not contain an empty string (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: VH6HT82VQLT6HQACDIMFS8DQP7VV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+]], Vertex did not succeed due to OWN_TASK_FAILURE, failedTasks:1 killedTasks:46, Vertex vertex_1493779389658_0007_1_01 [Reducer 2] killed/failed due to:OWN_TASK_FAILURE]DAG did not succeed due to VERTEX_FAILURE. failedVertices:1 killedVertices:0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Status: Running (Executing on YARN cluster with App id application_1493779389658_0008)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED  
+----------------------------------------------------------------------------------------------
+Map 1 .......... container     SUCCEEDED     60         60        0        0       0       0  
+Reducer 2        container        FAILED     47          0        0       47       4       0  
+----------------------------------------------------------------------------------------------
+VERTICES: 01/02  [==============>>------------] 56%   ELAPSED TIME: 137.60 s   
+----------------------------------------------------------------------------------------------
+Status: Failed
+Vertex failed, vertexName=Reducer 2, vertexId=vertex_1493779389658_0008_2_01, diagnostics=[Task failed, taskId=task_1493779389658_0008_2_01_000019, diagnostics=[TaskAttempt 0 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0008_2_01_000019_0:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"0000000000000403","_col1":6.097417319986025},"value":null}
+
+
+
+
+,"url":"http://www.theverge.com/science","tf":8.741258741258741E-4}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"teach","idf":1.9037362904447441,"url":"http://www.theverge.com/science","tf":8.741258741258741E-4}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"teach","idf":1.9037362904447441,"url":"http://www.theverge.com/science","tf":8.741258741258741E-4}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: 1AH1CBBJI6NKAEQE26V5ISPS8RVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:120)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: 1AH1CBBJI6NKAEQE26V5ISPS8RVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 29 more
+], TaskAttempt 1 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0011_1_00_000005_1:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"te","idf":2.1468577583742254,"url":"http://www.nom-famille.com/nom-aubert.html","tf":7.047216349541931E-4}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"te","idf":2.1468577583742254,"url":"http://www.nom-famille.com/nom-aubert.html","tf":7.047216349541931E-4}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"te","idf":2.1468577583742254,"url":"http://www.nom-famille.com/nom-aubert.html","tf":7.047216349541931E-4}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: FI48FILR7C7HURC0K4ECIEO6ABVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:120)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: FI48FILR7C7HURC0K4ECIEO6ABVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 29 more
+], TaskAttempt 2 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0011_1_00_000005_2:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: 51J8M5EG39EFR2H5IEL5GQ2L7NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:120)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: 51J8M5EG39EFR2H5IEL5GQ2L7NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 29 more
+], TaskAttempt 3 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0011_1_00_000005_3:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for the table was exceeded. Consider increasing your provisioning level with the UpdateTable API. (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: HG36O49TPB0E35F1TA9ECOJAQNVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:120)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for the table was exceeded. Consider increasing your provisioning level with the UpdateTable API. (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: HG36O49TPB0E35F1TA9ECOJAQNVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 29 more
+]], Vertex did not succeed due to OWN_TASK_FAILURE, failedTasks:1 killedTasks:59, Vertex vertex_1493779389658_0011_1_00 [Map 1] killed/failed due to:OWN_TASK_FAILURE]
+DAG did not succeed due to VERTEX_FAILURE. failedVertices:1 killedVertices:0
+FAILED: Execution Error, return code 2 from org.apache.hadoop.hive.ql.exec.tez.TezTask. Vertex failed, vertexName=Map 1, vertexId=vertex_1493779389658_0011_1_00, diagnostics=[Task failed, taskId=task_1493779389658_0011_1_00_000005, diagnostics=[TaskAttempt 0 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0011_1_00_000005_0:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"teach","idf":1.9037362904447441,"url":"http://www.theverge.com/science","tf":8.741258741258741E-4}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"teach","idf":1.9037362904447441,"url":"http://www.theverge.com/science","tf":8.741258741258741E-4}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"teach","idf":1.9037362904447441,"url":"http://www.theverge.com/science","tf":8.741258741258741E-4}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: 1AH1CBBJI6NKAEQE26V5ISPS8RVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:120)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: 1AH1CBBJI6NKAEQE26V5ISPS8RVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 29 more
+], TaskAttempt 1 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0011_1_00_000005_1:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"te","idf":2.1468577583742254,"url":"http://www.nom-famille.com/nom-aubert.html","tf":7.047216349541931E-4}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"te","idf":2.1468577583742254,"url":"http://www.nom-famille.com/nom-aubert.html","tf":7.047216349541931E-4}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"te","idf":2.1468577583742254,"url":"http://www.nom-famille.com/nom-aubert.html","tf":7.047216349541931E-4}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: FI48FILR7C7HURC0K4ECIEO6ABVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:120)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: FI48FILR7C7HURC0K4ECIEO6ABVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 29 more
+], TaskAttempt 2 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0011_1_00_000005_2:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: 51J8M5EG39EFR2H5IEL5GQ2L7NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:120)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for one or more global secondary indexes of the table was exceeded. Consider increasing your provisioning level for the under-provisioned global secondary indexes with the UpdateTable API (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: 51J8M5EG39EFR2H5IEL5GQ2L7NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 29 more
+], TaskAttempt 3 failed, info=[Error: Error while running task ( failure ) : attempt_1493779389658_0011_1_00_000005_3:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"syria","idf":2.334363879686411,"url":"http://www.bloomberg.com/live?utm_source=bloomberg-menu&utm_medium=english","tf":0.0010548523206751054}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for the table was exceeded. Consider increasing your provisioning level with the UpdateTable API. (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: HG36O49TPB0E35F1TA9ECOJAQNVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:120)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException: The level of configured provisioned throughput for the table was exceeded. Consider increasing your provisioning level with the UpdateTable API. (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ProvisionedThroughputExceededException; Request ID: HG36O49TPB0E35F1TA9ECOJAQNVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 29 more
+]], Vertex did not succeed due to OWN_TASK_FAILURE, failedTasks:1 killedTasks:59, Vertex vertex_1493779389658_0011_1_00 [Map 1] killed/failed due to:OWN_TASK_FAILURE]DAG did not succeed due to VERTEX_FAILURE. failedVertices:1 killedVertices:0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Status: Running (Executing on YARN cluster with App id application_1493868039366_0001)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED  
+----------------------------------------------------------------------------------------------
+Map 1            container        FAILED      3          0        0        3       6       0  
+----------------------------------------------------------------------------------------------
+VERTICES: 00/01  [>>--------------------------] 0%    ELAPSED TIME: 1118.38 s  
+----------------------------------------------------------------------------------------------
+Status: Failed
+Vertex failed, vertexName=Map 1, vertexId=vertex_1493868039366_0001_4_00, diagnostics=[Task failed, taskId=task_1493868039366_0001_4_00_000001, diagnostics=[TaskAttempt 0 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0001_4_00_000001_0:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qbk4mftjcfz5fyoe1wr8mp","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qbk4mftjcfz5fyoe1wr8mp","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qbk4mftjcfz5fyoe1wr8mp","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: K5HKT1M1KHOFM09EHL7GCIOKLVVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.FilterOperator.process(FilterOperator.java:126)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: K5HKT1M1KHOFM09EHL7GCIOKLVVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 31 more
+], TaskAttempt 1 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0001_4_00_000001_1:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qbbvqzl4oyjyc0reu0hlgt3yq0shscj8ae3pe0","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qbbvqzl4oyjyc0reu0hlgt3yq0shscj8ae3pe0","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qbbvqzl4oyjyc0reu0hlgt3yq0shscj8ae3pe0","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 3LN5KQHNNUQ9D4VKGV7S8N8ACRVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.FilterOperator.process(FilterOperator.java:126)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: 3LN5KQHNNUQ9D4VKGV7S8N8ACRVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 31 more
+], TaskAttempt 2 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0001_4_00_000001_2:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qazzqwbuge89qkrdebscjverfrb","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qazzqwbuge89qkrdebscjverfrb","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qazzqwbuge89qkrdebscjverfrb","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: VRMQM7NKIQC5OIU5LASSJ6II2JVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.FilterOperator.process(FilterOperator.java:126)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: VRMQM7NKIQC5OIU5LASSJ6II2JVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 31 more
+], TaskAttempt 3 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0001_4_00_000001_3:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qauo7upiifv90aghrapcjwmjxtj1ifmcgl","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qauo7upiifv90aghrapcjwmjxtj1ifmcgl","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:95)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.pushRecord(MapRecordSource.java:70)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordProcessor.run(MapRecordProcessor.java:383)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row {"word":"qauo7upiifv90aghrapcjwmjxtj1ifmcgl","idf":6.097417319986025}
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:499)
+	at org.apache.hadoop.hive.ql.exec.tez.MapRecordSource.processRow(MapRecordSource.java:86)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: M0I7BM44OOQCB0QV55HUC65D8VVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.SelectOperator.process(SelectOperator.java:95)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.FilterOperator.process(FilterOperator.java:126)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.TableScanOperator.process(TableScanOperator.java:130)
+	at org.apache.hadoop.hive.ql.exec.MapOperator$MapOpCtx.forward(MapOperator.java:149)
+	at org.apache.hadoop.hive.ql.exec.MapOperator.process(MapOperator.java:489)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: M0I7BM44OOQCB0QV55HUC65D8VVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 31 more
+]], Vertex did not succeed due to OWN_TASK_FAILURE, failedTasks:1 killedTasks:2, Verte
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Status: Running (Executing on YARN cluster with App id application_1493868039366_0006)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED  
+----------------------------------------------------------------------------------------------
+Map 1 .......... container     SUCCEEDED     26         26        0        0       0       0  
+Reducer 2        container        FAILED     47          0        0       47       4       0  
+----------------------------------------------------------------------------------------------
+VERTICES: 01/02  [=========>>-----------------] 35%   ELAPSED TIME: 346.86 s   
+----------------------------------------------------------------------------------------------
+Status: Failed
+Vertex failed, vertexName=Reducer 2, vertexId=vertex_1493868039366_0006_1_01, diagnostics=[Task failed, taskId=task_1493868039366_0006_1_01_000013, diagnostics=[TaskAttempt 0 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0006_1_01_000013_0:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: SMVLMFAQAT62OC4LV96L31NRDVVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: SMVLMFAQAT62OC4LV96L31NRDVVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: SMVLMFAQAT62OC4LV96L31NRDVVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 1 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0006_1_01_000013_1:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: JUOFECK64J5A7UUBKEQ1IDH10NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: JUOFECK64J5A7UUBKEQ1IDH10NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: JUOFECK64J5A7UUBKEQ1IDH10NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 2 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0006_1_01_000013_2:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"1197772589","_col1":4.699477311313988},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"1197772589","_col1":4.699477311313988},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"1197772589","_col1":4.699477311313988},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: F4J8VOMCAJEBSLLMJ46JMHEU8VVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: F4J8VOMCAJEBSLLMJ46JMHEU8VVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: F4J8VOMCAJEBSLLMJ46JMHEU8VVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 3 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0006_1_01_000013_3:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"11978571669969891796072783721689098736458938142546425857555362864628009582789845319680000000000000001","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"11978571669969891796072783721689098736458938142546425857555362864628009582789845319680000000000000001","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"11978571669969891796072783721689098736458938142546425857555362864628009582789845319680000000000000001","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: V87CGJ8TVH54I4JNM75DFJ1I7FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: V87CGJ8TVH54I4JNM75DFJ1I7FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: V87CGJ8TVH54I4JNM75DFJ1I7FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+]], Vertex did not succeed due to OWN_TASK_FAILURE, failedTasks:1 killedTasks:46, Vertex vertex_1493868039366_0006_1_01 [Reducer 2] killed/failed due to:OWN_TASK_FAILURE]
+DAG did not succeed due to VERTEX_FAILURE. failedVertices:1 killedVertices:0
+FAILED: Execution Error, return code 2 from org.apache.hadoop.hive.ql.exec.tez.TezTask. Vertex failed, vertexName=Reducer 2, vertexId=vertex_1493868039366_0006_1_01, diagnostics=[Task failed, taskId=task_1493868039366_0006_1_01_000013, diagnostics=[TaskAttempt 0 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0006_1_01_000013_0:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: SMVLMFAQAT62OC4LV96L31NRDVVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: SMVLMFAQAT62OC4LV96L31NRDVVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: SMVLMFAQAT62OC4LV96L31NRDVVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 1 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0006_1_01_000013_1:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"119java","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: JUOFECK64J5A7UUBKEQ1IDH10NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: JUOFECK64J5A7UUBKEQ1IDH10NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: JUOFECK64J5A7UUBKEQ1IDH10NVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 2 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0006_1_01_000013_2:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"1197772589","_col1":4.699477311313988},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"1197772589","_col1":4.699477311313988},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"1197772589","_col1":4.699477311313988},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: F4J8VOMCAJEBSLLMJ46JMHEU8VVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: F4J8VOMCAJEBSLLMJ46JMHEU8VVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: F4J8VOMCAJEBSLLMJ46JMHEU8VVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
+], TaskAttempt 3 failed, info=[Error: Error while running task ( failure ) : attempt_1493868039366_0006_1_01_000013_3:java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"11978571669969891796072783721689098736458938142546425857555362864628009582789845319680000000000000001","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:211)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.run(TezProcessor.java:168)
+	at org.apache.tez.runtime.LogicalIOProcessorRuntimeTask.run(LogicalIOProcessorRuntimeTask.java:370)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:73)
+	at org.apache.tez.runtime.task.TaskRunner2Callable$1.run(TaskRunner2Callable.java:61)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:61)
+	at org.apache.tez.runtime.task.TaskRunner2Callable.callInternal(TaskRunner2Callable.java:37)
+	at org.apache.tez.common.CallableWithNdc.call(CallableWithNdc.java:36)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"11978571669969891796072783721689098736458938142546425857555362864628009582789845319680000000000000001","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:289)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordProcessor.run(ReduceRecordProcessor.java:279)
+	at org.apache.hadoop.hive.ql.exec.tez.TezProcessor.initializeAndRunProcessor(TezProcessor.java:185)
+	... 14 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row (tag=0) {"key":{"_col0":"11978571669969891796072783721689098736458938142546425857555362864628009582789845319680000000000000001","_col1":6.097417319986025},"value":null}
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:357)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource.pushRecord(ReduceRecordSource.java:279)
+	... 16 more
+Caused by: org.apache.hadoop.hive.ql.metadata.HiveException: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: V87CGJ8TVH54I4JNM75DFJ1I7FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:773)
+	at org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource$GroupIterator.next(ReduceRecordSource.java:348)
+	... 17 more
+Caused by: java.lang.RuntimeException: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: V87CGJ8TVH54I4JNM75DFJ1I7FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.handleException(DynamoDBFibonacciRetryer.java:108)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:83)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.writeBatch(DynamoDBClient.java:237)
+	at org.apache.hadoop.dynamodb.DynamoDBClient.putBatch(DynamoDBClient.java:202)
+	at org.apache.hadoop.dynamodb.write.AbstractDynamoDBRecordWriter.write(AbstractDynamoDBRecordWriter.java:108)
+	at org.apache.hadoop.hive.dynamodb.write.HiveDynamoDBRecordWriter.write(HiveDynamoDBRecordWriter.java:42)
+	at org.apache.hadoop.hive.ql.exec.FileSinkOperator.process(FileSinkOperator.java:751)
+	at org.apache.hadoop.hive.ql.exec.Operator.forward(Operator.java:879)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.forward(GroupByOperator.java:1023)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processAggr(GroupByOperator.java:828)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.processKey(GroupByOperator.java:702)
+	at org.apache.hadoop.hive.ql.exec.GroupByOperator.process(GroupByOperator.java:768)
+	... 18 more
+Caused by: com.amazonaws.AmazonServiceException: One or more parameter values were invalid: Size of hashkey has exceeded the maximum size limit of2048 bytes (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: ValidationException; Request ID: V87CGJ8TVH54I4JNM75DFJ1I7FVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1389)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:902)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:607)
+	at com.amazonaws.http.AmazonHttpClient.doExecute(AmazonHttpClient.java:376)
+	at com.amazonaws.http.AmazonHttpClient.executeWithTimer(AmazonHttpClient.java:338)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:287)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.doInvoke(AmazonDynamoDBClient.java:2000)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:1970)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.batchWriteItem(AmazonDynamoDBClient.java:779)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:244)
+	at org.apache.hadoop.dynamodb.DynamoDBClient$4.call(DynamoDBClient.java:238)
+	at org.apache.hadoop.dynamodb.DynamoDBFibonacciRetryer.runWithRetry(DynamoDBFibonacciRetryer.java:80)
+	... 28 more
