@@ -242,11 +242,12 @@ public class SearchServlet extends HttpServlet {
                         getClass().getResourceAsStream("searchresult.ftlh");
                 try {
                         BufferedReader br = new BufferedReader(
-                                        new FileReader("pagerankinput/xueyinnewword.txt")); // boost the speed
+                                        new FileReader("pagerankinput/xueyinnewword11.txt")); // boost the speed
                         String line;
                         while ((line = br.readLine()) != null) {
                                 String[] parts = line.split("\t");
-             
+             //university 1
+             //apple 1
                                 d_keywordsandidf.add(new ImmutablePair<String, Double>(parts[0], Double.parseDouble(parts[1])));
                                 d_keywordSet.add(parts[0]);
                         }
@@ -640,7 +641,10 @@ public class SearchServlet extends HttpServlet {
                         // google-style spell check
                         String correctedQuery = new String();
                         String[] terms = queryTerm.split("\\s+"); // get each term in the
-                                                                                                                // query string
+                                              //UNIVERSITYY
+                        					  //OF
+                        				      //APPLL
+                        // query string
                         ArrayList<Pair<String, String>> queryAndStem =
                                 new ArrayList<Pair<String, String>>(); // query and stem hashset
                         for (String term : terms) { // traverse through whole terms
@@ -648,21 +652,22 @@ public class SearchServlet extends HttpServlet {
                                 if (StopWordList.stopwords.contains(term)) {
                                         queryAndStem
                                                         .add(new ImmutablePair<String, String>(term, term));
-                                        continue;
+                                        continue; //OF, OF
                                 }
                                 d_stemmer.setCurrent(term);
                                 d_stemmer.stem();
                                 queryAndStem.add(new ImmutablePair<String, String>(
-                                                d_stemmer.getCurrent(), term));
+                                                d_stemmer.getCurrent(), term)); //UNIVERSITY, UNIVERSITYY
+                                												//APPL, APPLL
                         }
                         String realresult = "";
                         Pair<String, Double> minResult = new ImmutablePair<String, Double>("", Double.MAX_VALUE);
 //                        int distance = Integer.MAX_VALUE;
-                        for (Pair<String, String> term : queryAndStem) { // here is APPLLL
-                                String stemmed = term.getLeft();
+                        for (Pair<String, String> term : queryAndStem) { 
+                                String stemmed = term.getLeft(); //UNIVERSITY
                                 double minScore = Double.MAX_VALUE;
 
-                            if(d_keywordSet.contains(stemmed)) {
+                            if(d_keywordSet.contains(stemmed)) { // UNIVERSITYY +  OF +  
                                 realresult += term.getRight() + " ";
                             } else {
                                 for(Pair<String, Double> pair : d_keywordsandidf) {
@@ -671,7 +676,7 @@ public class SearchServlet extends HttpServlet {
                                         int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
                                         double score = 0.2 * idf + 0.8 * curdistance; //+ Math.abs(stemmed.length() - keyword.length());
                                         if (score < minScore) {
-                                        	minResult = pair;
+                                        	minResult = pair; 
                                         	minScore = score;
                                         }
 //                                        if (curdistance < distance) {
