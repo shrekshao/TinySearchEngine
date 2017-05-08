@@ -258,7 +258,7 @@ public class SearchServlet extends HttpServlet {
 			BufferedReader brbr = new BufferedReader(
 					new FileReader("pagerankinput/frequentwords.txt"));
 			String newline;
-			while ((newline = brbr.readLine()) != null) {
+			while ((newline = brbr.readLine()) != null) { //bug here!!!
 				d_keywordSet.add(newline);
 			}
 			brbr.close();			
@@ -719,7 +719,7 @@ public class SearchServlet extends HttpServlet {
                     String realword = term.getRight();
                     double minScore = Double.MAX_VALUE;
 
-                if(d_keywordSet.contains(realword)) { // UNIVERSITYY +  OF +  
+                if(d_keywordSet.contains(realword.toLowerCase())) { // UNIVERSITYY +  OF +  
                 	System.out.println("No correction!!!:::" + realword + ":::Contained on keyword list");
                     realresult += realword + " ";
                 } else {
@@ -728,7 +728,7 @@ public class SearchServlet extends HttpServlet {
                     		Double idf = pair.getRight();
                     		//***where i found the bug!!!***
                     		//key word list vs real word
-                            int curdistance = wordEditDistance(realword, keyword); //APPLLL VS KEY
+                            int curdistance = wordEditDistance(realword.toLowerCase(), keyword); //APPLLL VS KEY
                             double score = 0.2 * idf + 0.8 * curdistance; //+ Math.abs(stemmed.length() - keyword.length());
                             if (score < minScore) {
                             	minResult = pair; 
