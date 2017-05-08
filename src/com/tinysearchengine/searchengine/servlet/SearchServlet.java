@@ -669,7 +669,7 @@ public class SearchServlet extends HttpServlet {
                                 		String keyword = pair.getLeft();
                                 		Double idf = pair.getRight();
                                         int curdistance = wordEditDistance(stemmed, keyword); //APPLLL VS KEY
-                                        double score = idf + curdistance;
+                                        double score = 0.2 * idf + 0.8 * curdistance; //+ Math.abs(stemmed.length() - keyword.length());
                                         if (score < minScore) {
                                         	minResult = pair;
                                         	minScore = score;
